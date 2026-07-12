@@ -41,7 +41,7 @@ import os
 #------------------------------------------------------------------------------------------
 # Set to true so we can import EpiCollect data from TODAY!
 #------------------------------------------------------------------------------------------
-KR_TESTING = True
+KR_TESTING = False
 
 #------------------------------------------------------------------------------------------
 # From which EpiCollect (rain or maint) Project will we process records
