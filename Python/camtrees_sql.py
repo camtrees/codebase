@@ -116,8 +116,8 @@ def sql_camtrees_add_care_action(epicollect_record_type, care_action, tree_numbe
     # ------------------------------------------------------------------------------------------
     # Execute the SQL command
     # ------------------------------------------------------------------------------------------
-    updated_rows = execute_query(sql_command)
-    print(f"\t +++++ Updated {updated_rows[0][0]} row(s) in the tree_care_action table.")
+    added_rows = execute_query(sql_command)
+    print(f"\t +++++ Added {added_rows[0][0]} row(s) in the tree_care_action table.")
 
     return  ## END FUNCTION: sql_camtrees_add_care_action
 
@@ -196,8 +196,8 @@ def sql_camtrees_add_health_assessment(row, record_type, site, tree_number):
     # ------------------------------------------------------------------------------------------
     # Execute the SQL command
     # ------------------------------------------------------------------------------------------
-    updated_row = execute_query(sql_command)
-    print(f"\t +++++ Updated row {updated_row[0][0]} in the tree_health_assessment table.")
+    added_row = execute_query(sql_command)
+    print(f"\t +++++ Added row {added_row[0][0]} in the tree_health_assessment table.")
 
     return  ## END FUNCTION: sql_camtrees_add_health_assessment
 
@@ -224,8 +224,8 @@ def sql_camtrees_add_tree_initial_health(row, record_type, site, tree_number):
     # ------------------------------------------------------------------------------------------
     # Execute the SQL command
     # ------------------------------------------------------------------------------------------
-    updated_rows = execute_query(sql_command)
-    print(f"\t +++++ Updated {updated_rows[0][0]} row(s) in the tree_health_assessment table.")
+    added_rows = execute_query(sql_command)
+    print(f"\t +++++ Added {added_rows[0][0]} row(s) in the tree_health_assessment table.")
 
     return  ## END FUNCTION: sql_camtrees_add_care_action
 
