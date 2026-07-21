@@ -19,31 +19,36 @@ import psycopg2
 from dotenv import load_dotenv
 import os
 
+#------------------------------------------------------------------------------------------
+# Connect to the CAMTREES database? If not, connect to the KENSTER backup database.
+#------------------------------------------------------------------------------------------
+DB_CAMTREES = True
+
+# ------------------------------------------------------------------------------------------
+# Get NEON.COM Database connection parameters
+# ------------------------------------------------------------------------------------------
+# load .env into environment
+load_dotenv()
+
+if DB_CAMTREES == True:
+    # Get CAMTREES master database connection parameters from .env
+    DB_HOST = os.getenv("DB_HOST_WRITE")
+    DB_NAME = os.getenv("DB_NAME")
+    DB_USER = os.getenv("DB_USER")
+    DB_PASSWORD = os.getenv("DB_PASSWORD")
+    DB_PORT = os.getenv("DB_PORT")
+else:
+    # Get KENSTER backup database connection parameters from .env
+    DB_HOST = os.getenv("DB_KENSTER_HOST")
+    DB_NAME = os.getenv("DB_KENSTER_NAME")
+    DB_USER = os.getenv("DB_KENSTER_USER")
+    DB_PASSWORD = os.getenv("DB_KENSTER_PASSWORD")
+    DB_PORT = os.getenv("DB_KENSTER_PORT")
+
 def execute_query(query, params=None):
     """
     Executes a single SQL query and returns the results.
     """
-
-    # ------------------------------------------------------------------------------------------
-    # Get NEON.COM Database connection parameters
-    # ------------------------------------------------------------------------------------------
-    # load .env into environment
-    load_dotenv()
-
-    if DB_CAMTREES == True:
-        # Get CAMTREES master database connection parameters from .env
-        DB_HOST = os.getenv("DB_HOST_WRITE")
-        DB_NAME = os.getenv("DB_NAME")
-        DB_USER = os.getenv("DB_USER")
-        DB_PASSWORD = os.getenv("DB_PASSWORD")
-        DB_PORT = os.getenv("DB_PORT")
-    else:
-        # Get KENSTER backup database connection parameters from .env
-        DB_HOST = os.getenv("DB_KENSTER_HOST")
-        DB_NAME = os.getenv("DB_KENSTER_NAME")
-        DB_USER = os.getenv("DB_KENSTER_USER")
-        DB_PASSWORD = os.getenv("DB_KENSTER_PASSWORD")
-        DB_PORT = os.getenv("DB_KENSTER_PORT")
 
     conn    = None
     cur     = None
