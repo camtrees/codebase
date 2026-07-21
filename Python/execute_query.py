@@ -10,6 +10,8 @@
 ## Revised  : 2026-04-23 Initial Version
 ##            2026-06-11 Now using Neon CAMorg 'camtrees' database as the master
 ##            2026-07-11 Use .env file to load database connection parameters
+##            2026-07-20 Add capability to use either the Neon CAMTREES master
+##                       database or the KENSTER backup database
 ###############################################################################
 
 import psycopg2
@@ -28,12 +30,20 @@ def execute_query(query, params=None):
     # load .env into environment
     load_dotenv()
 
-    # Get database connection parameters from .env
-    DB_HOST     = os.getenv("DB_HOST_WRITE")
-    DB_NAME     = os.getenv("DB_NAME")
-    DB_USER     = os.getenv("DB_USER")
-    DB_PASSWORD = os.getenv("DB_PASSWORD")
-    DB_PORT     = os.getenv("DB_PORT")
+    if DB_CAMTREES == True:
+        # Get CAMTREES master database connection parameters from .env
+        DB_HOST = os.getenv("DB_HOST_WRITE")
+        DB_NAME = os.getenv("DB_NAME")
+        DB_USER = os.getenv("DB_USER")
+        DB_PASSWORD = os.getenv("DB_PASSWORD")
+        DB_PORT = os.getenv("DB_PORT")
+    else:
+        # Get KENSTER backup database connection parameters from .env
+        DB_HOST = os.getenv("DB_KENSTER_HOST")
+        DB_NAME = os.getenv("DB_KENSTER_NAME")
+        DB_USER = os.getenv("DB_KENSTER_USER")
+        DB_PASSWORD = os.getenv("DB_KENSTER_PASSWORD")
+        DB_PORT = os.getenv("DB_KENSTER_PORT")
 
     conn    = None
     cur     = None

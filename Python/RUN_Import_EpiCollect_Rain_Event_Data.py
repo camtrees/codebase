@@ -18,6 +18,8 @@
 ##            2026-05-07 Change EpiCollect 'Notes' filed to 'Note'
 ##            2026-06-06 <hkr> Allow for EpiCollect MAP_INDEX
 ##            2026-07-09 Use .env file to load EpiCollect access tokens
+##            2026-07-20 Add capability to use either the Neon CAMTREES master
+##                       database or the KENSTER backup database
 ###############################################################################
 
 # Python libraries
@@ -41,6 +43,11 @@ import os
 # Set to true so we can import EpiCollect data from TODAY!
 #------------------------------------------------------------------------------------------
 KR_TESTING = False
+
+#------------------------------------------------------------------------------------------
+# Connect to the CAMTREES database? If not, connect to the KENSTER backup database.
+#------------------------------------------------------------------------------------------
+DB_CAMTREES = True
 
 #------------------------------------------------------------------------------------------
 # From which EpiCollect (rain or maint) Project will we process records
