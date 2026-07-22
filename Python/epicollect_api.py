@@ -11,6 +11,7 @@
 ##
 ## Revised  : 2026-03-09 Initial Version
 ##            2026-06-06 <hkr> Allow for EpiCollect MAP_INDEX
+##            2026-07-22 <hkr> Storing access tokens in file (was using .env)
 ###############################################################################
 
 # Python libraries
@@ -18,8 +19,7 @@ import pandas as pd
 import pyepicollect as pyep
 
 # Kenster libraries
-from env_read_write import *
-from print_functions import *\
+from print_functions import *
 
 
 def epicollect_get_access_token(epicollect_attribs) -> str:
@@ -27,20 +27,17 @@ def epicollect_get_access_token(epicollect_attribs) -> str:
     Validate our access_token. If it's not valid, get a new one.
     """
 
-    # Read our current access_token from our .env file
-    access_token = env_read_key(epicollect_attribs['ACCESS_TOKEN'])
-
-    # # Read our current access_token from a local file.
-    # file_path = epicollect_attribs['TOKEN_FILE']
-    # try:
-    #     # Open the file in read mode ('r' is the default)
-    #     with open(file_path, 'r', encoding='utf-8') as file:
-    #         # Read the entire content into a single string variable
-    #         access_token = file.read()
-    # except FileNotFoundError:
-    #     print(f"Error: The file at {file_path} was not found.")
-    # except Exception as e:
-    #     print(f"An error occurred: {e}")
+    # Read our current access_token from a local file.
+    file_path = epicollect_attribs['TOKEN_FILE']
+    try:
+        # Open the file in read mode ('r' is the default)
+        with open(file_path, 'r', encoding='utf-8') as file:
+            # Read the entire content into a single string variable
+            access_token = file.read()
+    except FileNotFoundError:
+        print(f"Error: The file at {file_path} was not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
     # Try using the access_token to see if it's valid
     project = pyep.api.get_project(epicollect_attribs['PROJECT_SLUG'], access_token)
@@ -64,10 +61,10 @@ def epicollect_get_new_access_token(epicollect_attribs):
     new_access_token = pyep.auth.request_token(epicollect_attribs['CLIENT_ID'], epicollect_attribs['CLIENT_SECRET'])
     access_token = new_access_token['access_token']
 
-    # Store the new access_token in our .env file
-    success = env_write_key(epicollect_attribs['ACCESS_TOKEN'], access_token)
-    if success:
-        print(f"Key={epicollect_attribs['ACCESS_TOKEN']} saved successfully!")
+    # Store the new access_token in our external file
+    file_path = epicollect_attribs['TOKEN_FILE']
+    with open(file_path, 'w') as file:
+        file.write(access_token)
 
     return access_token
 

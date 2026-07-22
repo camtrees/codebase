@@ -14,39 +14,21 @@
 ##            2026-07-09 Use .env file to load database connection parameters
 ##            2026-07-20 Add capability to use either the Neon CAMTREES master
 ##                       database or the KENSTER backup database
+##            2026-07-22 Changes for using config.py file
 ##########################################################################################
 
 from pyhigh import get_elevation
 import psycopg2
 
-from dotenv import load_dotenv
-import os
+# load globals from config.py file
+from config import *
 
-# load .env into environment
-load_dotenv()
-
-DB_CAMTREES = True
-
-if DB_CAMTREES == True:
-    # Get CAMTREES master database connection parameters from .env
-    DB_HOST = os.getenv("DB_HOST_WRITE")
-    DB_NAME = os.getenv("DB_NAME")
-    DB_USER = os.getenv("DB_USER")
-    DB_PASSWORD = os.getenv("DB_PASSWORD")
-    DB_PORT = os.getenv("DB_PORT")
-else:
-    # Get KENSTER backup database connection parameters from .env
-    DB_HOST = os.getenv("DB_KENSTER_HOST")
-    DB_NAME = os.getenv("DB_KENSTER_NAME")
-    DB_USER = os.getenv("DB_KENSTER_USER")
-    DB_PASSWORD = os.getenv("DB_KENSTER_PASSWORD")
-    DB_PORT = os.getenv("DB_KENSTER_PORT")
 
 def main():
     conn = None
     cur = None
     try:
-        conn = psycopg2.connect(host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASSWORD)
+        conn = psycopg2.connect(host=DB_HOST_WRITE, database=DB_NAME, user=DB_USER, password=DB_PASSWORD)
         cur = conn.cursor()
 
         # Select trees with NULL elevation

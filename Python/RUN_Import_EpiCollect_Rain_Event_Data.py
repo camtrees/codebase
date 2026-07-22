@@ -18,6 +18,7 @@
 ##            2026-05-07 Change EpiCollect 'Notes' filed to 'Note'
 ##            2026-06-06 <hkr> Allow for EpiCollect MAP_INDEX
 ##            2026-07-09 Use .env file to load EpiCollect access tokens
+##            2026-07-22 Changes for using config.py file
 ###############################################################################
 
 # Python libraries
@@ -25,22 +26,17 @@ from datetime import date, timedelta
 import pandas
 from tabulate import tabulate
 
+# load globals from config.py file
+from config import *
+
 # Kenster libraries
 from camtrees_sql import *
 from epicollect_api import *
 from execute_query import execute_query
 from print_functions import *
 
-from dotenv import load_dotenv
-import os
-
 # import sys
 # sys.exit()
-
-#------------------------------------------------------------------------------------------
-# Set to true so we can import EpiCollect data from TODAY!
-#------------------------------------------------------------------------------------------
-KR_TESTING = False
 
 #------------------------------------------------------------------------------------------
 # From which EpiCollect (rain or maint) Project will we process records
@@ -57,22 +53,22 @@ def initialize_python_library_settings():
     #------------------------------------------------------------------------------------------
     pd.set_option('display.max_columns', None)
 
+    return ## END FUNCTION: initialize_python_library_settings
+
 
 def epicollect_configure_attribs(filter_from, filter_to):
     """
     Define EpiCollect attributes needed to access the EpiCollect private project data.
     """
-    # load .env into environment
-    load_dotenv()
 
     epicollect_attribs = {
         # ------------------------------------------------------------------------------------------
         # Get EpiCollect project access tokens
         # ------------------------------------------------------------------------------------------
-        'CLIENT_ID'     : os.getenv("RAIN_CLIENT_ID"),
-        'CLIENT_SECRET' : os.getenv("RAIN_CLIENT_SECRET"),
-        'PROJECT_NAME'  : os.getenv("RAIN_PROJECT_NAME"),
-        'PROJECT_SLUG'  : os.getenv("RAIN_PROJECT_SLUG"),
+        'CLIENT_ID'     : RAIN_CLIENT_ID,
+        'CLIENT_SECRET' : RAIN_CLIENT_SECRET,
+        'PROJECT_NAME'  : RAIN_PROJECT_NAME,
+        'PROJECT_SLUG'  : RAIN_PROJECT_SLUG,
         # ------------------------------------------------------------------------------------------
         # These are user specified to control which records will be returned
         # ------------------------------------------------------------------------------------------
@@ -83,13 +79,14 @@ def epicollect_configure_attribs(filter_from, filter_to):
         # ------------------------------------------------------------------------------------------
         # File that stores our access_token
         # ------------------------------------------------------------------------------------------
-        'ACCESS_TOKEN'  : 'RAIN_ACCESS_TOKEN'
+        'TOKEN_FILE'    : 'epicollect_cam_tree_rain_event_access_token'
         }
 
     print(f"\nFILTER_BY   : {epicollect_attribs['FILTER_BY']}"
           f"\nFILTER_FROM : {epicollect_attribs['FILTER_FROM']}"
           f"\nFILTER_TO   : {epicollect_attribs['FILTER_TO']}")
-    return epicollect_attribs
+
+    return epicollect_attribs ## END FUNCTION: epicollect_configure_attribs
 
 
 def epicollect_process_data(data):
@@ -102,10 +99,18 @@ def epicollect_process_data(data):
     df = pd.DataFrame(data)
 
     #------------------------------------------------------------------------------------------
+    # Print the DataFrame before any modifications
+    #------------------------------------------------------------------------------------------
+    print('\nThe DataFrame as received from EpiCollect...')
+    print(tabulate(df, headers='keys', tablefmt='psql'))
+
+    #------------------------------------------------------------------------------------------
     # If Kenster is testing, keep only data created by him
     #------------------------------------------------------------------------------------------
     if KR_TESTING:
+        print('\nKenster is TESTING. The DataFrame with only Kenster data...')
         df.drop(df[df['created_by'] != 'ken.rosenberry@gmail.com'].index, inplace=True)
+        print(tabulate(df, headers='keys', tablefmt='psql'))
 
     #------------------------------------------------------------------------------------------
     # Sort the DataFrame by the 'created_at' column (before we convert it into just a date)
@@ -115,6 +120,7 @@ def epicollect_process_data(data):
     #------------------------------------------------------------------------------------------
     # Print the sorted DataFrame before any modifications
     #------------------------------------------------------------------------------------------
+    print("\nThe DataFrame sorted by the 'created_at' column...")
     print(tabulate(df, headers='keys', tablefmt='psql'))
 
     # ------------------------------------------------------------------------------------------
@@ -131,7 +137,7 @@ def epicollect_process_data(data):
     df['Note'] = prepare_string_for_sql(df['Note'])
 
     #------------------------------------------------------------------------------------------
-    # Print the DataFrame after column string modification
+    # Print the DataFrame ready to be processed
     #------------------------------------------------------------------------------------------
     print(tabulate(df, headers='keys', tablefmt='psql'))
 
@@ -242,7 +248,7 @@ if __name__ == "__main__":
     #------------------------------------------------------------------------------------------
     data = epicollect_get_project_data(epicollect_attribs, access_token)
     if not data:
-        print('No data to process')
+        print('***** No data to process')
     else:
         epicollect_process_data(data)
 
@@ -257,4 +263,4 @@ if __name__ == "__main__":
 
         updated_rows = execute_query(f"UPDATE epicollect_import_date SET date = '{filter_to_as_str}' WHERE epicollect_project = '{EPICOLLECT_PROJECT}';")
         print(f"\n{LINE_SEP}")
-        print(f"Updated {updated_rows} row(s) in the epicollect_import_date table.")
+        print(f"***** Updated {updated_rows} row(s) in the epicollect_import_date table.")

@@ -10,20 +10,10 @@
 ##            2026-07-09 Use .env file to load database connection parameters
 ##########################################################################################
 
+# load globals from config.py file
+from config import *
+
 import psycopg2
-
-from dotenv import load_dotenv
-import os
-
-# load .env into environment
-load_dotenv()
-
-# Get database connection parameters from .env
-DB_HOST     = os.getenv("DB_HOST_READ")
-DB_NAME     = os.getenv("DB_NAME")
-DB_USER     = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_PORT     = os.getenv("DB_PORT")
 
 conn = None
 cur = None
@@ -31,11 +21,11 @@ cur = None
 try:
     # Establish the connection
     conn = psycopg2.connect(
-        host=DB_HOST,
-        database=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        port=DB_PORT
+        host     = DB_HOST_READ,
+        database = DB_NAME,
+        user     = DB_USER,
+        password = DB_PASSWORD,
+        port     = DB_PORT
     )
 
     # Create a cursor object
@@ -51,7 +41,7 @@ try:
     # Example: Querying data
     # get the state table
     cur.execute("SELECT code, name FROM state ORDER BY name ASC;")
-    # get Kimski's 9 trees (site_id = 23)
+    # get Kimski's trees (site_id = 23)
     # cur.execute("SELECT id, longitude, latitude FROM tree WHERE site_id = 23 ORDER BY id;")
     rows = cur.fetchall()
     print("\nStates:")

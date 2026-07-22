@@ -1,6 +1,8 @@
 ###############################################################################
 ## Program  : RUN_Import_EpiCollect_Tree_Maint_Data.py
 ##
+## Purpose  : Get EpiCollect Tree Maintenance data not yet processed
+##
 ## Requires : datetime to calculate date offsets from today
 ##            pandas - so EpiCollect results can be placed into a Pandas DataFrame
 ##            tabulate - prints the Pandas DataFrame
@@ -19,12 +21,16 @@
 ##            2026-05-16 <hkr> Changes required to process WildTACF trees
 ##            2026-06-06 <hkr> Allow for EpiCollect MAP_INDEX
 ##            2026-07-11 Use .env file to load EpiCollect access tokens
+##            2026-07-22 Changes for using config.py file
 ###############################################################################
 
 # Python libraries
-from   datetime import date, timedelta
+from datetime import date, timedelta
 import pandas
-from   tabulate import tabulate
+from tabulate import tabulate
+
+# load globals from config.py file
+from config import *
 
 # Kenster libraries
 from camtrees_sql import *
@@ -32,16 +38,8 @@ from epicollect_api import *
 from execute_query import execute_query
 from print_functions import *
 
-from dotenv import load_dotenv
-import os
-
 # import sys
 # sys.exit()
-
-#------------------------------------------------------------------------------------------
-# Set to true so we can import EpiCollect data from TODAY!
-#------------------------------------------------------------------------------------------
-KR_TESTING = False
 
 #------------------------------------------------------------------------------------------
 # From which EpiCollect (rain or maint) Project will we process records
@@ -66,17 +64,14 @@ def epicollect_configure_attribs(filter_from, filter_to):
     Define EpiCollect attributes needed to access the EpiCollect private project data.
     """
 
-    # load .env into environment
-    load_dotenv()
-
     epicollect_attribs = {
         # ------------------------------------------------------------------------------------------
         # Get EpiCollect project access tokens
         # ------------------------------------------------------------------------------------------
-        'CLIENT_ID'     : os.getenv("MAINT_CLIENT_ID"),
-        'CLIENT_SECRET' : os.getenv("MAINT_CLIENT_SECRET"),
-        'PROJECT_NAME'  : os.getenv("MAINT_PROJECT_NAME"),
-        'PROJECT_SLUG'  : os.getenv("MAINT_PROJECT_SLUG"),
+        'CLIENT_ID'     : MAINT_CLIENT_ID,
+        'CLIENT_SECRET' : MAINT_CLIENT_SECRET,
+        'PROJECT_NAME'  : MAINT_PROJECT_NAME,
+        'PROJECT_SLUG'  : MAINT_PROJECT_SLUG,
         # ------------------------------------------------------------------------------------------
         # These are user specified to control which records will be returned
         # ------------------------------------------------------------------------------------------
@@ -87,7 +82,7 @@ def epicollect_configure_attribs(filter_from, filter_to):
         # ------------------------------------------------------------------------------------------
         # File that stores our access_token
         # ------------------------------------------------------------------------------------------
-        'ACCESS_TOKEN': 'MAINT_ACCESS_TOKEN'
+        'TOKEN_FILE'    : 'epicollect_cam_tree_maintenance_access_token'
         }
 
     print(f"\nFILTER_BY   : {epicollect_attribs['FILTER_BY']}"
