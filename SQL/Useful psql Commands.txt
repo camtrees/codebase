@@ -1,0 +1,42 @@
+==========================================================================================
+== File    : Useful psql Commands.txt
+==  
+== Purpose : Some useful 'psql' commands
+==
+== Note    : Neon can execute these, but DBeaver does not have a method to execute psql
+==
+== Source  : https://hasura.io/blog/top-psql-commands-and-flags-you-need-to-know-postgresql
+==========================================================================================
+		
+	Note: Most commands can take additional tokens:
+			S = show system objects
+			x = expanded mode
+			+ = additional detail
+
+	\?				display help info and a list of all available psql meta-commands
+
+	\conninfo		display information about current connection
+
+	\ddp			list default privileges
+	\dp				list table, view, and sequence access privileges
+
+	\c	<database>	switch to another database
+
+	\d				list tables, views, and sequences
+	\d	<table>		describe a table
+
+	\df				list functions
+	\di				list indexes
+	\dm				list materialized views
+	\dn				list schemas
+	\ds				list sequences
+	\dt				list tables
+	\du				list roles
+	\du <username>	list all users (roles) and their privileges
+	\dv				list views
+	\dy				list event triggers
+
+	\l				list databases
+==========================================================================================
+
+

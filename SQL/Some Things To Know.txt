@@ -1,0 +1,42 @@
+==========================================================================================
+==  File    : Some Things To Know.txt
+==
+==  Purpose : Yes, some things to know about how we created the CAMTREES database
+==========================================================================================
+
+==========================================================================================
+== Created the NEON.COM account to house the CAMTREES database
+==========================================================================================
+	-- Create the Neon Account
+	Creat a Neon account for 'camorgdatabase@gmail'
+
+
+==========================================================================================
+== Install the postgis extension into our CAMTREES PostgreSQL Database
+==========================================================================================
+	Execute the SQL command: CREATE EXTENSION postgis
+
+
+==========================================================================================
+== Create a Neon Read Replica branch (a read only connection to the camtrees database)
+== which is used as an alternative to traditional authorization mechanisms
+==========================================================================================
+	Use the Neon console to create the Read Replica
+
+
+==========================================================================================
+== Created a NEON.COM account to house the nightly backups of the CAMTREES database
+==========================================================================================
+	Creat a Neon account for 'ken.rosenberry@gmail'
+
+
+==========================================================================================
+== Created a GitHub account to house:
+==     1. Python and SQL source code
+==     2. The CAMTREES Database website (https://camtrees.github.io)
+==        that documents what a CAMTREES Database admin needs to know
+==     3. A GitHub action that does a nightly backup of the CAMTREES database
+==           From: the camorgdatabase@gmail.com Neon workspace
+==             To: the ken.rosenberry@gmail.com Neon workspace
+==========================================================================================
+	Creat an account for 'camorgdatabase@gmail'

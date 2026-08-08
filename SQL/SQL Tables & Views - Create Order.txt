@@ -1,0 +1,431 @@
+==========================================================================================
+==  File    : SQL Tables & Views - Create Order.txt
+==  
+==  Purpose : Lists all tables and views and their order of creation
+==========================================================================================
+
+==========================================================================================
+== Independent Tables - Do these first. Creation order is insignificant.
+==========================================================================================
+	docs_web_link
+	epicollect_import_date
+	z_test_url
+
+
+==========================================================================================
+== Lookup Tables
+==
+== Note: Do these next. Then, the "MUST BE BEFORE" tables are insignificant.
+==
+== Note: These tables come BEFORE all other tables other than those above.
+==       Their order is independent of each other.
+==       Unlike tables in the next section (tables with foreign keys),
+==          these tables will NOT have a special view.
+==========================================================================================
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	epicollect_record_type
+		MUST BE BEFORE
+			tree
+			tree_care_action
+			tree_health_assessment
+			tree_photo
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	phone_type
+		MUST BE BEFORE
+			volunteer_phone
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	state
+		MUST BE BEFORE
+			town
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree_access_level_type
+		MUST BE BEFORE
+			tree
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree_access_method_type
+		MUST BE BEFORE
+			tree
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree_access_path_type
+		MUST BE BEFORE
+			tree
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree_care_action_type
+		MUST BE BEFORE
+			tree_care_action
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree_form_type
+		MUST BE BEFORE
+			tree
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree_health_type
+		MUST BE BEFORE
+			tree_health_assessment
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree_health_nuts_type
+		MUST BE BEFORE
+			tree_health_assessment
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree_parent_type
+		MUST BE BEFORE
+			tree
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree_planting_method_type
+		MUST BE BEFORE
+			tree
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	volunteer_interest_type
+		MUST BE BEFORE
+			volunteer_interest
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	volunteer_status_type
+		MUST BE BEFORE
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+==========================================================================================
+== CAM Tables
+==
+== Note: Lookup Tables from above are prefixed with '***'
+==========================================================================================
+	town
+		MUST BE BEFORE
+			site
+			volunteer
+		MUST BE AFTER
+			state
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	volunteer
+		MUST BE BEFORE
+			hub
+			organization
+			site
+			tree
+			tree_care_action
+			tree_health_assessment
+			tree_photo
+			volunteer_interest
+			volunteer_phone
+		MUST BE AFTER
+			***state
+			town
+			***volunteer_status_type
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	volunteer_interest
+		MUST BE BEFORE
+		MUST BE AFTER
+			volunteer
+			***volunteer_interest_type
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	volunteer_phone
+		MUST BE BEFORE
+		MUST BE AFTER
+			***phone_type
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	organization
+		MUST BE BEFORE
+			site
+		MUST BE AFTER
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	hub
+		MUST BE BEFORE
+			site_hub
+		MUST BE AFTER
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	site
+		MUST BE BEFORE
+			site_hub
+			tree
+			tree_care_action
+			tree_health_assessment
+			tree_photo
+		MUST BE AFTER
+			organization
+			town
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	site_hub
+		MUST BE BEFORE
+		MUST BE AFTER
+			hub
+			site
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree
+		MUST BE BEFORE
+		MUST BE AFTER
+			***epicollect_record_type
+			site
+			***tree_access_level_type
+			***tree_access_method_type
+			***tree_access_path_type
+			***tree_form_type
+			***tree_planting_method_type
+			volunteer
+			
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree_care_action
+		MUST BE BEFORE
+		MUST BE AFTER
+			***epicollect_record_type
+			site
+			tree
+			***tree_care_action_type
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree_health_assessment
+		MUST BE BEFORE
+		MUST BE AFTER
+			***epicollect_record_type
+			site
+			tree
+			***tree_health_type
+			***tree_health_nuts_type
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	tree_photo
+		MUST BE BEFORE
+		MUST BE AFTER
+			***epicollect_record_type
+			site
+			tree
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+==========================================================================================
+== END OF TABLES
+==========================================================================================
+
+
+==========================================================================================
+== START OF VIEWS
+==========================================================================================
+
+==========================================================================================
+== Views for listing latest and earliest values of certain columns
+==========================================================================================
+	cam_tree_latest_health
+	cam_tree_latest_height
+	cam_tree_latest_water
+	cam_tree_photos_earliest_photos
+	cam_tree_photos_latest_photos
+
+
+==========================================================================================
+== Views of our 'main' tables
+==
+== Note: Views should be obvious based on the view name and looking at the view data.
+==========================================================================================
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_hubs
+		MUST BE AFTER
+			hub
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_organizations
+		MUST BE AFTER
+			organization
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_sites
+		MUST BE AFTER
+			organization
+			site
+			***town
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_sites_hubs
+		MUST BE AFTER
+			hub
+			site
+			site_hub
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_towns_with_state_name
+		MUST BE AFTER
+			state
+			town
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_tree_care_action
+		MUST BE AFTER
+			***epicollect_record_type
+			site
+			tree_care_action
+			***tree_care_action_type
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_tree_health_assessment
+		MUST BE AFTER
+			***epicollect_record_type
+			site
+			tree_health_assessment
+			volunteer
+			***tree_health_type
+			***tree_health_nuts_type
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_tree_photos
+		MUST BE AFTER
+			***epicollect_record_type
+			site
+			tree_photo
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_tree_photos_with_tags
+		MUST BE AFTER
+			cam_tree_photos
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_tree_photos_without_tags
+		MUST BE AFTER
+			cam_tree_photos
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_trees
+		MUST BE AFTER
+			cam_tree_latest_health
+			cam_tree_latest_water
+			***epicollect_record_type
+			hub
+			organization
+			site
+			site_hub
+			tree
+			***tree_access_level_type
+			***tree_access_method_type
+			***tree_access_path_type
+			***tree_form_type
+			***tree_planting_method_type
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_volunteer_interests
+		MUST BE AFTER
+			volunteer
+			volunteer_interest
+			***volunteer_interest_type
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_volunteer_phone_numbers
+		MUST BE AFTER
+			***phone_type
+			volunteer_phone
+			volunteer
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	cam_volunteers
+		MUST BE AFTER
+			state
+			town
+			volunteer
+			volunteer_phone
+			***volunteer_status_type
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+==========================================================================================
+== Views for counting rows
+== Frequency Count of a single column listing values and how often they appear.
+== Similar to R Table function with a single variable (column).
+== Similar to a SAS Proc Freq with a single variable (column) in the Tables statement.
+==
+== Note: Views should be obvious based on the view name and looking at the view data.
+==========================================================================================
+	data_count_tree_care_action_by_volunteer
+	data_count_trees_by_health
+	data_count_trees_by_primary_caretaker
+	data_count_trees_by_site
+
+
+==========================================================================================
+== Views used when planting new trees
+==========================================================================================
+	data_count_next_tree_number_for_planting
+
+
+==========================================================================================
+== Views that display the relationship between two (or more) categorical variables.
+== Similar to R Table function with a multiple variables (columns).
+== Similar to a SAS Proc Freq with multiple variables (columns) in the Tables statement.
+==
+== Note: Views should be obvious based on the view name and looking at the view data.
+==========================================================================================
+	data_crosstab_care_action_by_record_type
+	data_crosstab_site_by_hub
+	data_crosstab_tree_planting_method_by_wire_fence
+
+
+==========================================================================================
+== Views using PostGIS functions to show the distance between two trees.
+==
+== Note: Views should be obvious based on the view name and looking at the view data.
+==========================================================================================
+	data_distance_between_all_trees
+	data_distance_between_trees_at_same_site
+	data_distance_trees_within_15_meters_of_each_other
+
+
+==========================================================================================
+== Views used to export data for use in other applications.
+==========================================================================================
+	data_export_epicollect_tree_parent_type
+	data_export_epicollect_volunteer_email
+	data_export_google_map_data
+
+
+==========================================================================================
+== Views for listing duplicate tree_care_actions and duplicate tree_health_assessments
+==========================================================================================
+	data_duplicate_tree_care_actions
+	data_duplicate_tree_health_assessments
+
+
+==========================================================================================
+== Views for listing possible missing data
+==========================================================================================
+	data_error_hubs_with_no_captain
+	data_error_hubs_with_no_sites
+	data_error_sites_in_multiple_hubs
+	data_error_sites_not_in_any_hub
+	data_error_sites_with_no_contact
+	data_error_sites_with_no_primary_caretaker
+	data_error_sites_with_no_site_url
+	data_error_sites_with_no_trees
+	data_error_trees_with_gps_approximated
+	data_error_trees_with_no_elevation
+	data_error_trees_with_no_gps
+	data_error_trees_with_no_mother_or_father
+	data_error_trees_with_no_primary_caretaker
+	data_error_trees_with_no_tag_info
+	data_error_trees_with_no_tag_photo
+	data_error_trees_with_planting_method_unknown
+	data_error_volunteers_with_no_email
+	data_error_volunteers_with_no_hometown
+	data_error_volunteers_with_no_phone
+
+
+==========================================================================================
+== Views used by Kenster
+==========================================================================================
+	user_hkr_tree_photos_for_tag_info_editing
+
+
+==========================================================================================
+== Views useful to print when a volunteer is making a site visit
+==========================================================================================
+	data_site_visit
+
+
+==========================================================================================
+== Views helpful mostly to a Database Administrator
+==========================================================================================
+	v_pg_show_columns_generated
+	v_pg_show_constraints
+	v_pg_show_count_table_rows
+	v_pg_show_count_view_rows
+	v_pg_show_functions
+	v_pg_show_indexes
+	v_pg_show_sequences
+	v_pg_show_table_ownership
+	v_pg_show_triggers
+	v_pg_show_unique_indexes
+	v_pg_show_user_membership
+	v_pg_show_user_roles
+	v_pg_show_view_ownership

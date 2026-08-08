@@ -1,0 +1,88 @@
+==========================================================================================
+==  File    : Kenster's SQL Naming Conventions.txt
+==  
+==  Purpose : The naming convention used for the CAMTREES Database
+==========================================================================================
+
+------------------------------------------------------------------------------------------
+-- General Rules
+------------------------------------------------------------------------------------------
+
+Object       Convention Rule                                              Example(s)
+----------   ----------------------------------------------------------   ----------------
+Case         snake_case (all lowercase words separated by underscores)    tree_care_action
+Tables       singular noun, descriptive, lowercase snake_case             tree, tree_photo
+Columns      descriptive, lowercase, snake_case                           volunteer_id
+
+
+------------------------------------------------------------------------------------------
+-- Join Table
+------------------------------------------------------------------------------------------
+<table name>_<table name>
+Example: site_hub
+
+
+------------------------------------------------------------------------------------------
+-- Column Names
+------------------------------------------------------------------------------------------
+
+Object                 Convention Rule                                      Example(s)
+--------------------   --------------------------------------------------   ----------
+Primary Key Column     id | code                                            id, code
+                           id - for GENERATED ALWAYS AS IDENTITY
+                         code - for natural values like state postal code
+Foreign Key Column     [referenced_table_name]_[id | code]                  town_id
+
+
+
+------------------------------------------------------------------------------------------
+-- PostgreSQL Constraints Naming Convention Using Suffix's
+------------------------------------------------------------------------------------------
+
+Type Constraint        Syntax
+--------------------   -------------------------------------------------------------------
+Primary Key            <table name>_pkey
+                       Examples: hub_pkey
+                                 town_pkey
+
+
+Foreign Key            <table name>_<column name>[_and_<column name>]_fkey
+                       Examples: town_state_code_fkey
+                                 volunteer_town_id_fkey
+
+Index                  <table name>_<column name>[_and_<column name>]_index
+                       Note:     PostgreSQL uses 'idx'; we use 'index'
+                       Examples: tree_geog_index
+
+
+Unique Constraint      <table name>_<column name>[_and_<column name>]_unique
+                       Note:     PostgreSQL uses 'key'; we use 'unique'
+                       Examples: state_code_unique
+                                 town_name_and_state_code_unique
+
+
+Check Constraint       <table name>_<column name>[_and_<column name>][_<suffix>]_check
+                       Note:     The optional suffix should denote the type of validation,
+                                 such as length and enum. Can also be used to disambiguate
+                                 multiple CHECK constraints on the same column.
+                       Examples: state_code_check
+
+
+Exclusion Constraint   <table name>_<column name>[_and_<column name>]*_[_<suffix>]_exclude
+                       Note:     PostgreSQL uses 'excl'; we use 'exclude'
+                       Note:     The optional suffix denotes the type of exclusion
+                       Examples: reservations_start_at_end_at_no_overlap_exclude
+
+Sequence               <table name>_<column name>_seq
+                       Examples: state_id_seq
+                                 town_id_seq
+                                 volunteer_id_seq
+
+Trigger                <table name | view name | database>_<action name>_<after | before>_<action>
+                       Note:     Use <database> if same trigger function is used for multiple tables
+                       Examples: camtree_photos_edit_tag_photo_before_update
+
+Function               <database>_<function_purpose>
+                       Examples: camtrees_count_table_rows
+                                 camtrees_update_tree_photo_tag
+                                 camtrees_manage_dates
