@@ -1,0 +1,25 @@
+------------------------------------------------------------------------------------------
+-- View: data_crosstab_care_action_by_record_type
+--
+-- Create Order:
+--		MUST BE AFTER
+--			cam_tree_care_action
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_crosstab_care_action_by_record_type;
+CREATE OR REPLACE VIEW data_crosstab_care_action_by_record_type AS
+	SELECT
+		COALESCE(care_action, 'Column Total') AS "Care Action",
+		COUNT(*) FILTER (WHERE record_type = 'all'      ) AS "Record Type ALL"  ,
+		COUNT(*) FILTER (WHERE record_type = 'one'      ) AS "Record Type ONE"  ,
+		COUNT(*) FILTER (WHERE record_type = 'plant'    ) AS "Record Type PLANT"  ,
+		COUNT(*) FILTER (WHERE record_type = 'rain'     ) AS "Record Type RAIN"  ,
+		COUNT(*) FILTER (WHERE record_type = 'wildcam'  ) AS "Record Type WildCAM"  ,
+		COUNT(*) FILTER (WHERE record_type = 'wildtacf' ) AS "Record Type WildTACF"  ,
+		COUNT(*)                                          AS "Row Total"
+	FROM
+		cam_tree_care_action
+	GROUP BY
+		ROLLUP(care_action)
+		ORDER BY
+			care_action
+	;

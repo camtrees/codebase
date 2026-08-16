@@ -1,0 +1,13 @@
+==========================================================================================
+== NOTE: CROSSTAB Views
+==
+== Views that display the relationship between two (or more) categorical variables.
+== Similar to R Table function with a multiple variables (columns).
+== Similar to a SAS Proc Freq with multiple variables (columns) in the Tables statement.
+==
+== Note: The 'R' application would do a better job creating crosstab tables.
+==       Because in SQL we need to specify ALL the possible values for one of the columns.
+==       That is very likely to create incomplete data.
+==
+== Note: Views should be obvious based on the view name and looking at the view data.
+==========================================================================================

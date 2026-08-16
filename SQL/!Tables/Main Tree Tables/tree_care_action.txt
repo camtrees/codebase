@@ -1,0 +1,75 @@
+------------------------------------------------------------------------------------------
+-- Table: tree_care_action
+--
+-- Purpose: The care actions performed on trees
+--
+-- Create Order:
+--		MUST BE BEFORE
+--		MUST BE AFTER
+--			***epicollect_record_type
+--			site
+--			tree
+--			***tree_care_action_type
+--			volunteer
+------------------------------------------------------------------------------------------
+-- public.tree_care_action definition
+
+-- Drop table
+
+-- DROP TABLE public.tree_care_action;
+
+CREATE TABLE public.tree_care_action (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	epicollect_record_type_id int4 NOT NULL, -- The EpiCollect record_type (pathway through the app) used to collect the data
+	"date" date NOT NULL, -- The date the care action was performed
+	volunteer_id int4 NOT NULL, -- The volunteer who performed the care action
+	care_action_id int4 NOT NULL, -- The care action performed
+	date_created date NOT NULL, -- The date the record was created
+	date_updated date NOT NULL, -- The date the record was most recently updated
+	note text NULL, -- Any notes provided by the volunteer when performing the care action
+	tree_id int4 NOT NULL, -- The tree on which the care action was performed
+	CONSTRAINT tree_care_action_care_action_id_not_null NOT NULL care_action_id,
+	CONSTRAINT tree_care_action_date_created_not_null NOT NULL date_created,
+	CONSTRAINT tree_care_action_date_not_null NOT NULL date,
+	CONSTRAINT tree_care_action_date_updated_not_null NOT NULL date_updated,
+	CONSTRAINT tree_care_action_epicollect_record_type_id_not_null NOT NULL epicollect_record_type_id,
+	CONSTRAINT tree_care_action_id_not_null NOT NULL id,
+	CONSTRAINT tree_care_action_pkey PRIMARY KEY (id),
+	CONSTRAINT tree_care_action_tree_id_not_null NOT NULL tree_id,
+	CONSTRAINT tree_care_action_volunteer_id_not_null NOT NULL volunteer_id
+);
+COMMENT ON TABLE public.tree_care_action IS 'Care actions performed on trees';
+
+-- Column comments
+
+COMMENT ON COLUMN public.tree_care_action.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.tree_care_action.epicollect_record_type_id IS 'The EpiCollect record_type (pathway through the app) used to collect the data';
+COMMENT ON COLUMN public.tree_care_action."date" IS 'The date the care action was performed';
+COMMENT ON COLUMN public.tree_care_action.volunteer_id IS 'The volunteer who performed the care action';
+COMMENT ON COLUMN public.tree_care_action.care_action_id IS 'The care action performed';
+COMMENT ON COLUMN public.tree_care_action.date_created IS 'The date the record was created';
+COMMENT ON COLUMN public.tree_care_action.date_updated IS 'The date the record was most recently updated';
+COMMENT ON COLUMN public.tree_care_action.note IS 'Any notes provided by the volunteer when performing the care action';
+COMMENT ON COLUMN public.tree_care_action.tree_id IS 'The tree on which the care action was performed';
+
+-- Table Triggers
+
+create trigger camtrees_manage_dates before
+insert
+    or
+update
+    on
+    public.tree_care_action for each row execute function camtrees_manage_dates();
+
+-- Permissions
+
+ALTER TABLE public.tree_care_action OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.tree_care_action TO neondb_owner;
+
+
+-- public.tree_care_action foreign keys
+
+ALTER TABLE public.tree_care_action ADD CONSTRAINT tree_care_action_care_action_id_fkey FOREIGN KEY (care_action_id) REFERENCES public.tree_care_action_type(id);
+ALTER TABLE public.tree_care_action ADD CONSTRAINT tree_care_action_epicollect_record_type_id_fkey FOREIGN KEY (epicollect_record_type_id) REFERENCES public.epicollect_record_type(id);
+ALTER TABLE public.tree_care_action ADD CONSTRAINT tree_care_action_tree_id_fkey FOREIGN KEY (tree_id) REFERENCES public.tree(id);
+ALTER TABLE public.tree_care_action ADD CONSTRAINT tree_care_action_volunteer_id_fkey FOREIGN KEY (volunteer_id) REFERENCES public.volunteer(id);

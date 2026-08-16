@@ -1,0 +1,23 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_sites_with_no_site_url
+--
+-- Purpose: Sites with no URL
+--
+-- Create Order:
+--		MUST BE AFTER
+--			site
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_sites_with_no_site_url;
+CREATE OR REPLACE VIEW data_error_sites_with_no_site_url AS
+	SELECT
+		name       AS site,
+		url        AS site_url
+	FROM
+		site
+	WHERE
+		url IS NULL
+		AND LOWER(name) <> 'wild tree unknown to tacf'
+		AND LOWER(name) <> 'wild tree known to tacf'
+	ORDER BY
+		site
+	;

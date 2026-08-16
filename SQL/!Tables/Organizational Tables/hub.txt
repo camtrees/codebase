@@ -1,0 +1,61 @@
+------------------------------------------------------------------------------------------
+-- Table: hub
+--
+-- Purpose: The exhaustive list of hubs
+--
+-- Create Order:
+--		MUST BE BEFORE
+--			site_hub
+--		MUST BE AFTER
+--			volunteer
+------------------------------------------------------------------------------------------
+-- public.hub definition
+
+-- Drop table
+
+-- DROP TABLE public.hub;
+
+CREATE TABLE public.hub (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	"name" text NOT NULL, -- The Hub name
+	captain_id int4 NULL, -- The Hub captain
+	lieutenant_id int4 NULL, -- The Hub lieutenant
+	date_created date NOT NULL, -- The date the record was created
+	date_updated date NOT NULL, -- The date the record was most recently updated
+	CONSTRAINT hub_date_created_not_null NOT NULL date_created,
+	CONSTRAINT hub_date_updated_not_null NOT NULL date_updated,
+	CONSTRAINT hub_id_not_null NOT NULL id,
+	CONSTRAINT hub_name_not_null NOT NULL name,
+	CONSTRAINT hub_pkey PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX hub_name_unique ON public.hub USING btree (name);
+COMMENT ON TABLE public.hub IS 'Hub regions as defined by Eva Butler';
+
+-- Column comments
+
+COMMENT ON COLUMN public.hub.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.hub."name" IS 'The Hub name';
+COMMENT ON COLUMN public.hub.captain_id IS 'The Hub captain';
+COMMENT ON COLUMN public.hub.lieutenant_id IS 'The Hub lieutenant';
+COMMENT ON COLUMN public.hub.date_created IS 'The date the record was created';
+COMMENT ON COLUMN public.hub.date_updated IS 'The date the record was most recently updated';
+
+-- Table Triggers
+
+create trigger camtrees_manage_dates before
+insert
+    or
+update
+    on
+    public.hub for each row execute function camtrees_manage_dates();
+
+-- Permissions
+
+ALTER TABLE public.hub OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.hub TO neondb_owner;
+
+
+-- public.hub foreign keys
+
+ALTER TABLE public.hub ADD CONSTRAINT hub_captain_fkey FOREIGN KEY (captain_id) REFERENCES public.volunteer(id);
+ALTER TABLE public.hub ADD CONSTRAINT hub_lieutenant_fkey FOREIGN KEY (lieutenant_id) REFERENCES public.volunteer(id);

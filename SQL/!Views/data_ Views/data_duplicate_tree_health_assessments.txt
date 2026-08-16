@@ -1,0 +1,26 @@
+------------------------------------------------------------------------------------------
+-- View: data_duplicate_tree_health_assessments
+--
+-- Purpose: Duplicate tree_health_assessments records
+--
+-- Create Order:
+--		MUST BE AFTER
+--			tree_care_action
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_duplicate_tree_health_assessments
+CREATE OR REPLACE VIEW data_duplicate_tree_health_assessments AS
+	SELECT
+		tree_id,
+		date,
+		COUNT(*) AS duplicate_count
+	FROM
+		tree_health_assessment
+	GROUP BY
+		tree_id,
+		date
+	HAVING
+		COUNT(*) > 1
+	ORDER BY
+		tree_id,
+		date
+		;

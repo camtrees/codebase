@@ -1,0 +1,42 @@
+------------------------------------------------------------------------------------------
+-- View: data_distance_trees_within_15_meters_of_each_other
+--
+-- Purpose: Show tree to tree distance for all trees within 15 meters of each other
+--
+-- Note: Efficient way using ST_DWithin to find tree distances
+--
+-- Create Order :
+--		MUST BE AFTER
+--			site
+--			tree
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_distance_trees_within_15_meters_of_each_other;
+CREATE OR REPLACE VIEW data_distance_trees_within_15_meters_of_each_other AS
+	SELECT
+		s1.name                                                         AS tree1_site,
+		t1.number                                                       AS tree1_tree_number,
+		s2.name                                                         AS tree2_site,
+		t2.number                                                       AS tree2_tree_number,		
+		ROUND(ST_Distance(t1.geog, t2.geog))                            AS distance_in_meters,
+		ROUND((ST_Distance(t1.geog, t2.geog) * 3.280839895)::numeric,1) AS distance_in_feet
+	FROM
+		tree AS t1
+	JOIN
+		tree AS t2
+		ON t1.id <> t2.id -- yields double rows versus using just '<'
+	JOIN
+		site s1
+		ON t1.site_id = s1.id
+	JOIN
+		site s2
+		ON t2.site_id = s2.id
+	WHERE
+		ST_DWithin(t1.geog, t2.geog, 15)
+		AND ST_Distance(t1.geog, t2.geog) <> 0
+		AND t1.id <> t2.id -- <> yields double rows versus using just '<'
+	ORDER BY
+		s1.name,
+		s2.name,
+		t1.number,
+		t2.number
+	;

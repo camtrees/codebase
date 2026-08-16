@@ -1,0 +1,39 @@
+------------------------------------------------------------------------------------------
+-- View: data_export_google_map_data
+--
+-- Purpose: Export Google Map Data as CSV file and load into Google Maps
+--
+-- MAP URL: https://www.google.com/maps/d/edit?mid=1BnudQOUMWyFeMCpp1HV90hQPCFrWSx0&usp=sharing
+--
+-- Create Order:
+--		MUST BE AFTER
+--			cam_trees
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_export_google_map_data;
+CREATE OR REPLACE VIEW data_export_google_map_data AS
+	SELECT
+		site                              AS "Site",
+		tree_number                       AS "Tree Number",
+		site || ' ' || tree_number        AS "Site - Tree Number",
+		"date_planted_or_observed(wild)"  AS "Date Planted or First Observed",
+		planted_by                        AS "Planted By",
+		elevation_in_feet                 AS "Elevation",
+		latitude                          AS "Latitude",
+		longitude                         AS "Longitude",
+		planting_method                   AS "Planting Method",
+		wire_fence                        AS "Wire Fence",
+		tag_info                          AS "Tag Info",
+		access_path                       AS "Access Path",
+		access_level                      AS "Access Level",
+		access_method                     AS "Access Method",
+		access_note                       AS "Access Note",
+		latest_health                     AS "Latest Health",
+		latest_health_date                AS "Latest Health Date",
+		latest_height_in_inches           AS "Latest Height in Inches",
+		FLOOR(latest_height_in_inches / 12)::INTEGER || ' ft ' || ROUND(latest_height_in_inches % 12)::INTEGER || ' in' AS tree_height,
+		latest_height_date                AS "Latest Height Date",
+		latest_water_date                 AS "Latest Water Date",
+		mother_tree                       AS "Mother Tree",
+		father_tree                       AS "Father Tree"
+	FROM cam_trees
+	;

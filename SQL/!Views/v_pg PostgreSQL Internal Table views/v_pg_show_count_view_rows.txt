@@ -1,0 +1,14 @@
+------------------------------------------------------------------------------------------
+-- View: v_pg_show_count_view_rows
+--
+-- Requires: camtrees_count_view_rows FUNCTION
+------------------------------------------------------------------------------------------
+
+-- Create view that will use the count function
+DROP VIEW IF EXISTS v_pg_show_count_view_rows;
+CREATE OR REPLACE VIEW v_pg_show_count_view_rows AS
+	SELECT
+		*
+	FROM
+		camtrees_count_view_rows()
+	;

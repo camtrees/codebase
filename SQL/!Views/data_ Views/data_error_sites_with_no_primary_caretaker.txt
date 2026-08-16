@@ -1,0 +1,23 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_sites_with_no_primary_caretaker
+--
+-- Purpose: Sites with no primary caretaker
+--
+-- Create Order:
+--		MUST BE AFTER
+--			site
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_sites_with_no_primary_caretaker;
+CREATE OR REPLACE VIEW data_error_sites_with_no_primary_caretaker AS
+	SELECT
+		name                   AS site,
+		primary_caretaker_id   AS primary_caretaker
+	FROM
+		site
+	WHERE
+		primary_caretaker_id IS NULL
+		AND LOWER(name) <> 'wild tree unknown to tacf'
+		AND LOWER(name) <> 'wild tree known to tacf'
+	ORDER BY
+		name
+	;

@@ -1,0 +1,29 @@
+------------------------------------------------------------------------------------------
+-- View: data_duplicate_tree_care_actions
+--
+-- Purpose: Duplicate tree_care_action records
+--
+-- Create Order:
+--		MUST BE AFTER
+--			tree_care_action
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_duplicate_tree_care_actions
+CREATE OR REPLACE VIEW data_duplicate_tree_care_actions AS
+	SELECT
+		tree_id,
+		care_action_id,
+		date,
+		COUNT(*) AS duplicate_count
+	FROM
+		tree_care_action
+	GROUP BY
+		tree_id,
+		care_action_id,
+		date
+	HAVING
+		COUNT(*) > 1
+	ORDER BY
+		tree_id,
+		care_action_id,
+		date
+		;

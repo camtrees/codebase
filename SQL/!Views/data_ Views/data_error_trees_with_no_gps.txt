@@ -1,0 +1,29 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_trees_with_no_gps
+--
+-- Purpose: Trees with missing longitude and latitude data
+--
+-- Create Order:
+--		MUST BE AFTER
+--          site
+--			tree
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_trees_with_no_gps;
+CREATE OR REPLACE VIEW data_error_trees_with_no_gps AS
+	SELECT
+		s.name       AS site,
+		t.number     AS tree_number,
+		t.longitude,
+		t.latitude
+	FROM
+		tree t
+	JOIN
+		site s
+		ON t.site_id = s.id
+	WHERE
+		t.longitude IS NULL
+		OR t.latitude IS NULL 
+	ORDER BY
+		s.name,
+		t.number
+	;

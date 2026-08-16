@@ -1,0 +1,48 @@
+------------------------------------------------------------------------------------------
+-- Function: camtrees_count_view_rows
+--
+-- Purpose: Assists with counting rows in Views
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_count_view_rows();
+
+CREATE OR REPLACE FUNCTION public.camtrees_count_view_rows()
+	RETURNS TABLE(
+		view_schema  text,
+		view_name    text,
+		row_count    bigint
+		)
+	LANGUAGE plpgsql
+	AS       $function$
+
+	DECLARE
+		r record;
+		count_val bigint;
+
+	BEGIN
+		FOR r IN SELECT
+					schemaname,
+					viewname
+				 FROM
+				 	pg_catalog.pg_views
+				 WHERE
+				 	schemaname NOT IN ('pg_catalog', 'information_schema')
+				 	AND viewname <> 'v_pg_show_count_view_rows'
+				 	AND viewname like 'cam_%'
+				 ORDER BY schemaname, viewname
+		LOOP
+			EXECUTE format('SELECT COUNT(*) FROM %I.%I', r.schemaname, r.viewname)
+			INTO count_val;
+			view_schema := r.schemaname;
+			view_name := r.viewname;
+			row_count := count_val;
+			RETURN NEXT;
+		END LOOP;
+		RETURN;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_count_view_rows() OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_count_view_rows() TO neondb_owner;

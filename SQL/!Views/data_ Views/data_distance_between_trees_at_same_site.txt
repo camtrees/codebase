@@ -1,0 +1,40 @@
+------------------------------------------------------------------------------------------
+-- View: data_distance_between_trees_at_same_site
+--
+-- Purpose: Show tree to tree distance but only for trees at the same site
+--
+-- Create Order :
+--		MUST BE AFTER
+--			site
+--			tree
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_distance_between_trees_at_same_site;
+CREATE OR REPLACE VIEW data_distance_between_trees_at_same_site AS
+	SELECT
+		s.name                                                              AS site,
+		t1.number                                                           AS tree1_number,
+		t2.number                                                           AS tree2_number,
+		ROUND(ST_Distance(t1.geog, t2.geog))                                AS distance_in_meters,
+		ROUND((ST_Distance(t1.geog, t2.geog) * 3.280839895)::numeric,1) AS distance_in_feet
+	FROM
+		tree t1
+	JOIN -- join tree table to itself to get all combinations
+		tree t2
+		ON t1.site_id = t2.site_id -- only calculate distance for trees at same site
+		AND t1.number <> t2.number -- yields double rows versus using just '<'
+	JOIN -- so we can see site names
+		site s
+		ON t1.site_id = s.id
+	WHERE -- so we can exclude certain trees
+		ST_Distance(t1.geog, t2.geog) <> 0 -- exclude sites that have the same longitude and latitude for all trees
+		-- UNCOMMENT the following line to get the distance between trees at a particular site
+		-- AND s.name = 'PVT KLC House'
+		-- UNCOMMENT the following line to see only distance for tree '003' 
+		-- AND t1.number = '003'
+		-- UNCOMMENT the above and following lines to see only the distance between trees '001' and '009'
+		-- AND t2.number = '009'
+	ORDER BY
+		s.name,
+		t1.number,
+		t2.number
+	;

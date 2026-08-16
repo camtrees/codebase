@@ -1,0 +1,81 @@
+------------------------------------------------------------------------------------------
+-- Table : volunteer
+--
+-- Purpose  : The list of all volunteers
+--
+-- Create Order:
+--		MUST BE BEFORE
+--			hub
+--			organization
+--			site
+--			tree
+--			tree_care_action
+--			tree_health_assessment
+--			tree_photo
+--			volunteer_interest
+--			volunteer_phone
+--		MUST BE AFTER
+--			***state
+--			***town
+--			***volunteer_status_type
+------------------------------------------------------------------------------------------
+-- public.volunteer definition
+
+-- Drop table
+
+-- DROP TABLE public.volunteer;
+
+CREATE TABLE public.volunteer (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	email text NOT NULL, -- The volunteer's email address
+	first_name text NOT NULL -- The volunteer's first name,
+	last_name text NOT NULL, -- The volunteer's last name
+	title text NULL -- The volunteer's title,
+	status_id int4 NOT NULL, -- The volunteer's status (active, inactive, etc)
+	town_id int4 NULL -- The volunteer's home town,
+	date_created date NOT NULL, -- The date the record was created
+	date_updated date NOT NULL, -- The date the record was most recently updated
+	CONSTRAINT volunteer_date_created_not_null NOT NULL date_created,
+	CONSTRAINT volunteer_date_updated_not_null NOT NULL date_updated,
+	CONSTRAINT volunteer_email_not_null NOT NULL email,
+	CONSTRAINT volunteer_first_name_not_null NOT NULL first_name,
+	CONSTRAINT volunteer_id_not_null NOT NULL id,
+	CONSTRAINT volunteer_last_name_not_null NOT NULL last_name,
+	CONSTRAINT volunteer_pkey PRIMARY KEY (id),
+	CONSTRAINT volunteer_status_id_not_null NOT NULL status_id
+);
+CREATE UNIQUE INDEX volunteer_email_unique ON public.volunteer USING btree (email);
+CREATE UNIQUE INDEX volunteer_first_name_and_last_name_unique ON public.volunteer USING btree (first_name, last_name);
+COMMENT ON TABLE public.volunteer IS 'Volunteers. All persons referenced in any table must appear in this table.';
+
+-- Column comments
+
+COMMENT ON COLUMN public.volunteer.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.volunteer.email IS 'The volunteer''s email address';
+COMMENT ON COLUMN public.volunteer.first_name IS 'The volunteer''s first name';
+COMMENT ON COLUMN public.volunteer.last_name IS 'The volunteer''s last name';
+COMMENT ON COLUMN public.volunteer.title IS 'The volunteer''s title';
+COMMENT ON COLUMN public.volunteer.status_id IS 'The volunteer''s status (active, inactive, etc)';
+COMMENT ON COLUMN public.volunteer.town_id IS 'The volunteer''s home town';
+COMMENT ON COLUMN public.volunteer.date_created IS 'The date the record was created';
+COMMENT ON COLUMN public.volunteer.date_updated IS 'The date the record was most recently updated';
+
+-- Table Triggers
+
+create trigger camtrees_manage_dates before
+insert
+    or
+update
+    on
+    public.volunteer for each row execute function camtrees_manage_dates();
+
+-- Permissions
+
+ALTER TABLE public.volunteer OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.volunteer TO neondb_owner;
+
+
+-- public.volunteer foreign keys
+
+ALTER TABLE public.volunteer ADD CONSTRAINT volunteer_status_id_fkey FOREIGN KEY (status_id) REFERENCES public.volunteer_status_type(id);
+ALTER TABLE public.volunteer ADD CONSTRAINT volunteer_town_id_fkey FOREIGN KEY (town_id) REFERENCES public.town(id);

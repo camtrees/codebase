@@ -1,0 +1,29 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_trees_with_no_elevation
+--
+-- Purpose: Trees with missing elevation
+--
+-- Create Order:
+--		MUST BE AFTER
+--          site
+--			tree
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_trees_with_no_elevation;
+CREATE OR REPLACE VIEW data_error_trees_with_no_elevation AS
+	SELECT
+		s.name              AS site,
+		t.number            AS tree_number,
+		t.longitude         AS longitude,
+		t.latitude          AS latitude,
+		t.elevation_in_feet AS tree_elevation
+	FROM
+		tree t
+	JOIN
+		site s
+		ON t.site_id = s.id
+	WHERE
+		t.elevation_in_feet IS NULL
+	ORDER BY
+		s.name,
+		t.number
+	;

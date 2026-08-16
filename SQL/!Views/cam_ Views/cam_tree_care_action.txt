@@ -1,0 +1,50 @@
+------------------------------------------------------------------------------------------
+-- View: cam_tree_care_action
+--
+-- Purpose: The tree_care_actions performed by volunteers
+--
+-- Create Order :
+--		MUST BE AFTER
+--			***epicollect_record_type
+--			site
+--			tree_care_action
+--			***tree_care_action_type
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_tree_care_action;
+CREATE OR REPLACE VIEW cam_tree_care_action AS
+	SELECT
+		v.first_name || ' ' || v.last_name AS volunteer,
+		e.record_type,
+		s.name                             AS site,
+		t.number                           AS tree_number,
+		tca.date,
+		v.email                            AS volunteer_email,
+		tcat.care_action,
+		tca.date_created,
+		tca.date_updated,
+		tca.note,
+		tree_id
+	FROM
+		tree_care_action tca
+	LEFT JOIN
+		epicollect_record_type e
+		ON tca.epicollect_record_type_id = e.id
+	LEFT JOIN
+		tree t
+		ON tca.tree_id = t.id
+	LEFT JOIN
+		site s
+		ON t.site_id = s.id
+	LEFT JOIN
+		volunteer v
+		ON tca.volunteer_id = v.id
+	LEFT JOIN
+		tree_care_action_type tcat
+		ON tca.care_action_id = tcat.id
+	ORDER BY
+		s.name,
+		t.number,
+		tca.date,
+		tcat.care_action
+	;

@@ -1,0 +1,63 @@
+------------------------------------------------------------------------------------------
+-- View: data_site_visit
+--
+-- Purpose: Show data useful to have printed for when a volunteer performs a site visit
+--
+-- Create Order :
+--		MUST BE AFTER
+--			cam_tree_latest_health
+--			site
+--			tree
+--			***tree_access_level_type
+--			***tree_access_method_type
+--			***tree_access_path_type
+--			***tree_form_type
+--			***tree_planting_method_type
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_site_visit;
+CREATE OR REPLACE VIEW data_site_visit AS
+	SELECT
+		s.name                                  AS "Site",
+		t.number                                AS "Tree #",
+		t.date                                  AS "Planted",
+		ctlh.latest_health                      AS "Health",
+		tapt.access_path                        AS "Access Path",
+		talt.access_level                       AS "Access Level",
+		t.gps_locked                            AS "GPS Locked",
+		tpmt.planting_method                    AS "Planting Method",
+		t.wire_fence                            AS "Wire Fence",
+		p1.parent                               AS "Mother Tree",
+		p2.parent                               AS "Father Tree",
+		t.parent_tree_note                      AS "Parent Tree Note",
+		t.note                                  AS "Note"
+	FROM
+		tree t
+	LEFT JOIN
+		tree_parent_type p1
+		ON t.mother_tree_id = p1.id
+	LEFT JOIN
+		tree_parent_type p2
+		ON t.father_tree_id = p2.id
+	LEFT JOIN
+		site s
+		ON t.site_id = s.id
+	LEFT JOIN
+		tree_access_path_type tapt
+		ON t.access_path_id = tapt.id
+	LEFT JOIN
+		tree_access_level_type talt
+		ON t.access_level_id = talt.id
+	LEFT JOIN
+		tree_form_type tft
+		ON t.form_id = tft.id
+	LEFT JOIN
+		tree_planting_method_type tpmt
+		ON t.planting_method_id = tpmt.id
+	LEFT JOIN
+		cam_tree_latest_health ctlh
+		ON s.name  = ctlh.site 
+		AND t.number  = ctlh.tree_number 
+	ORDER BY
+		s.name,
+		t.number
+	;

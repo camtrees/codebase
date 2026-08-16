@@ -1,0 +1,29 @@
+------------------------------------------------------------------------------------------
+-- View: data_crosstab_tree_planting_method_by_wire_fence
+--
+-- Create Order:
+--		MUST BE AFTER
+--			cam_trees
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_crosstab_tree_planting_method_by_wire_fence;
+CREATE OR REPLACE VIEW data_crosstab_tree_planting_method_by_wire_fence AS
+	SELECT
+		COALESCE(planting_method, 'Column Total') AS "Planting Method",
+		COUNT(*) FILTER (WHERE wire_fence IS TRUE)     AS "Wire Fence TRUE",
+		COUNT(*) FILTER (WHERE wire_fence IS FALSE)    AS "Wire Fence FALSE",
+		COUNT(*) FILTER (WHERE wire_fence IS NULL)     AS "Wire Fence NULL",
+		COUNT(*)                                       AS "Row Total"
+	FROM
+		cam_trees
+	GROUP BY
+		ROLLUP(planting_method) -- Generates a total row for all tpmt.planting_method
+		ORDER BY
+			CASE coalesce(planting_method,'Unknown Planting Method')
+				WHEN 'short tube' THEN 1
+				WHEN 'half tube'  THEN 2
+				WHEN 'tall tube'  THEN 3
+				WHEN 'n/a'        THEN 4
+				WHEN 'unknown'    THEN 4
+								  ELSE 5 -- for values not in the custom list, sort them normally or give them a low priority
+				END
+	;

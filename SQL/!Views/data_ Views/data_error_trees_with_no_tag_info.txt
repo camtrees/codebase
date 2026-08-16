@@ -1,0 +1,29 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_trees_with_no_tag_info
+--
+-- Purpose: Trees with no tag_info
+--
+-- Create Order:
+--		MUST BE AFTER
+--			tree
+--			site
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_trees_with_no_tag_info;
+CREATE OR REPLACE VIEW data_error_trees_with_no_tag_info AS
+	SELECT
+		s.name         AS site,
+		t.number       AS tree_number,
+		t.tag_info
+	FROM
+		tree t
+	JOIN
+		site s
+		ON t.site_id = s.id
+	WHERE
+		t.tag_info IS NULL
+		AND LOWER(s.name) <> 'wild tree unknown to tacf'
+		AND LOWER(s.name) <> 'wild tree known to tacf'
+	ORDER BY
+		s.name,
+		t.number
+	;

@@ -1,0 +1,56 @@
+------------------------------------------------------------------------------------------
+-- View: cam_volunteers
+--
+-- Purpose: The list of all volunteers
+--
+-- Create Order :
+--		MUST BE AFTER
+--			state
+--			town
+--			volunteer
+--			volunteer_phone
+--			***volunteer_status_type
+------------------------------------------------------------------------------------------
+DROP VIEW IF EXISTS cam_volunteers;
+CREATE OR REPLACE VIEW cam_volunteers AS
+	SELECT
+		v.first_name,
+		v.last_name,
+		v.first_name || ' ' || v.last_name AS "volunteer",
+		v.email,
+		v.title,
+		vst.status,
+		regexp_replace(vp1.number, '(\d{3})(\d{3})(\d{4})', '(\1) \2-\3')  AS "cell_phone",
+		regexp_replace(vp2.number, '(\d{3})(\d{3})(\d{4})', '(\1) \2-\3')  AS "work_phone",
+		regexp_replace(vp3.number, '(\d{3})(\d{3})(\d{4})', '(\1) \2-\3')  AS "home_phone",
+		t.name AS town,
+		s.code AS state,
+		s.name AS state_name,
+		v.date_created,
+		v.date_updated
+	FROM
+		volunteer v
+	LEFT JOIN
+		volunteer_status_type vst
+		ON v.status_id = vst.id
+	LEFT JOIN
+		town t
+		ON v.town_id = t.id
+	LEFT JOIN
+		state s
+		ON t.state_code = s.code
+	LEFT JOIN
+		volunteer_phone vp1
+		ON vp1.volunteer_id = v.id
+		AND vp1.phone_type_id = (SELECT id FROM phone_type WHERE phone_type.label='cell')
+	LEFT JOIN
+		volunteer_phone vp2
+		ON vp2.volunteer_id = v.id
+		AND vp2.phone_type_id = (SELECT id FROM phone_type WHERE phone_type.label='work')
+	LEFT JOIN
+		volunteer_phone vp3
+		ON vp3.volunteer_id = v.id
+		AND vp3.phone_type_id = (SELECT id FROM phone_type WHERE phone_type.label='home')
+	ORDER BY
+		v.first_name, v.last_name
+	;

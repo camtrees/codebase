@@ -1,0 +1,39 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_sites_in_multiple_hubs
+--
+-- Purpose: Sites in more than one hub
+--
+-- Create Order:
+--		MUST BE AFTER
+--			hub
+--			site
+--			site_hub
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_sites_in_multiple_hubs;
+CREATE OR REPLACE VIEW data_error_sites_in_multiple_hubs AS
+	SELECT
+		s.name AS site,
+		h.name AS hub
+	FROM
+		site s
+	JOIN
+		site_hub sh
+		ON s.id = sh.site_id
+	JOIN
+		hub h
+		ON sh.hub_id = h.id
+	WHERE 
+		s.id IN (
+		SELECT
+			site_id 
+		FROM
+			site_hub 
+		GROUP BY
+			site_id 
+		HAVING
+			COUNT(DISTINCT hub_id) > 1
+		)
+	ORDER BY
+		s.name,
+		h.name
+	;

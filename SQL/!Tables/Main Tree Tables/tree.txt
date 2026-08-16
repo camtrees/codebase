@@ -1,0 +1,131 @@
+------------------------------------------------------------------------------------------
+-- Table: tree
+--
+-- Purpose: A list of CAM trees planted
+--
+-- Create Order:
+--		MUST BE BEFORE
+--		MUST BE AFTER
+--			***epicollect_record_type
+--			site
+--			***tree_access_level_type
+--			***tree_access_method_type
+--			***tree_access_path_type
+--			***tree_form_type
+--			***tree_planting_method_type
+--			volunteer
+------------------------------------------------------------------------------------------
+-- public.tree definition
+
+-- Drop table
+
+-- DROP TABLE public.tree;
+
+CREATE TABLE public.tree (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	epicollect_record_type_id int4 NOT NULL, -- The EpiCollect record_type (pathway through the app) used to collect the data
+	site_id int4 NOT NULL, -- The site at which the tree was planted
+	"number" text NOT NULL, -- The tree number as text. CAM planted trees are integers with leading zeroes. WildCAM trees use the longitude and latitude as a tree number. WildTACF trees use a tree id in the format 'ME-XXnnn' where XX are two uppercase letters and nnn are three digits.
+	"date" date NOT NULL, -- The date the tree was planted OR for Wild trees the date the tree was observed
+	volunteer_id int4 NOT NULL, -- The volunteer who planted the tree OR for Wild trees the volunteer who observed the tree
+	primary_caretaker_id int4 NULL, -- The primary caretaker of the tree. Responsible for watering, etc.
+	secondary_caretaker_id int4 NULL, -- The secondary caretaker of the tree. Responsible for watering, etc.
+	longitude float8 NULL, -- The GPS longitude
+	latitude float8 NULL, -- The GPS latitude
+	geog public.geography(point, 4326) GENERATED ALWAYS AS (st_setsrid(st_makepoint(longitude, latitude), 4326)::geography) STORED NULL, -- An ArcGIS POINT value used to plot the tree on a map
+	gps_locked bool DEFAULT false NOT NULL, -- 'true' means our Python scripts should NOT be allowed to update the Longitude and Latitude values
+	form_id int4 NULL, -- The tree form
+	planting_method_id int4 NULL, -- The method used to plant the tree
+	wire_fence bool NULL, -- Was a wire fence placed around the tree when it was planted?
+	tag_info text NULL, -- Additional info on the Mother and Father trees
+	classification text NULL, -- The botanical categorization of the tree
+	note text NULL, -- Any notes provided by the volunteer when PLANTING or OBSERVING the tree
+	date_created date NOT NULL, -- The date the record was created
+	date_updated date NOT NULL, -- The date the record was most recently updated
+	elevation_in_feet float8 NULL, -- The elevation of the tree
+	access_path_id int4 NULL, -- What kind of road, trail, etc is used to access the tree
+	access_level_id int4 NULL, -- How easy is it to access the tree
+	access_method_id int4 NULL, -- What method of access is necessary to pollinate or harvest the tree
+	access_note text NULL, -- Comments regarding tree accessibility
+	mother_tree_id int4 NULL, -- Mother tree
+	mother_tree_other text NULL, -- Mother tree recorded during planting when the mother tree is not in the current tree_parent_type list
+	father_tree_id int4 NULL, -- Father tree
+	father_tree_other text NULL, -- Father tree recorded during planting when the father tree is not in the current tree_parent_type list
+	parent_tree_note text NULL, -- Additional Mother/Father tree info provided when the tree was planted
+	CONSTRAINT tree_date_created_not_null NOT NULL date_created,
+	CONSTRAINT tree_date_not_null NOT NULL date,
+	CONSTRAINT tree_date_updated_not_null NOT NULL date_updated,
+	CONSTRAINT tree_epicollect_record_type_id_not_null NOT NULL epicollect_record_type_id,
+	CONSTRAINT tree_gps_locked_not_null NOT NULL gps_locked,
+	CONSTRAINT tree_id_not_null NOT NULL id,
+	CONSTRAINT tree_number_not_null NOT NULL number,
+	CONSTRAINT tree_pkey PRIMARY KEY (id),
+	CONSTRAINT tree_site_id_not_null NOT NULL site_id,
+	CONSTRAINT tree_volunteer_id_not_null NOT NULL volunteer_id
+);
+CREATE INDEX tree_geog_index ON public.tree USING gist (geog);
+CREATE UNIQUE INDEX tree_site_id_and_number_unique ON public.tree USING btree (site_id, number);
+COMMENT ON TABLE public.tree IS 'CAM planted trees or Wild trees under observation';
+
+-- Column comments
+
+COMMENT ON COLUMN public.tree.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.tree.epicollect_record_type_id IS 'The EpiCollect record_type (pathway through the app) used to collect the data';
+COMMENT ON COLUMN public.tree.site_id IS 'The site at which the tree was planted';
+COMMENT ON COLUMN public.tree."number" IS 'The tree number as text. CAM planted trees are integers with leading zeroes. WildCAM trees use the longitude and latitude as a tree number. WildTACF trees use a tree id in the format ''ME-XXnnn'' where XX are two uppercase letters and nnn are three digits.';
+COMMENT ON COLUMN public.tree."date" IS 'The date the tree was planted OR for Wild trees the date the tree was observed';
+COMMENT ON COLUMN public.tree.volunteer_id IS 'The volunteer who planted the tree OR for Wild trees the volunteer who observed the tree';
+COMMENT ON COLUMN public.tree.primary_caretaker_id IS 'The primary caretaker of the tree. Responsible for watering, etc.';
+COMMENT ON COLUMN public.tree.secondary_caretaker_id IS 'The secondary caretaker of the tree. Responsible for watering, etc.';
+COMMENT ON COLUMN public.tree.longitude IS 'The GPS longitude';
+COMMENT ON COLUMN public.tree.latitude IS 'The GPS latitude';
+COMMENT ON COLUMN public.tree.geog IS 'An ArcGIS POINT value used to plot the tree on a map';
+COMMENT ON COLUMN public.tree.gps_locked IS '''true'' means our Python scripts should NOT be allowed to update the Longitude and Latitude values';
+COMMENT ON COLUMN public.tree.form_id IS 'The tree form';
+COMMENT ON COLUMN public.tree.planting_method_id IS 'The method used to plant the tree';
+COMMENT ON COLUMN public.tree.wire_fence IS 'Was a wire fence placed around the tree when it was planted?';
+COMMENT ON COLUMN public.tree.tag_info IS 'Additional info on the Mother and Father trees';
+COMMENT ON COLUMN public.tree.classification IS 'The botanical categorization of the tree';
+COMMENT ON COLUMN public.tree.note IS 'Any notes provided by the volunteer when PLANTING or OBSERVING the tree';
+COMMENT ON COLUMN public.tree.date_created IS 'The date the record was created';
+COMMENT ON COLUMN public.tree.date_updated IS 'The date the record was most recently updated';
+COMMENT ON COLUMN public.tree.elevation_in_feet IS 'The elevation of the tree';
+COMMENT ON COLUMN public.tree.access_path_id IS 'What kind of road, trail, etc is used to access the tree';
+COMMENT ON COLUMN public.tree.access_level_id IS 'How easy is it to access the tree';
+COMMENT ON COLUMN public.tree.access_method_id IS 'What method of access is necessary to pollinate or harvest the tree';
+COMMENT ON COLUMN public.tree.access_note IS 'Comments regarding tree accessibility';
+COMMENT ON COLUMN public.tree.mother_tree_id IS 'Mother tree';
+COMMENT ON COLUMN public.tree.mother_tree_other IS 'Mother tree recorded during planting when the mother tree is not in the current tree_parent_type list';
+COMMENT ON COLUMN public.tree.father_tree_id IS 'Father tree';
+COMMENT ON COLUMN public.tree.father_tree_other IS 'Father tree recorded during planting when the father tree is not in the current tree_parent_type list';
+COMMENT ON COLUMN public.tree.parent_tree_note IS 'Additional Mother/Father tree info provided when the tree was planted';
+
+-- Table Triggers
+
+create trigger camtrees_manage_dates before
+insert
+    or
+update
+    on
+    public.tree for each row execute function camtrees_manage_dates();
+
+-- Permissions
+
+ALTER TABLE public.tree OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.tree TO neondb_owner;
+
+
+-- public.tree foreign keys
+
+ALTER TABLE public.tree ADD CONSTRAINT tree_access_level_type_id_fkey FOREIGN KEY (access_level_id) REFERENCES public.tree_access_level_type(id);
+ALTER TABLE public.tree ADD CONSTRAINT tree_access_method_type_id_fkey FOREIGN KEY (access_method_id) REFERENCES public.tree_access_method_type(id);
+ALTER TABLE public.tree ADD CONSTRAINT tree_access_path_type_id_fkey FOREIGN KEY (access_path_id) REFERENCES public.tree_access_path_type(id);
+ALTER TABLE public.tree ADD CONSTRAINT tree_epicollect_record_type_id_fkey FOREIGN KEY (epicollect_record_type_id) REFERENCES public.epicollect_record_type(id);
+ALTER TABLE public.tree ADD CONSTRAINT tree_father_tree_id_fkey FOREIGN KEY (father_tree_id) REFERENCES public.tree_parent_type(id);
+ALTER TABLE public.tree ADD CONSTRAINT tree_form_id_fkey FOREIGN KEY (form_id) REFERENCES public.tree_form_type(id);
+ALTER TABLE public.tree ADD CONSTRAINT tree_mother_tree_id_fkey FOREIGN KEY (mother_tree_id) REFERENCES public.tree_parent_type(id);
+ALTER TABLE public.tree ADD CONSTRAINT tree_planting_method_id_fkey FOREIGN KEY (planting_method_id) REFERENCES public.tree_planting_method_type(id);
+ALTER TABLE public.tree ADD CONSTRAINT tree_primary_caretaker_id_fkey FOREIGN KEY (primary_caretaker_id) REFERENCES public.volunteer(id);
+ALTER TABLE public.tree ADD CONSTRAINT tree_secondary_caretaker_id_fkey FOREIGN KEY (secondary_caretaker_id) REFERENCES public.volunteer(id);
+ALTER TABLE public.tree ADD CONSTRAINT tree_site_id_fkey FOREIGN KEY (site_id) REFERENCES public.site(id);
+ALTER TABLE public.tree ADD CONSTRAINT tree_volunteer_id_fkey FOREIGN KEY (volunteer_id) REFERENCES public.volunteer(id);

@@ -1,0 +1,49 @@
+------------------------------------------------------------------------------------------
+-- View: data_count_trees_by_health
+--
+-- Purpose: Show count of trees by the tree health
+--
+-- Create Order:
+--		MUST BE AFTER
+--			cam_trees
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_count_trees_by_health;
+CREATE OR REPLACE VIEW data_count_trees_by_health AS
+	SELECT 
+		COALESCE(tht.health, 'unknown health') AS "Health",
+		count(*)                               AS "# Trees"
+	FROM
+		tree t
+	LEFT JOIN
+		tree_health_assessment tha
+		ON t.id = tha.tree_id
+	LEFT JOIN
+		tree_health_type tht
+		ON tha.health_id = tht.id
+	LEFT JOIN (
+		SELECT 
+			tree_id,
+			MAX(date) as latest_date
+		FROM
+			tree_health_assessment 
+		WHERE
+			health_id IS NOT NULL
+		GROUP BY
+			tree_id
+		) latest_health
+		ON t.id = latest_health.tree_id
+		AND tha.date = latest_health.latest_date
+	WHERE
+		tha.id IS NULL
+		OR tha.date = latest_health.latest_date
+	GROUP BY
+		COALESCE(tht.health, 'unknown health')
+	ORDER BY 
+		CASE COALESCE(tht.health, 'unknown health')
+			WHEN 'good'    THEN 1
+			WHEN 'poor'    THEN 2
+			WHEN 'dead'    THEN 3
+			WHEN 'dormant' THEN 4
+			ELSE 5 -- for values not in the custom list, sort them normally or give them a low priority
+		END
+	;

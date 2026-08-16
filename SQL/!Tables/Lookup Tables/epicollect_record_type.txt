@@ -1,0 +1,37 @@
+------------------------------------------------------------------------------------------
+-- Table: epicollect_record_type
+--
+-- Purpose: The list of EpiCollect record types
+--
+-- Create Order:
+--		MUST BE BEFORE
+--			tree
+--			tree_care_action
+--			tree_health_assessment
+--			tree_photo
+------------------------------------------------------------------------------------------
+-- public.epicollect_record_type definition
+
+-- Drop table
+
+-- DROP TABLE public.epicollect_record_type;
+
+CREATE TABLE public.epicollect_record_type (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	record_type text NOT NULL, -- EpiCollect record types (path the volunteer takes trhough the iPhone appapp)
+	CONSTRAINT epicollect_record_type_id_not_null NOT NULL id,
+	CONSTRAINT epicollect_record_type_pkey PRIMARY KEY (id),
+	CONSTRAINT epicollect_record_type_record_type_not_null NOT NULL record_type
+);
+CREATE UNIQUE INDEX epicollect_record_type_record_type_unique ON public.epicollect_record_type USING btree (record_type);
+COMMENT ON TABLE public.epicollect_record_type IS 'Lookup Table - EpiCollect record types (path the volunteer takes trhough the iPhone app)';
+
+-- Column comments
+
+COMMENT ON COLUMN public.epicollect_record_type.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.epicollect_record_type.record_type IS 'EpiCollect record types (path the volunteer takes trhough the iPhone appapp)';
+
+-- Permissions
+
+ALTER TABLE public.epicollect_record_type OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.epicollect_record_type TO neondb_owner;

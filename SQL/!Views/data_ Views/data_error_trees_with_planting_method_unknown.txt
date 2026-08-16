@@ -1,0 +1,31 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_trees_with_planting_method_unknown
+--
+-- Purpose: Trees with unknown planting method
+--
+-- Create Order:
+--		MUST BE AFTER
+--			tree
+--          site
+--          tree_planting_method_type
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_trees_with_planting_method_unknown;
+CREATE OR REPLACE VIEW data_error_trees_with_planting_method_unknown AS
+	SELECT
+		s.name               AS site,
+		t.number             AS tree_number,
+		pmt.planting_method  AS planting_method
+	FROM
+		tree t
+	JOIN
+		site s
+		ON t.site_id = s.id
+	JOIN
+		tree_planting_method_type pmt
+		ON t.planting_method_id = pmt.id
+	WHERE
+		planting_method = 'unknown'
+	ORDER BY
+		site,
+		tree_number
+	;

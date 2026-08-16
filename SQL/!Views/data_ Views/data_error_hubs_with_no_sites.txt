@@ -1,0 +1,24 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_hubs_with_no_sites
+--
+-- Purpose: Hubs not linked to any sites
+--
+-- Create Order:
+--		MUST BE AFTER
+--			hub
+--			site_hub
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_hubs_with_no_sites;
+CREATE OR REPLACE VIEW data_error_hubs_with_no_sites AS
+	SELECT
+		h.name AS "Hubs with no Sites"
+	FROM
+		hub h
+	LEFT JOIN
+		site_hub sh
+		ON h.id = sh.hub_id
+	WHERE
+		sh.hub_id IS NULL
+	ORDER BY
+		h.name
+	;

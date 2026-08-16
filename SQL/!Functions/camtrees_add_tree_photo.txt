@@ -1,0 +1,76 @@
+------------------------------------------------------------------------------------------
+-- Function: camtrees_add_tree_photo
+--
+-- Purpose: Add a new tree photo
+--
+-- Returns: the id number of the tree_photo added
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_add_tree_photo(text, text, text, date, text, text);
+
+CREATE OR REPLACE FUNCTION public.camtrees_add_tree_photo(
+	p_epicollect_record_type  text,
+	p_site_name               text,
+	p_tree_number             text,
+	p_date                    date,
+	p_volunteer_email         text,
+	p_filename                text
+	)
+	RETURNS  integer
+	LANGUAGE plpgsql
+	AS       $function$
+
+	DECLARE
+		v_epicollect_record_type_id INTEGER;
+		v_site_id                   INTEGER;
+		v_tree_id                   INTEGER;
+		v_volunteer_id              INTEGER;
+		v_photo_id                  INTEGER;
+
+	BEGIN
+		-- Get epicollect_record_type_id
+		SELECT id INTO v_epicollect_record_type_id FROM epicollect_record_type WHERE record_type = lower(p_epicollect_record_type);
+
+		-- Get site_id
+		SELECT id INTO v_site_id FROM site WHERE name = p_site_name;
+		IF v_site_id IS NULL THEN
+			RAISE EXCEPTION 'Site not found: %', p_site_name;
+		END IF;
+		
+		-- Get tree_id
+		SELECT id INTO v_tree_id FROM tree WHERE site_id=v_Site_id and number=p_tree_number;
+		IF v_tree_id IS NULL THEN
+			RAISE EXCEPTION 'Tree not found. Site:"%" Tree_Number:"%"', p_site_name, p_tree_number;
+		END IF;
+
+		-- Get the volunteer_id
+		SELECT id INTO v_volunteer_id FROM volunteer WHERE email = lower(p_volunteer_email);
+		IF v_volunteer_id IS NULL THEN
+			RAISE EXCEPTION 'Volunteer not found: %', p_volunteer_email;
+		END IF;
+
+		-- Insert the new tree
+		INSERT INTO tree_photo (
+			epicollect_record_type_id,
+			tree_id,
+			date,
+			volunteer_id,
+			filename
+			)
+		VALUES (
+			v_epicollect_record_type_id,
+			v_tree_id,
+			p_date,
+			v_volunteer_id,
+			p_filename
+			)
+		RETURNING id INTO v_photo_id;
+		
+		RETURN v_photo_id;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_add_tree_photo(text, text, text, date, text, text) OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_add_tree_photo(text, text, text, date, text, text) TO neondb_owner;

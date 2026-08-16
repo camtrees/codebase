@@ -1,0 +1,46 @@
+------------------------------------------------------------------------------------------
+-- View: cam_tree_latest_water
+--
+-- Purpose: Show most recent date trees have been watered
+--
+-- Create Order:
+--		MUST BE AFTER
+--			tree
+--			site
+--			tree_care_action
+--			tree_care_action_type
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_tree_latest_water;
+CREATE VIEW cam_tree_latest_water AS 
+	WITH ranked_water_date AS (
+		SELECT 
+			s.name   AS site, 
+			t.number AS tree_number, 
+			tca.date AS latest_water_date,
+			ROW_NUMBER() OVER (
+				PARTITION BY s.name, t.number 
+				ORDER BY tca.date DESC
+			) AS rn
+		FROM
+			tree_care_action tca 
+		JOIN
+			tree t ON tca.tree_id = t.id 
+		JOIN
+			site s ON t.site_id = s.id 
+		JOIN
+			tree_care_action_type tcat ON tca.care_action_id = tcat.id 
+		WHERE
+			tcat.care_action = 'water'
+		) 
+	SELECT 
+		site, 
+		tree_number, 
+		latest_water_date 
+	FROM
+		ranked_water_date 
+	WHERE
+		rn = 1
+	ORDER BY
+		site,
+		tree_number
+	;

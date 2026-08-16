@@ -1,0 +1,21 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_sites_with_no_contact
+--
+-- Purpose: Sites with no contact person
+--
+-- Create Order :
+--		MUST BE AFTER
+--			site
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_sites_with_no_contact;
+CREATE OR REPLACE VIEW data_error_sites_with_no_contact AS
+	SELECT
+		name           AS site,
+		volunteer_id   AS contact
+	FROM
+		site
+	WHERE
+		volunteer_id IS NULL
+	ORDER BY
+		name
+	;

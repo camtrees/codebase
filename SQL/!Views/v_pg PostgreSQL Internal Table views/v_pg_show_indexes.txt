@@ -1,0 +1,21 @@
+------------------------------------------------------------------------------------------
+-- View: v_pg_show_indexes
+--
+-- Note: Could use DBeaver to show them instead
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS v_pg_show_indexes;
+CREATE OR REPLACE VIEW v_pg_show_indexes AS
+	SELECT
+		split_part(indexname, '_', -1) AS index_type,
+		tablename,
+		indexname,
+		indexdef
+	FROM
+		pg_indexes
+	WHERE
+		schemaname = 'public'::name
+	ORDER BY
+		index_type,
+		tablename,
+		indexname
+	;

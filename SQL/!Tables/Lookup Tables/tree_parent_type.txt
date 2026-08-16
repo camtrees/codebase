@@ -1,0 +1,37 @@
+------------------------------------------------------------------------------------------
+-- Table: tree_parent_type
+--
+-- Purpose: The list of parent (Mother and Father) trees
+--
+-- Create Order:
+--		MUST BE BEFORE
+--			tree
+--      if building tables from scratch
+------------------------------------------------------------------------------------------
+-- public.tree_parent_type definition
+
+-- Drop table
+
+-- DROP TABLE public.tree_parent_type;
+
+CREATE TABLE public.tree_parent_type (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	parent text NOT NULL, -- Mother and Father trees
+	note text NULL, -- Any notes about the tree. Perhaps the tree's mother, or father, or location. Etc.
+	CONSTRAINT tree_parent_type_id_not_null NOT NULL id,
+	CONSTRAINT tree_parent_type_parent_not_null NOT NULL parent,
+	CONSTRAINT tree_parent_type_pkey PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX tree_parent_type_parent_unique ON public.tree_parent_type USING btree (parent);
+COMMENT ON TABLE public.tree_parent_type IS 'Lookup Table - Mother and Father Trees';
+
+-- Column comments
+
+COMMENT ON COLUMN public.tree_parent_type.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.tree_parent_type.parent IS 'Mother and Father trees';
+COMMENT ON COLUMN public.tree_parent_type.note IS 'Any notes about the tree. Perhaps the tree''s mother, or father, or location. Etc.';
+
+-- Permissions
+
+ALTER TABLE public.tree_parent_type OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.tree_parent_type TO neondb_owner;

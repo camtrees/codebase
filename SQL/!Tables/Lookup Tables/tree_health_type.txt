@@ -1,0 +1,34 @@
+------------------------------------------------------------------------------------------
+-- Table: tree_health_type
+--
+-- Purpose: The list of tree health types
+--
+-- Create Order:
+--		MUST BE BEFORE
+--			tree_health_assessment
+------------------------------------------------------------------------------------------
+-- public.tree_health_type definition
+
+-- Drop table
+
+-- DROP TABLE public.tree_health_type;
+
+CREATE TABLE public.tree_health_type (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	health text NOT NULL, -- The tree health
+	CONSTRAINT tree_health_type_health_not_null NOT NULL health,
+	CONSTRAINT tree_health_type_id_not_null NOT NULL id,
+	CONSTRAINT tree_health_type_pkey PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX tree_health_type_health_unique ON public.tree_health_type USING btree (health);
+COMMENT ON TABLE public.tree_health_type IS 'Lookup Table - Tree health (good, poor, dead)';
+
+-- Column comments
+
+COMMENT ON COLUMN public.tree_health_type.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.tree_health_type.health IS 'The tree health';
+
+-- Permissions
+
+ALTER TABLE public.tree_health_type OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.tree_health_type TO neondb_owner;

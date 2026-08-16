@@ -1,0 +1,30 @@
+------------------------------------------------------------------------------------------
+-- Table : epicollect_import_date
+--
+-- Purpose  : The date we last imported EpiCollect data from either
+--            the CAM Rain Event project or the CAM Tree Maintenance project
+------------------------------------------------------------------------------------------
+-- public.epicollect_import_date definition
+
+-- Drop table
+
+-- DROP TABLE public.epicollect_import_date;
+
+CREATE TABLE public.epicollect_import_date (
+	epicollect_project text NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	"date" date NOT NULL, -- The date each project was last processed
+	CONSTRAINT epicollect_import_date_date_not_null NOT NULL date,
+	CONSTRAINT epicollect_import_date_epicollect_project_not_null NOT NULL epicollect_project,
+	CONSTRAINT epicollect_import_date_pkey PRIMARY KEY (epicollect_project)
+);
+COMMENT ON TABLE public.epicollect_import_date IS 'Epicollect Import Dates from running Python programs';
+
+-- Column comments
+
+COMMENT ON COLUMN public.epicollect_import_date.epicollect_project IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.epicollect_import_date."date" IS 'The date each project was last processed';
+
+-- Permissions
+
+ALTER TABLE public.epicollect_import_date OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.epicollect_import_date TO neondb_owner;

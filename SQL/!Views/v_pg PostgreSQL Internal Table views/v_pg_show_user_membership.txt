@@ -1,0 +1,28 @@
+------------------------------------------------------------------------------------------
+-- View: v_pg_show_user_membership
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS v_pg_show_user_membership;
+CREATE OR REPLACE VIEW v_pg_show_user_membership AS
+	SELECT
+		rolname,
+		ARRAY(	SELECT
+					b.rolname
+				FROM
+					pg_auth_members m
+				JOIN
+					pg_roles b
+					ON m.roleid = b.oid
+				WHERE
+					m.member = r.oid) AS memberof
+	FROM
+		pg_roles r
+	WHERE
+		rolname <> ALL (ARRAY['pg_signal_backend'::name,
+							  'rds_iam'::name,
+							  'rds_replication'::name,
+							  'rds_superuser'::name,
+							  'rdsadmin'::name,
+							  'rdsrepladmin'::name])
+	ORDER BY
+		rolname
+	;

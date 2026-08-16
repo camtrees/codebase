@@ -1,0 +1,47 @@
+------------------------------------------------------------------------------------------
+-- Table: town
+--
+-- Purpose: List of all towns in Maine. Plus a few other towns in neighboring states
+--          for TACF volunteers, and for testing by Kenster
+--
+-- Create Order :
+--		MUST BE BEFORE
+--			site
+--			volunteer
+--		MUST BE AFTER
+--			state
+------------------------------------------------------------------------------------------
+-- public.town definition
+
+-- Drop table
+
+-- DROP TABLE public.town;
+
+CREATE TABLE public.town (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	"name" text NOT NULL, -- The town name
+	state_code varchar(2) NOT NULL, -- The state name
+	CONSTRAINT town_id_not_null NOT NULL id,
+	CONSTRAINT town_name_not_null NOT NULL name,
+	CONSTRAINT town_pkey PRIMARY KEY (id),
+	CONSTRAINT town_state_code_check CHECK ((char_length((state_code)::text) = 2)),
+	CONSTRAINT town_state_code_not_null NOT NULL state_code
+);
+CREATE UNIQUE INDEX town_name_and_state_code_unique ON public.town USING btree (name, state_code);
+COMMENT ON TABLE public.town IS 'Lookup Table - All towns in Maine with a few towns from other states';
+
+-- Column comments
+
+COMMENT ON COLUMN public.town.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.town."name" IS 'The town name';
+COMMENT ON COLUMN public.town.state_code IS 'The state name';
+
+-- Permissions
+
+ALTER TABLE public.town OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.town TO neondb_owner;
+
+
+-- public.town foreign keys
+
+ALTER TABLE public.town ADD CONSTRAINT town_state_code_fkey FOREIGN KEY (state_code) REFERENCES public.state(code);

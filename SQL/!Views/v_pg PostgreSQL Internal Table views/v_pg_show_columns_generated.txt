@@ -1,0 +1,15 @@
+------------------------------------------------------------------------------------------
+-- View: v_pg_show_columns_generated
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS v_pg_show_columns_generated;
+CREATE OR REPLACE VIEW v_pg_show_columns_generated AS
+	SELECT
+		table_schema,
+		table_name,
+		column_name,
+		generation_expression
+	FROM
+		information_schema.columns
+	WHERE
+		is_generated::text = 'ALWAYS'::text
+	;

@@ -1,0 +1,21 @@
+------------------------------------------------------------------------------------------
+-- View: data_export_epicollect_volunteer_email
+--
+-- Purpose: Export volunteer_email as CSV file to load into EpiCollect CAM Tree Maintenance form
+--
+-- Create Order:
+--		MUST BE AFTER
+--			tree_parent_type
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_export_epicollect_volunteer_email;
+CREATE OR REPLACE VIEW data_export_epicollect_volunteer_email AS
+	SELECT 
+		email AS "EpiCollect Collectors"
+	FROM
+		volunteer
+	WHERE
+		email != 'kimcolson.sebago@gmail.com'
+		AND email != 'ken.rosenberry@gmail.com'
+	ORDER BY
+		email ASC	
+	;

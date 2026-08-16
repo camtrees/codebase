@@ -1,0 +1,52 @@
+------------------------------------------------------------------------------------------
+-- View: cam_tree_latest_height
+--
+-- Purpose: Show latest tree_height
+--
+-- Note: Would be more efficient using a LEFT JOIN LATERAL instead of using ROW_NUMBER.
+--
+--       Google: postgresql using a LEFT JOIN LATERAL instead of using ROW_NUMBER
+--       for a good explanation of the difference.
+--
+-- Create Order:
+--		MUST BE AFTER
+--			tree_health_assessment
+--			tree
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_tree_latest_height;
+CREATE OR REPLACE VIEW cam_tree_latest_height AS
+	WITH ranked_assessments AS (
+		SELECT
+			tree_id,
+			date,
+			height_in_inches,
+			ROW_NUMBER() OVER (
+				PARTITION BY tree_id
+				ORDER BY date DESC, id DESC
+				) AS rn
+		FROM
+			tree_health_assessment
+		WHERE
+			height_in_inches IS NOT NULL
+		)
+		SELECT
+			s.name              AS site,
+			t.number            AS tree_number,
+			ra.height_in_inches AS latest_height_in_inches,
+			ra.date             AS latest_height_date
+		FROM
+			tree t
+		JOIN
+			site s
+			ON
+				t.site_id = s.id
+		JOIN
+			ranked_assessments ra
+			ON
+				t.id = ra.tree_id
+		WHERE
+			ra.rn = 1
+		ORDER BY
+			s.name,
+			t.number
+		;

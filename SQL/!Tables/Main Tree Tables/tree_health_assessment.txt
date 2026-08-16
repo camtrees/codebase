@@ -1,0 +1,90 @@
+------------------------------------------------------------------------------------------
+-- Table: tree_health_assessment
+--
+-- Purpose: The health assessments performed on trees
+--
+-- Create Order:
+--		MUST BE BEFORE
+--		MUST BE AFTER
+--			***epicollect_record_type
+--			site
+--			tree
+--			***tree_health_type
+--			***tree_health_nuts_type
+--			volunteer
+------------------------------------------------------------------------------------------
+-- public.tree_health_assessment definition
+
+-- Drop table
+
+-- DROP TABLE public.tree_health_assessment;
+
+CREATE TABLE public.tree_health_assessment (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	epicollect_record_type_id int4 NOT NULL, -- The EpiCollect record_type (pathway through the app) used to collect the data
+	"date" date NOT NULL, -- The date the health assessment was taken
+	volunteer_id int4 NOT NULL, -- The volunteer who performed the health assessment
+	health_id int4 NULL, -- The health of the tree
+	height_in_inches numeric(6, 2) NULL, -- The height of the tree
+	diameter_in_inches numeric(6, 2) NULL, -- The diameter of the tree
+	blight bool NULL, -- Does the tree have blight?
+	stump_sprouting bool NULL, -- Is there any stump sprouting?
+	catkins bool NULL, -- Does the tree have catkins?
+	blossoms bool NULL, -- Does the tree have blossoms?
+	nuts_id int4 NULL, -- Are there Nuts (Burrs) Present?
+	note text NULL, -- Any notes provided by the volunteer when performing the tree health assessment
+	date_created date NOT NULL, -- The date the record was created
+	date_updated date NOT NULL, -- The date the record was most recently updated
+	tree_id int4 NOT NULL, -- The tree for which the health assessment was taken
+	CONSTRAINT tree_health_assesment_date_not_null NOT NULL date,
+	CONSTRAINT tree_health_assesment_epicollect_record_type_id_not_null NOT NULL epicollect_record_type_id,
+	CONSTRAINT tree_health_assesment_id_not_null NOT NULL id,
+	CONSTRAINT tree_health_assesment_pkey PRIMARY KEY (id),
+	CONSTRAINT tree_health_assesment_volunteer_id_not_null NOT NULL volunteer_id,
+	CONSTRAINT tree_health_assessment_date_created_not_null NOT NULL date_created,
+	CONSTRAINT tree_health_assessment_date_updated_not_null NOT NULL date_updated,
+	CONSTRAINT tree_health_assessment_tree_id_not_null NOT NULL tree_id
+);
+COMMENT ON TABLE public.tree_health_assessment IS 'Tree measurements and observations to access the health of the tree';
+
+-- Column comments
+
+COMMENT ON COLUMN public.tree_health_assessment.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.tree_health_assessment.epicollect_record_type_id IS 'The EpiCollect record_type (pathway through the app) used to collect the data';
+COMMENT ON COLUMN public.tree_health_assessment."date" IS 'The date the health assessment was taken';
+COMMENT ON COLUMN public.tree_health_assessment.volunteer_id IS 'The volunteer who performed the health assessment';
+COMMENT ON COLUMN public.tree_health_assessment.health_id IS 'The health of the tree';
+COMMENT ON COLUMN public.tree_health_assessment.height_in_inches IS 'The height of the tree';
+COMMENT ON COLUMN public.tree_health_assessment.diameter_in_inches IS 'The diameter of the tree';
+COMMENT ON COLUMN public.tree_health_assessment.blight IS 'Does the tree have blight?';
+COMMENT ON COLUMN public.tree_health_assessment.stump_sprouting IS 'Is there any stump sprouting?';
+COMMENT ON COLUMN public.tree_health_assessment.catkins IS 'Does the tree have catkins?';
+COMMENT ON COLUMN public.tree_health_assessment.blossoms IS 'Does the tree have blossoms?';
+COMMENT ON COLUMN public.tree_health_assessment.nuts_id IS 'Are there Nuts (Burrs) Present?';
+COMMENT ON COLUMN public.tree_health_assessment.note IS 'Any notes provided by the volunteer when performing the tree health assessment';
+COMMENT ON COLUMN public.tree_health_assessment.date_created IS 'The date the record was created';
+COMMENT ON COLUMN public.tree_health_assessment.date_updated IS 'The date the record was most recently updated';
+COMMENT ON COLUMN public.tree_health_assessment.tree_id IS 'The tree for which the health assessment was taken';
+
+-- Table Triggers
+
+create trigger camtrees_manage_dates before
+insert
+    or
+update
+    on
+    public.tree_health_assessment for each row execute function camtrees_manage_dates();
+
+-- Permissions
+
+ALTER TABLE public.tree_health_assessment OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.tree_health_assessment TO neondb_owner;
+
+
+-- public.tree_health_assessment foreign keys
+
+ALTER TABLE public.tree_health_assessment ADD CONSTRAINT tree_health_assesment_epicollect_record_type_id_fkey FOREIGN KEY (epicollect_record_type_id) REFERENCES public.epicollect_record_type(id);
+ALTER TABLE public.tree_health_assessment ADD CONSTRAINT tree_health_assesment_health_id_fkey FOREIGN KEY (health_id) REFERENCES public.tree_health_type(id);
+ALTER TABLE public.tree_health_assessment ADD CONSTRAINT tree_health_assesment_nuts_id_fkey FOREIGN KEY (nuts_id) REFERENCES public.tree_health_nuts_type(id);
+ALTER TABLE public.tree_health_assessment ADD CONSTRAINT tree_health_assesment_volunteer_id_fkey FOREIGN KEY (volunteer_id) REFERENCES public.volunteer(id);
+ALTER TABLE public.tree_health_assessment ADD CONSTRAINT tree_health_assessment_tree_id_fkey FOREIGN KEY (tree_id) REFERENCES public.tree(id);

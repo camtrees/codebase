@@ -1,0 +1,25 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_volunteers_with_no_hometown
+--
+-- Purpose: Volunteers with no home town
+--
+-- Create Order:
+--		MUST BE AFTER
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_volunteers_with_no_hometown;
+CREATE OR REPLACE VIEW data_error_volunteers_with_no_hometown AS
+	SELECT
+		first_name,
+		last_name,
+		email,
+		town_id       AS "hometown"
+	FROM
+		volunteer
+	WHERE
+		town_id IS NULL
+	ORDER BY
+		first_name,
+		last_name
+	;
+

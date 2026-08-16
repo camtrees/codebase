@@ -1,0 +1,59 @@
+------------------------------------------------------------------------------------------
+-- View: cam_tree_health_assessment
+--
+-- Purpose: Tree size and health measurements
+--
+-- Create Order :
+--		MUST BE AFTER
+--			***epicollect_record_type
+--			site
+--			tree_health_assessment
+--			volunteer
+--			***tree_health_type
+--			***tree_health_nuts_type
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_tree_health_assessment;
+CREATE OR REPLACE VIEW cam_tree_health_assessment AS
+	SELECT
+		v.first_name || ' ' || v.last_name AS volunteer,
+		v.email                            AS volunteer_email,
+		e.record_type,
+		s.name                             AS site,
+		t.number                           AS tree_number,
+		h.date,
+		tht.health,
+		h.height_in_inches,
+		h.diameter_in_inches,
+		h.blight,
+		h.stump_sprouting,
+		h.catkins,
+		h.blossoms,
+		n.nuts,
+		h.note,
+		h.date_created,
+		h.date_updated
+	FROM
+		tree_health_assessment h
+	LEFT JOIN
+		epicollect_record_type e
+		ON h.epicollect_record_type_id = e.id
+	LEFT JOIN
+		tree t
+		ON h.tree_id = t.id
+	LEFT JOIN
+		site s
+		ON t.site_id = s.id
+	LEFT JOIN
+		volunteer v
+		ON h.volunteer_id = v.id
+	LEFT JOIN
+		tree_health_type tht
+		ON h.health_id = tht.id
+	LEFT JOIN
+		tree_health_nuts_type n
+		ON h.nuts_id = n.id
+	ORDER BY
+		s.name,
+		t.number,
+		h.date
+	;

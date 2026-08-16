@@ -1,0 +1,44 @@
+------------------------------------------------------------------------------------------
+-- Table: site_hub
+--
+-- Purpose: The list of sites within hubs
+--
+-- Create Order:
+--		MUST BE AFTER
+--			hub
+--			site
+------------------------------------------------------------------------------------------
+-- public.site_hub definition
+
+-- Drop table
+
+-- DROP TABLE public.site_hub;
+
+CREATE TABLE public.site_hub (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	site_id int4 NOT NULL, -- The Site
+	hub_id int4 NOT NULL, -- The Hub
+	CONSTRAINT site_hub_hub_id_not_null NOT NULL hub_id,
+	CONSTRAINT site_hub_id_not_null NOT NULL id,
+	CONSTRAINT site_hub_pkey PRIMARY KEY (id),
+	CONSTRAINT site_hub_site_id_not_null NOT NULL site_id
+);
+CREATE UNIQUE INDEX site_hub_site_id_and_hub_id_unique ON public.site_hub USING btree (site_id, hub_id);
+COMMENT ON TABLE public.site_hub IS 'Sites contained in each hub';
+
+-- Column comments
+
+COMMENT ON COLUMN public.site_hub.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.site_hub.site_id IS 'The Site';
+COMMENT ON COLUMN public.site_hub.hub_id IS 'The Hub';
+
+-- Permissions
+
+ALTER TABLE public.site_hub OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.site_hub TO neondb_owner;
+
+
+-- public.site_hub foreign keys
+
+ALTER TABLE public.site_hub ADD CONSTRAINT site_hub_hub_id_fkey FOREIGN KEY (hub_id) REFERENCES public.hub(id);
+ALTER TABLE public.site_hub ADD CONSTRAINT site_hub_site_id_fkey FOREIGN KEY (site_id) REFERENCES public.site(id);

@@ -1,0 +1,17 @@
+------------------------------------------------------------------------------------------
+-- View: v_pg_show_view_ownership
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS v_pg_show_view_ownership;
+CREATE OR REPLACE VIEW v_pg_show_view_ownership AS
+	SELECT
+		schemaname,
+		viewname,
+		viewowner
+	FROM
+		pg_views
+	WHERE
+		schemaname <> ALL (ARRAY['pg_catalog'::name, 'information_schema'::name])
+	ORDER BY
+		schemaname,
+		viewname
+	;

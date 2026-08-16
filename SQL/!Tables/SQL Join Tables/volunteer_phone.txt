@@ -1,0 +1,47 @@
+------------------------------------------------------------------------------------------
+-- Table: volunteer_phone
+--
+-- Purpose: The list of phone numbers for volunteers
+--
+-- Create Order:
+--		MUST BE BEFORE
+--		MUST BE AFTER
+--			***phone_type
+--			volunteer
+------------------------------------------------------------------------------------------
+-- public.volunteer_phone definition
+
+-- Drop table
+
+-- DROP TABLE public.volunteer_phone;
+
+CREATE TABLE public.volunteer_phone (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	volunteer_id int4 NOT NULL, -- The volunteer
+	phone_type_id int4 NOT NULL, -- The type of phone (cell, home, work, etc)
+	"number" text NOT NULL, -- The phone number
+	CONSTRAINT volunteer_phone_id_not_null NOT NULL id,
+	CONSTRAINT volunteer_phone_number_not_null NOT NULL number,
+	CONSTRAINT volunteer_phone_phone_type_id_not_null NOT NULL phone_type_id,
+	CONSTRAINT volunteer_phone_pkey PRIMARY KEY (id),
+	CONSTRAINT volunteer_phone_volunteer_id_not_null NOT NULL volunteer_id
+);
+COMMENT ON TABLE public.volunteer_phone IS 'Phone numbers at which volunteers can be reached';
+
+-- Column comments
+
+COMMENT ON COLUMN public.volunteer_phone.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.volunteer_phone.volunteer_id IS 'The volunteer';
+COMMENT ON COLUMN public.volunteer_phone.phone_type_id IS 'The type of phone (cell, home, work, etc)';
+COMMENT ON COLUMN public.volunteer_phone."number" IS 'The phone number';
+
+-- Permissions
+
+ALTER TABLE public.volunteer_phone OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.volunteer_phone TO neondb_owner;
+
+
+-- public.volunteer_phone foreign keys
+
+ALTER TABLE public.volunteer_phone ADD CONSTRAINT volunteer_phone_phone_type_id_fkey FOREIGN KEY (phone_type_id) REFERENCES public.phone_type(id);
+ALTER TABLE public.volunteer_phone ADD CONSTRAINT volunteer_phone_volunteer_id_fkey FOREIGN KEY (volunteer_id) REFERENCES public.volunteer(id);

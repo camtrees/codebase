@@ -1,0 +1,30 @@
+------------------------------------------------------------------------------------------
+-- View: cam_sites_hubs
+--
+-- Purpose: The list of all sites and their associated hubs
+--
+-- Note: The sites and hubs relationship is a many to many one
+--
+-- Create Order :
+--		MUST BE AFTER
+--			hub
+--			site
+--			site_hub
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_sites_hubs;
+CREATE OR REPLACE VIEW cam_sites_hubs AS
+	SELECT
+		s.name AS site,
+		h.name AS hub
+	FROM
+		site_hub sh
+	LEFT JOIN
+		site s
+		ON sh.site_id = s.id
+	LEFT JOIN
+		hub  h
+		ON sh.hub_id  = h.id
+	ORDER BY
+		h.name,
+		s.name
+	;

@@ -1,0 +1,26 @@
+------------------------------------------------------------------------------------------
+-- View: cam_organizations
+--
+-- Purpose: The list of organizations with contact name
+--
+-- Create Order :
+--		MUST BE AFTER
+--			organization
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_organizations;
+CREATE OR REPLACE VIEW cam_organizations AS
+	SELECT
+		o.code                             AS org_code,
+		o.name                             AS organization,
+		v.first_name || ' ' || v.last_name AS contact,
+		o.date_created,
+		o.date_updated
+	FROM
+		organization o
+	LEFT JOIN
+		volunteer v
+		ON o.volunteer_id = v.id
+	ORDER BY
+		o.name
+	;

@@ -1,0 +1,45 @@
+------------------------------------------------------------------------------------------
+-- Function: camtrees_tree_gps_locked
+--
+-- Purpose: Get tree's gps_locked value
+--
+-- Paramters: p_site_name     - the name of the site
+--            p_tree_number   - the tree number
+--
+-- Returns: true  - gps_locked is true
+--            false - gps_locked is false
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_tree_gps_locked(text, text);
+
+CREATE OR REPLACE FUNCTION public.camtrees_tree_gps_locked(
+	p_site_name text,
+	p_tree_number text
+	)
+	RETURNS boolean
+	LANGUAGE plpgsql
+	AS $function$
+		
+	DECLARE
+		v_site_id    INTEGER;
+		v_gps_locked BOOLEAN;
+
+	BEGIN
+		-- Get the site_id
+		SELECT id INTO v_site_id
+		FROM site
+		WHERE name = p_site_name;
+		
+		-- Get the gps_locked value
+		SELECT gps_locked INTO v_gps_locked
+		FROM tree
+		WHERE site_id = v_site_id AND number = p_tree_number;
+		
+		RETURN v_gps_locked;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_tree_gps_locked(text, text) OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_tree_gps_locked(text, text) TO neondb_owner;

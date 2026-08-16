@@ -1,0 +1,21 @@
+==========================================================================================
+== Views showing the distance between trees
+==
+== First: We must enable postgis
+==    CREATE EXTENSION IF NOT EXISTS postgis;
+==
+== Next: Verify our 'tree' table has columns...
+==    longitude     float8
+==    latitude      float8
+==    gis_map_view  geography(Point, 4326) GENERATED ALWAYS AS (ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography) STORED
+==
+== Then: We need to create a 'Spatial Index' on the 'geog' column for fast spatial queries
+==    CREATE INDEX tree_geog_index ON tree USING GIST (geog)
+==
+== Note: For GPS data, which uses degrees on a spherical earth, the geography type is
+==       preferred because it handles distance calculations in meters correctly without
+==       needing to understand map projections (units).
+==
+== Note: Accurate Small-Scale Distance (Recommended)...
+==       Convert points to geography type to get distances directly in meters
+==========================================================================================

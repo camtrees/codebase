@@ -1,0 +1,35 @@
+------------------------------------------------------------------------------------------
+-- View: data_count_next_tree_number_for_planting
+--
+-- Purpose: Show the NEXT CamOrg tree number to be used when planting new trees
+--
+-- Create Order:
+--		MUST BE AFTER
+--			organization
+--			site
+--			tree
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_count_next_tree_number_for_planting;
+CREATE OR REPLACE VIEW data_count_next_tree_number_for_planting AS
+	SELECT 
+		COALESCE(max((t.number)::integer) + 1, 1) AS "NEXT Tree Number",
+		o.code AS "CAM Org",
+		o.name AS "CAM Org Name"
+	FROM
+		organization o
+	LEFT JOIN
+		site s
+		ON o.id = s.organization_id
+	LEFT JOIN
+		tree t
+		ON s.id = t.site_id
+		AND t.number ~ '^[0-9]+$'
+	WHERE
+		LOWER(s.name) <> 'wild tree unknown to tacf'
+		AND LOWER(s.name) <> 'wild tree known to tacf'
+	GROUP BY
+		o.code,
+		o.name
+	ORDER BY
+		o.code
+	;

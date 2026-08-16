@@ -1,0 +1,34 @@
+------------------------------------------------------------------------------------------
+-- Table: volunteer_status_type
+--
+-- Purpose: The list of volunteer statuses
+--
+-- Create Order:
+--		MUST BE BEFORE
+--			volunteer
+------------------------------------------------------------------------------------------
+-- public.volunteer_status_type definition
+
+-- Drop table
+
+-- DROP TABLE public.volunteer_status_type;
+
+CREATE TABLE public.volunteer_status_type (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	status text NOT NULL, -- The volunteer status
+	CONSTRAINT status_type_id_not_null NOT NULL id,
+	CONSTRAINT status_type_status_not_null NOT NULL status,
+	CONSTRAINT volunteer_status_type_pkey PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX volunteer_status_type_status_unique ON public.volunteer_status_type USING btree (status);
+COMMENT ON TABLE public.volunteer_status_type IS 'Lookup Table - Volunteer status (active, inactive, etc)';
+
+-- Column comments
+
+COMMENT ON COLUMN public.volunteer_status_type.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.volunteer_status_type.status IS 'The volunteer status';
+
+-- Permissions
+
+ALTER TABLE public.volunteer_status_type OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.volunteer_status_type TO neondb_owner;

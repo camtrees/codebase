@@ -1,0 +1,14 @@
+------------------------------------------------------------------------------------------
+-- View: v_pg_show_sequences
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS v_pg_show_sequences;
+CREATE OR REPLACE VIEW v_pg_show_sequences AS
+	SELECT
+		relname
+	FROM
+		pg_class
+	WHERE
+		relkind = 'S'::"char"
+	ORDER BY
+		relname
+	;

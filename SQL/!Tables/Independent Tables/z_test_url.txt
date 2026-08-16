@@ -1,0 +1,47 @@
+------------------------------------------------------------------------------------------
+-- Table : z_test_url
+--
+-- Purpose  : Testing a Hyperlink Generated value column (excel_url) for MS Excel when
+--            exporting a CSV file. That column will then be a clickable cell to open
+--            a browser window using the generated value.
+--
+-- Also     : The 'url' column can be used to open a browser page in DBeaver.
+------------------------------------------------------------------------------------------
+-- public.z_test_url definition
+
+-- Drop table
+
+-- DROP TABLE public.z_test_url;
+
+CREATE TABLE public.z_test_url (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	url text NULL, -- A URL
+	excel_url text GENERATED ALWAYS AS (('=HYPERLINK("'::text || url) || '")'::text) VIRTUAL NULL, -- The URL format for exporting into Excel
+	date_created date NULL, -- The date the record was created
+	date_updated date NULL, -- The date the record was most recently updated
+	CONSTRAINT z_test_url_id_not_null NOT NULL id,
+	CONSTRAINT z_test_url_pkey PRIMARY KEY (id)
+);
+COMMENT ON TABLE public.z_test_url IS 'Test table for Kenster to experiment with URL''s and their clickability';
+
+-- Column comments
+
+COMMENT ON COLUMN public.z_test_url.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.z_test_url.url IS 'A URL';
+COMMENT ON COLUMN public.z_test_url.excel_url IS 'The URL format for exporting into Excel';
+COMMENT ON COLUMN public.z_test_url.date_created IS 'The date the record was created';
+COMMENT ON COLUMN public.z_test_url.date_updated IS 'The date the record was most recently updated';
+
+-- Table Triggers
+
+create trigger camtrees_manage_dates before
+insert
+    or
+update
+    on
+    public.z_test_url for each row execute function camtrees_manage_dates();
+
+-- Permissions
+
+ALTER TABLE public.z_test_url OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.z_test_url TO neondb_owner;

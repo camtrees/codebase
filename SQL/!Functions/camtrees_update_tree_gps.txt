@@ -1,0 +1,82 @@
+------------------------------------------------------------------------------------------
+-- Function: camtrees_update_tree_gps
+--
+-- Purpose: Update tree's GPS data. Append new access_note data to existing access_note
+--
+-- Returns: true  - the tree's GPS data was updated
+--            false - the tree's GPS data was NOT updated
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_update_tree_gps(text, text, text, text, text);
+
+CREATE OR REPLACE FUNCTION public.camtrees_update_tree_gps(
+	p_site_name text,
+	p_tree_number text,
+	p_longitude text,
+	p_latitude text,
+	p_access_note text
+	)
+	RETURNS  boolean
+	LANGUAGE plpgsql
+	AS       $function$
+
+	DECLARE
+		v_access_note   TEXT;
+		v_site_id       INTEGER;
+		v_tree_id       INTEGER;
+		v_rows_updated  INTEGER;
+		v_existing_note TEXT;
+		v_new_note      TEXT;
+
+	BEGIN
+		-- Get the site id
+		SELECT id INTO v_site_id
+		FROM site
+		WHERE name = trim(p_site_name);
+		IF v_site_id IS NULL THEN
+			RAISE EXCEPTION 'site not found: %', p_site_name;
+		END IF;
+		
+		-- Get the tree id
+		SELECT id, access_note INTO v_tree_id, v_existing_note
+		FROM tree
+		WHERE site_id = v_site_id AND number = p_tree_number;
+		IF v_tree_id IS NULL THEN
+			RAISE EXCEPTION 'tree not found. Site: "%" Tree Number: "%"', p_site_name, p_tree_number;
+		END IF;
+
+		-- Replace 'NULL' string values with NULL for various input parameters
+		p_longitude     := NULLIF(p_longitude   , 'NULL');
+		p_latitude      := NULLIF(p_latitude    , 'NULL');
+		p_access_note   := NULLIF(p_access_note , 'NULL');
+		
+		-- Concatenate access notes
+		IF p_access_note IS NOT NULL THEN
+			IF v_existing_note IS NOT NULL AND trim(v_existing_note) != '' THEN
+				v_new_note := v_existing_note || '; ' || p_access_note;
+			ELSE
+				v_new_note := p_access_note;
+			END IF;
+		ELSE
+			v_new_note := v_existing_note;
+		END IF;		
+
+		-- Update the tree with provided values
+		UPDATE tree
+		SET 
+			longitude     = p_longitude::DOUBLE PRECISION,
+			latitude      = p_latitude::DOUBLE PRECISION,
+			gps_locked    = true,
+			access_note   = v_new_note
+		WHERE id = v_tree_id;
+		
+		GET DIAGNOSTICS v_rows_updated = ROW_COUNT;
+		
+		RETURN v_rows_updated > 0;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_update_tree_gps(text, text, text, text, text) OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_update_tree_gps(text, text, text, text, text) TO neondb_owner;

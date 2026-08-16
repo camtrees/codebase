@@ -1,0 +1,12 @@
+------------------------------------------------------------------------------------------
+-- View: v_pg_show_count_table_rows
+--
+-- Requires: camtrees_count_table_rows FUNCTION
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS v_pg_show_count_table_rows;
+CREATE OR REPLACE VIEW v_pg_show_count_table_rows AS
+	SELECT
+		*
+	FROM
+		camtrees_count_table_rows()
+	;

@@ -1,0 +1,148 @@
+------------------------------------------------------------------------------------------
+-- Function: camtrees_add_tree
+--
+-- Purpose: Add a new tree
+--
+-- Returns: the id number of the tree added
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_add_tree(text, text, text, date, text, text, text, text, text, text, text, text, text, text, text, text, text, text, text);
+
+CREATE OR REPLACE FUNCTION public.camtrees_add_tree(
+	p_epicollect_record_type  text,
+	p_site_name               text,
+	p_tree_number             text,
+	p_date                    date,
+	p_volunteer_email         text,
+	p_longitude               text,
+	p_latitude                text,
+	p_gps_locked              text,
+	p_access_path             text,
+	p_access_level            text,
+	p_access_note             text,
+	p_planting_method         text,
+	p_wire_fence              text,
+	p_mother_tree             text,
+	p_mother_tree_other       text,
+	p_father_tree             text,
+	p_father_tree_other       text,
+	p_parent_tree_note        text,
+	p_note                    text
+	)
+	RETURNS  integer
+	LANGUAGE plpgsql
+	AS       $function$
+
+	DECLARE
+		v_epicollect_record_type_id INTEGER;
+		v_site_id                   INTEGER;
+		v_volunteer_id              INTEGER;
+		v_access_path_id            INTEGER;
+		v_access_level_id           INTEGER;
+		v_mother_tree_id            INTEGER;
+		v_father_tree_id            INTEGER;
+		v_planting_method_id        INTEGER;
+		v_tree_id                   INTEGER;
+
+	BEGIN
+		-- Get epicollect_record_type_id
+		SELECT id INTO v_epicollect_record_type_id FROM epicollect_record_type WHERE record_type = lower(p_epicollect_record_type);
+
+		-- Get site_id
+		SELECT id INTO v_site_id FROM site WHERE name = p_site_name;
+		IF v_site_id IS NULL THEN
+			RAISE EXCEPTION 'Site not found: %', p_site_name;
+		END IF;
+		
+		-- Get the volunteer_id
+		SELECT id INTO v_volunteer_id FROM volunteer WHERE email = lower(p_volunteer_email);
+
+		-- Get access_path_id if access_path provided
+		IF p_access_path IS NOT NULL THEN
+			SELECT id INTO v_access_path_id FROM tree_access_path_type WHERE access_path = lower(p_access_path);
+		END IF;
+		
+		-- Get access_level_id if access_level provided
+		IF p_access_level IS NOT NULL THEN
+			SELECT id INTO v_access_level_id FROM tree_access_level_type WHERE access_level = lower(p_access_level);
+		END IF;
+				
+		-- Get planting_method_id if planting_method provided
+		IF p_planting_method IS NOT NULL THEN
+			SELECT id INTO v_planting_method_id FROM tree_planting_method_type WHERE planting_method = lower(p_planting_method);
+		END IF;
+
+		-- Replace 'NULL' string values with NULL for various input parameters
+		p_longitude         := NULLIF(p_longitude         , 'NULL');
+		p_latitude          := NULLIF(p_latitude          , 'NULL');
+		p_gps_locked        := NULLIF(p_gps_locked        , 'NULL');
+		p_mother_tree       := NULLIF(p_mother_tree       , 'NULL');
+		p_mother_tree_other := NULLIF(p_mother_tree_other , 'NULL');
+		p_father_tree       := NULLIF(p_father_tree       , 'NULL');
+		p_father_tree_other := NULLIF(p_father_tree_other , 'NULL');
+		p_parent_tree_note  := NULLIF(p_parent_tree_note  , 'NULL');
+		p_access_note       := NULLIF(p_access_note       , 'NULL');
+		p_wire_fence        := NULLIF(p_wire_fence        , 'NULL');
+		p_note              := NULLIF(p_note              , 'NULL');
+		
+		-- Get the mother_tree_id
+		IF p_mother_tree IS NOT NULL THEN
+			SELECT id INTO v_mother_tree_id FROM tree_parent_type WHERE parent = p_mother_tree;
+		END IF;
+
+		-- Get the father_tree_id
+		IF p_father_tree IS NOT NULL THEN
+			SELECT id INTO v_father_tree_id FROM tree_parent_type WHERE parent = p_father_tree;
+		END IF;
+
+		-- Insert the new tree
+		INSERT INTO tree (
+			epicollect_record_type_id,
+			site_id,
+			number,
+			date,
+			volunteer_id,
+			longitude,
+			latitude,
+			gps_locked,
+			access_path_id,
+			access_level_id,
+			access_note,
+			planting_method_id,
+			wire_fence,
+			mother_tree_id,
+			mother_tree_other,
+			father_tree_id,
+			father_tree_other,
+			parent_tree_note,
+			note
+		) VALUES (
+			v_epicollect_record_type_id,
+			v_site_id,
+			p_tree_number,
+			p_date,
+			v_volunteer_id,
+			p_longitude::DOUBLE PRECISION,
+			p_latitude::DOUBLE PRECISION,
+			p_gps_locked::BOOLEAN,
+			v_access_path_id,
+			v_access_level_id,
+			p_access_note,
+			v_planting_method_id,
+			p_wire_fence::BOOLEAN,
+			v_mother_tree_id,
+			p_mother_tree_other,
+			v_father_tree_id,
+			p_father_tree_other,
+			p_parent_tree_note,
+			p_note
+		) RETURNING id INTO v_tree_id;
+		
+		RETURN v_tree_id;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_add_tree(text, text, text, date, text, text, text, text, text, text, text, text, text, text, text, text, text, text, text) OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_add_tree(text, text, text, date, text, text, text, text, text, text, text, text, text, text, text, text, text, text, text) TO neondb_owner;

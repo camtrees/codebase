@@ -1,0 +1,23 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_sites_with_no_trees
+--
+-- Purpose: Sites with no trees
+--
+-- Create Order:
+--		MUST BE AFTER
+--			site
+--			tree
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_sites_with_no_trees;
+CREATE OR REPLACE VIEW data_error_sites_with_no_trees AS
+SELECT 
+	s.name AS site_name
+	FROM
+		site s
+	LEFT JOIN
+		tree t
+		ON s.id = t.site_id
+	WHERE
+		t.site_id IS NULL
+	ORDER BY
+		s.name;

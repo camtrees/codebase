@@ -1,0 +1,36 @@
+------------------------------------------------------------------------------------------
+-- View: data_count_tree_care_action_by_volunteer
+--
+-- Purpose: Show how many times volunteers have attended to trees by type of care_action
+--
+-- Create Order:
+--		MUST BE AFTER
+--			cam_trees
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_count_tree_care_action_by_volunteer;
+CREATE OR REPLACE VIEW data_count_tree_care_action_by_volunteer AS
+	SELECT 
+		((v.first_name || ' '::text) || v.last_name) AS volunteer,
+		tcat.care_action,
+		count(tcat.care_action) AS count_care_action
+	FROM 
+		tree_care_action tca
+	LEFT JOIN 
+		epicollect_record_type e
+		ON tca.epicollect_record_type_id = e.id
+	LEFT JOIN
+		volunteer v
+		ON tca.volunteer_id = v.id
+	LEFT JOIN
+		tree_care_action_type tcat
+		ON tca.care_action_id = tcat.id
+	WHERE
+		lower(e.record_type) <> 'rain'::text
+	GROUP BY
+		v.first_name || ' '::text || v.last_name,
+		tcat.care_action
+	ORDER BY
+		tcat.care_action,
+		count(tcat.care_action) DESC,
+		v.first_name || ' '::text || v.last_name
+	;

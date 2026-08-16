@@ -1,0 +1,83 @@
+------------------------------------------------------------------------------------------
+-- Table: site
+--
+-- Purpose: The exhaustive list of sites
+--
+-- Create Order:
+--		MUST BE BEFORE
+--			site_hub
+--			tree
+--			tree_care_action
+--			tree_health_assessment
+--			tree_photo
+--		MUST BE AFTER
+--			organization
+--			town
+--			volunteer
+------------------------------------------------------------------------------------------
+-- public.site definition
+
+-- Drop table
+
+-- DROP TABLE public.site;
+
+CREATE TABLE public.site (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	"name" text NOT NULL, -- The Site name
+	organization_id int4 NOT NULL, -- The CAM Org short code
+	town_id int4 NULL, -- The town in which the site resides
+	"location" text NULL, -- The address (if sensible) of the site
+	location_note text NULL, -- Info useful to help locate the site
+	volunteer_id int4 NULL, -- The site contact person
+	date_created date NOT NULL, -- The date the record was created
+	date_updated date NOT NULL, -- The date this record was most recently updated
+	url text NULL, -- The URL of the site (if there is one)
+	primary_caretaker_id int4 NULL, -- The primary volunteer who has accepted responsibility for monitoring and maintaining all the trees at a given site
+	secondary_caretaker_id int4 NULL, -- The secondary volunteer who has accepted responsibility for monitoring and maintaining all the trees at a given site
+	CONSTRAINT site_date_created_not_null NOT NULL date_created,
+	CONSTRAINT site_date_updated_not_null NOT NULL date_updated,
+	CONSTRAINT site_id_not_null NOT NULL id,
+	CONSTRAINT site_name_not_null NOT NULL name,
+	CONSTRAINT site_organization_id_not_null NOT NULL organization_id,
+	CONSTRAINT site_pkey PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX site_name_unique ON public.site USING btree (name);
+COMMENT ON TABLE public.site IS 'Sites where trees are planted';
+
+-- Column comments
+
+COMMENT ON COLUMN public.site.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.site."name" IS 'The Site name';
+COMMENT ON COLUMN public.site.organization_id IS 'The CAM Org short code';
+COMMENT ON COLUMN public.site.town_id IS 'The town in which the site resides';
+COMMENT ON COLUMN public.site."location" IS 'The address (if sensible) of the site';
+COMMENT ON COLUMN public.site.location_note IS 'Info useful to help locate the site';
+COMMENT ON COLUMN public.site.volunteer_id IS 'The site contact person';
+COMMENT ON COLUMN public.site.date_created IS 'The date the record was created';
+COMMENT ON COLUMN public.site.date_updated IS 'The date this record was most recently updated';
+COMMENT ON COLUMN public.site.url IS 'The URL of the site (if there is one)';
+COMMENT ON COLUMN public.site.primary_caretaker_id IS 'The primary volunteer who has accepted responsibility for monitoring and maintaining all the trees at a given site';
+COMMENT ON COLUMN public.site.secondary_caretaker_id IS 'The secondary volunteer who has accepted responsibility for monitoring and maintaining all the trees at a given site';
+
+-- Table Triggers
+
+create trigger camtrees_manage_dates before
+insert
+    or
+update
+    on
+    public.site for each row execute function camtrees_manage_dates();
+
+-- Permissions
+
+ALTER TABLE public.site OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.site TO neondb_owner;
+
+
+-- public.site foreign keys
+
+ALTER TABLE public.site ADD CONSTRAINT site_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES public.organization(id);
+ALTER TABLE public.site ADD CONSTRAINT site_primary_caretaker_id_fkey FOREIGN KEY (primary_caretaker_id) REFERENCES public.volunteer(id);
+ALTER TABLE public.site ADD CONSTRAINT site_secondary_caretaker_id_fkey FOREIGN KEY (secondary_caretaker_id) REFERENCES public.volunteer(id);
+ALTER TABLE public.site ADD CONSTRAINT site_town_id_fkey FOREIGN KEY (town_id) REFERENCES public.town(id);
+ALTER TABLE public.site ADD CONSTRAINT site_volunteer_id_fkey FOREIGN KEY (volunteer_id) REFERENCES public.volunteer(id);

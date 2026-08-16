@@ -1,0 +1,32 @@
+------------------------------------------------------------------------------------------
+-- Table : docs_web_link
+--
+-- Purpose  : A list of database changes made by the administrator
+------------------------------------------------------------------------------------------
+-- public.docs_web_link definition
+
+-- Drop table
+
+-- DROP TABLE public.docs_web_link;
+
+CREATE TABLE public.docs_web_link (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	title text NOT NULL, -- Short title
+	link text NOT NULL, -- The URL
+	CONSTRAINT docs_web_links_id_not_null NOT NULL id,
+	CONSTRAINT docs_web_links_link_not_null NOT NULL link,
+	CONSTRAINT docs_web_links_pkey PRIMARY KEY (id),
+	CONSTRAINT docs_web_links_title_not_null NOT NULL title
+);
+COMMENT ON TABLE public.docs_web_link IS 'Helpful web links';
+
+-- Column comments
+
+COMMENT ON COLUMN public.docs_web_link.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.docs_web_link.title IS 'Short title';
+COMMENT ON COLUMN public.docs_web_link.link IS 'The URL';
+
+-- Permissions
+
+ALTER TABLE public.docs_web_link OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.docs_web_link TO neondb_owner;

@@ -1,0 +1,51 @@
+------------------------------------------------------------------------------------------
+-- View: cam_tree_latest_health
+--
+-- Purpose: Show latest tree_health
+--
+-- Create Order:
+--		MUST BE AFTER
+--			tree_health_assessment
+--			tree
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_tree_latest_health;
+CREATE OR REPLACE VIEW cam_tree_latest_health AS
+	WITH ranked_assessments AS (
+		SELECT
+			tree_id,
+			date,
+			health_id,
+			ROW_NUMBER() OVER (
+				PARTITION BY tree_id
+				ORDER BY date DESC, id DESC
+				) AS rn
+		FROM
+			tree_health_assessment
+		WHERE
+			health_id IS NOT NULL
+		)
+		SELECT
+			s.name     AS site,
+			t.number   AS tree_number,
+			ra.date    AS latest_health_date,
+			tht.health AS latest_health
+		FROM
+			tree t
+		JOIN
+			site s
+		ON
+			t.site_id = s.id
+		JOIN
+			ranked_assessments ra
+		ON
+			t.id = ra.tree_id
+		JOIN
+			tree_health_type tht
+		ON
+			ra.health_id = tht.id
+		WHERE
+			ra.rn = 1
+		ORDER BY
+			s.name,
+			t.number
+		;

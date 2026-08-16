@@ -1,0 +1,45 @@
+------------------------------------------------------------------------------------------
+-- Table: volunteer_interest
+--
+-- Purpose: The list of interests for volunteers who have expressed any interests
+--
+-- Create Order:
+--		MUST BE BEFORE
+--		MUST BE AFTER
+--			volunteer
+--			***volunteer_interest_type
+------------------------------------------------------------------------------------------
+-- public.volunteer_interest definition
+
+-- Drop table
+
+-- DROP TABLE public.volunteer_interest;
+
+CREATE TABLE public.volunteer_interest (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	volunteer_id int4 NOT NULL, -- The volunteer
+	interest_id int4 NOT NULL, -- The interest shown by the volunteer
+	CONSTRAINT volunteer_interest_id_not_null NOT NULL id,
+	CONSTRAINT volunteer_interest_interest_id_not_null NOT NULL interest_id,
+	CONSTRAINT volunteer_interest_pkey PRIMARY KEY (id),
+	CONSTRAINT volunteer_interest_volunteer_id_not_null NOT NULL volunteer_id
+);
+CREATE UNIQUE INDEX volunteer_interest_volunteer_id_and_interest_id_unique ON public.volunteer_interest USING btree (volunteer_id, interest_id);
+COMMENT ON TABLE public.volunteer_interest IS 'Volunteer''s interests. Like watering trees or being available for special events.';
+
+-- Column comments
+
+COMMENT ON COLUMN public.volunteer_interest.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.volunteer_interest.volunteer_id IS 'The volunteer';
+COMMENT ON COLUMN public.volunteer_interest.interest_id IS 'The interest shown by the volunteer';
+
+-- Permissions
+
+ALTER TABLE public.volunteer_interest OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.volunteer_interest TO neondb_owner;
+
+
+-- public.volunteer_interest foreign keys
+
+ALTER TABLE public.volunteer_interest ADD CONSTRAINT volunteer_interest_interest_id_fkey FOREIGN KEY (interest_id) REFERENCES public.volunteer_interest_type(id);
+ALTER TABLE public.volunteer_interest ADD CONSTRAINT volunteer_interest_volunteer_id_fkey FOREIGN KEY (volunteer_id) REFERENCES public.volunteer(id);

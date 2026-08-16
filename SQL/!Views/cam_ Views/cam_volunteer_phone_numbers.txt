@@ -1,0 +1,29 @@
+------------------------------------------------------------------------------------------
+-- View: cam_volunteer_phone_numbers
+--
+-- Purpose: The list of all volunteers' phone numbers
+--
+-- Create Order :
+--		MUST BE AFTER
+--			***phone_type
+--			volunteer_phone
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_volunteer_phone_numbers;
+CREATE OR REPLACE VIEW cam_volunteer_phone_numbers AS
+	SELECT
+		v.first_name || ' ' || v.last_name AS volunteer,
+		p.label                            AS phone_type,
+		regexp_replace(vp.number, '(\d{3})(\d{3})(\d{4})', '(\1) \2-\3') AS phone_number
+	FROM
+		volunteer_phone vp
+	LEFT JOIN
+		volunteer v
+		ON vp.volunteer_id = v.id
+	LEFT JOIN
+		phone_type p
+		ON vp.phone_type_id = p.id
+	ORDER BY
+		volunteer,
+		p.label
+	;

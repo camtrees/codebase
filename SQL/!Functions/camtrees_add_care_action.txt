@@ -1,0 +1,133 @@
+------------------------------------------------------------------------------------------
+-- Function: camtrees_add_care_action
+--
+-- Purpose: Add a tree_care_action from an EpiCollect 'ONE', 'ALL', or 'RAIN' record
+--
+-- SAMPLE calles to the function...
+--
+-- An EpiCollect 'all'  event Record_Type
+--                      Note: For an 'all' record_type, the tree_number_min should be '000' and the tree_number_max should be '999'
+--                      SELECT camtrees_add_care_action('all'  , 'water' , '000' , '999' , '2026-05-08' , 'ken.rosenberry@gmail.com'  , 'PVT KLC House' , 'Some note here' );
+--
+-- An EpiCollect 'rain' event Record_Type for MULTIPLE SITES
+--                      Note: For a 'rain' record_type, the tree_number_min should be '000', the tree_number_max should be '999', and the care_action should be 'water'
+--                      SELECT camtrees_add_care_action('all'  , 'water' , '000' , '999' , '2026-05-08' , 'ken.rosenberry@gmail.com'  , 'SLSP Boat Ramp, SLSP New Gate' , 'Some note here' );
+--
+-- An EpiCollect 'one'  event Record_Type
+--                      Note: For a 'one' record_type, the tree_number_min and the tree_number_max should be the same value!
+--                      SELECT camtrees_add_care_action('one'  , 'weed'  , '005' , '005' , '2026-05-08' , 'ken.rosenberry@gmail.com'  , 'PVT KLC House' , 'Some note here' );
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_add_care_action(text, text, text, text, date, text, text, text);
+
+CREATE OR REPLACE FUNCTION public.camtrees_add_care_action(
+	p_epicollect_record_type  text,
+	p_care_action_type        text,
+	p_tree_number_min         text,
+	p_tree_number_max         text,
+	p_date                    date,
+	p_volunteer_email         text,
+	p_sites                   text,
+	p_note                    text
+	)
+	RETURNS  integer
+	LANGUAGE plpgsql
+	AS       $function$
+
+	DECLARE
+		v_epicollect_record_type_id INTEGER;
+		v_volunteer_id              INTEGER;
+		v_care_action_id            INTEGER;
+		v_site_name                 TEXT;
+		v_site_id                   INTEGER;
+		v_rows_added_inside_loop    INTEGER;
+		v_total_rows_added          INTEGER := 0;
+		
+	BEGIN
+		RAISE NOTICE '------------------------------------------------------------';
+		RAISE NOTICE 'Processing EpiCollect "%" records...', p_epicollect_record_type;
+
+		-- Get the epicollect_record_type_id
+		SELECT id INTO v_epicollect_record_type_id
+		FROM epicollect_record_type
+		WHERE record_type = lower(p_epicollect_record_type);
+		IF v_epicollect_record_type_id IS NULL THEN
+			RAISE EXCEPTION 'epicollect_record_type not found: %', p_epicollect_record_type;
+		END IF;
+	
+		-- Get the care_action_id
+		SELECT id INTO v_care_action_id
+		FROM tree_care_action_type
+		WHERE care_action = lower(p_care_action_type);
+		IF v_care_action_id IS NULL THEN
+			RAISE EXCEPTION 'care_action_type not found: %', p_care_action_type;
+		END IF;
+	
+		-- Get the volunteer_id
+		SELECT id INTO v_volunteer_id
+		FROM volunteer
+		WHERE email = lower(p_volunteer_email);
+		IF v_volunteer_id IS NULL THEN
+			RAISE EXCEPTION 'volunteer_email not found: %', p_volunteer_email;
+		END IF;
+		
+		-- Set empty p_note to NULL
+		p_note := NULLIF(trim(p_note), '');
+			
+		-- Set 'NULL' p_note to NULL
+		p_note := NULLIF(p_note, 'NULL');
+
+		-- Loop through the comma-separated list of sites
+		FOR v_site_name IN SELECT unnest(string_to_array(p_sites, ','))
+		LOOP
+			RAISE NOTICE 'Processing site: % ...', v_site_name;
+
+			-- Get the site id
+			SELECT id INTO v_site_id
+			FROM site
+			WHERE name = trim(v_site_name);
+			IF v_site_id IS NULL THEN
+				RAISE EXCEPTION 'site not found: %', v_site_name;
+			END IF;
+				
+			-- Insert a row for each tree at the site
+			INSERT INTO tree_care_action (
+				epicollect_record_type_id,
+				date,
+				volunteer_id,
+				care_action_id,
+				note,
+				tree_id
+			)
+			SELECT
+				v_epicollect_record_type_id,
+				p_date,
+				v_volunteer_id,
+				v_care_action_id,
+				p_note,
+				t.id
+			FROM
+				tree t
+			WHERE
+				t.site_id = v_site_id
+				AND p_date >= t.date
+				AND t.number BETWEEN p_tree_number_min AND p_tree_number_max
+			;
+	
+			-- For each site (LOOP) Get the number of rows added
+			GET DIAGNOSTICS v_rows_added_inside_loop = ROW_COUNT;
+
+			-- Increment the total rows added counter
+			v_total_rows_added := v_total_rows_added + v_rows_added_inside_loop;
+
+			RAISE NOTICE '    Care action added for % trees.', v_rows_added_inside_loop;
+		END LOOP;
+	
+		RETURN v_total_rows_added;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_add_care_action(text, text, text, text, date, text, text, text) OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_add_care_action(text, text, text, text, date, text, text, text) TO neondb_owner;

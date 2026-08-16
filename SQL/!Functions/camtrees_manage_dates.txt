@@ -1,0 +1,39 @@
+------------------------------------------------------------------------------------------
+-- Function : camtrees_manage_dates
+--
+-- Purpose  : Add a date_created on INSERT and date_updated on UPDATE
+--
+-- Note     : Trigger is used for many tables
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_manage_dates();
+
+CREATE OR REPLACE FUNCTION public.camtrees_manage_dates()
+	RETURNS  trigger
+	LANGUAGE plpgsql
+	AS       $function$
+
+	BEGIN
+		-- Set date_created and date_updated on INSERT
+		IF TG_OP = 'INSERT' THEN
+			NEW.date_created := CURRENT_DATE;
+			NEW.date_updated := CURRENT_DATE;
+			RETURN NEW;
+		END IF;
+	
+		-- Update date_updated on UPDATE
+		IF TG_OP = 'UPDATE' THEN
+			NEW.date_updated := CURRENT_DATE;
+			-- Prevent manual changes to date_created
+			NEW.date_created := OLD.date_created;
+			RETURN NEW;
+		END IF;
+	
+		RETURN NEW;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_manage_dates() OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_manage_dates() TO neondb_owner;

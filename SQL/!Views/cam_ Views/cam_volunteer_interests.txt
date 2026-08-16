@@ -1,0 +1,27 @@
+------------------------------------------------------------------------------------------
+-- View: cam_volunteer_interests
+--
+-- Purpose: The list of all volunteers' interests
+--
+-- Create Order :
+--		MUST BE AFTER
+--			volunteer
+--			volunteer_interest
+--			***volunteer_interest_type
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_volunteer_interests;
+CREATE OR REPLACE VIEW cam_volunteer_interests AS
+	SELECT
+		v.first_name || ' ' || v.last_name AS volunteer,
+		i.interest
+	FROM
+		volunteer_interest vi
+	LEFT JOIN
+		volunteer v
+		ON vi.volunteer_id = v.id
+	LEFT JOIN
+		volunteer_interest_type i
+		ON vi.interest_id = i.id
+	ORDER BY
+		volunteer
+	;

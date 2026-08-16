@@ -1,0 +1,32 @@
+------------------------------------------------------------------------------------------
+-- View: data_crosstab_site_by_hub
+--
+-- Create Order:
+--		MUST BE AFTER
+--			cam_trees
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_crosstab_site_by_hub;
+CREATE OR REPLACE VIEW data_crosstab_site_by_hub AS
+	SELECT
+		COALESCE(site, 'Column Total') AS "Site",
+		COUNT(*) FILTER (WHERE hub = 'Bethel'        ) AS "Bethel Hub"        ,
+		COUNT(*) FILTER (WHERE hub = 'Bridgton'      ) AS "Bridgton Hub"      ,
+		COUNT(*) FILTER (WHERE hub = 'Ellsworth'     ) AS "Ellsworth Hub"     ,
+		COUNT(*) FILTER (WHERE hub = 'Freeport'      ) AS "Freeport Hub"      ,
+		COUNT(*) FILTER (WHERE hub = 'Hartland'      ) AS "Hartland Hub"      ,
+		COUNT(*) FILTER (WHERE hub = 'Lincoln'       ) AS "Lincoln Hub"       ,
+		COUNT(*) FILTER (WHERE hub = 'Manchester NH' ) AS "Manchester NH Hub" ,
+		COUNT(*) FILTER (WHERE hub = 'Orono'         ) AS "Orono Hub"         ,
+		COUNT(*) FILTER (WHERE hub = 'Princeton'     ) AS "Princeton Hub"     ,
+		COUNT(*) FILTER (WHERE hub = 'Sanford'       ) AS "Sanford Hub"       ,
+		COUNT(*) FILTER (WHERE hub = 'Searsport'     ) AS "Searsport Hub"     ,
+		COUNT(*) FILTER (WHERE hub = 'Warren'        ) AS "Warren Hub"        ,
+		COUNT(*) FILTER (WHERE hub =  NULL)            AS "Unknown Hub"       ,
+		COUNT(*)                                       AS "Row Total"
+	FROM
+		cam_sites_hubs
+	GROUP BY
+		ROLLUP(site)
+		ORDER BY
+			site
+	;

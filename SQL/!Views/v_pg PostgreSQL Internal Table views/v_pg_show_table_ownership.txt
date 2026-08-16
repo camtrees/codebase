@@ -1,0 +1,18 @@
+------------------------------------------------------------------------------------------
+-- View: v_pg_show_table_ownership
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS v_pg_show_table_ownership;
+CREATE OR REPLACE VIEW v_pg_show_table_ownership AS
+	SELECT
+		schemaname,
+		tablename,
+		tableowner
+	FROM
+		pg_tables
+	WHERE
+		(schemaname <> ALL (ARRAY['pg_catalog'::name, 'information_schema'::name]))
+		AND schemaname !~~ 'pg_toast%'::text
+	ORDER BY
+		schemaname,
+		tablename
+	;

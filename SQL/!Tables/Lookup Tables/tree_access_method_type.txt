@@ -1,0 +1,34 @@
+------------------------------------------------------------------------------------------
+-- Table: tree_access_method_type
+--
+-- Purpose: The list of access_methods
+--
+-- Create Order:
+--		MUST BE BEFORE
+--			tree
+------------------------------------------------------------------------------------------
+-- public.tree_access_method_type definition
+
+-- Drop table
+
+-- DROP TABLE public.tree_access_method_type;
+
+CREATE TABLE public.tree_access_method_type (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	access_method text NOT NULL, -- Access method (ladder, bucket loader, etc)
+	CONSTRAINT tree_access_method_type_access_method_not_null NOT NULL access_method,
+	CONSTRAINT tree_access_method_type_id_not_null NOT NULL id,
+	CONSTRAINT tree_access_method_type_pkey PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX tree_access_method_type_access_method_unique ON public.tree_access_method_type USING btree (access_method);
+COMMENT ON TABLE public.tree_access_method_type IS 'Lookup Table - Access method to pollinate or harves trees';
+
+-- Column comments
+
+COMMENT ON COLUMN public.tree_access_method_type.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.tree_access_method_type.access_method IS 'Access method (ladder, bucket loader, etc)';
+
+-- Permissions
+
+ALTER TABLE public.tree_access_method_type OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.tree_access_method_type TO neondb_owner;

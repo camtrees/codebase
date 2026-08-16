@@ -1,0 +1,20 @@
+------------------------------------------------------------------------------------------
+-- View: cam_tree_photos_with_tags
+--
+-- Purpose: Just the tree_photos that are snapshots of the tree tags
+--
+-- Note: We will NOT ALLOW editing of data in this view
+--
+-- Create Order :
+--		MUST BE AFTER
+--			cam_tree_photos
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_tree_photos_with_tags;
+CREATE OR REPLACE VIEW cam_tree_photos_with_tags AS
+	SELECT
+		*
+	FROM
+		cam_tree_photos
+	WHERE
+		tag_photo = true
+	;

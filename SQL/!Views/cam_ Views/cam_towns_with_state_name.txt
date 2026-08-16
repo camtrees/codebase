@@ -1,0 +1,25 @@
+------------------------------------------------------------------------------------------
+-- View: cam_towns_with_state_name
+--
+-- Purpose: Join the 'town' and 'state' tables so we can see the state name
+--
+-- Create Order :
+--		MUST BE AFTER
+--			state
+--			town
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_towns_with_state_name;
+CREATE OR REPLACE VIEW cam_towns_with_state_name AS
+	SELECT
+		t.state_code AS state,
+		t.name       AS town,
+		s.name       AS state_name
+	FROM
+		town t
+	LEFT JOIN
+		state s
+		ON t.state_code = s.code
+	ORDER BY
+		s.name,
+		t.name
+	;

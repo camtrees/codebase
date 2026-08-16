@@ -1,0 +1,77 @@
+------------------------------------------------------------------------------------------
+-- Function: camtrees_add_tree_initial_health
+--
+-- Purpose: Add a new initial tree_health_assessment from EpiCollect 'PLANT' record
+--
+-- Returns: the id number of the health_assessment added
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_add_tree_initial_health(text, text, text, date, text, text);
+
+CREATE OR REPLACE FUNCTION public.camtrees_add_tree_initial_health(
+	p_epicollect_record_type  text,
+	p_site_name               text,
+	p_tree_number             text,
+	p_date                    date,
+	p_volunteer_email         text,
+	p_health                  text
+	)
+	RETURNS  integer
+	LANGUAGE plpgsql
+	AS       $function$
+
+	DECLARE
+		v_epicollect_record_type_id INTEGER;
+		v_site_id                   INTEGER;
+		v_tree_id                   INTEGER;
+		v_volunteer_id              INTEGER;
+		v_health_id                 INTEGER;
+
+	BEGIN
+		-- Get epicollect_record_type_id
+		SELECT id INTO v_epicollect_record_type_id FROM epicollect_record_type WHERE record_type = lower(p_epicollect_record_type);
+
+		-- Get site_id
+		SELECT id INTO v_site_id FROM site WHERE name = p_site_name;
+		IF v_site_id IS NULL THEN
+			RAISE EXCEPTION 'Site not found: %', p_site_name;
+		END IF;
+
+		-- Get tree_id
+		SELECT id INTO v_tree_id FROM tree WHERE site_id=v_Site_id and number=p_tree_number;
+		IF v_tree_id IS NULL THEN
+			RAISE EXCEPTION 'Tree not found. Site:"%" Tree_Number:"%"', p_site_name, p_tree_number;
+		END IF;
+		
+		-- Get the volunteer_id
+		SELECT id INTO v_volunteer_id FROM volunteer WHERE email = lower(p_volunteer_email);
+
+		-- Get health_id if health provided
+		IF p_health IS NOT NULL THEN
+			SELECT id INTO v_health_id FROM tree_health_type WHERE health = lower(p_health);
+		END IF;
+					
+		-- Insert the new tree
+		INSERT INTO tree_health_assessment (
+			epicollect_record_type_id,
+			tree_id,
+			date,
+			volunteer_id,
+			health_id
+			)
+		VALUES (
+			v_epicollect_record_type_id,
+			v_tree_id,
+			p_date,
+			v_volunteer_id,
+			v_health_id
+			) RETURNING id INTO v_tree_id;
+		
+		RETURN v_tree_id;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_add_tree_initial_health(text, text, text, date, text, text) OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_add_tree_initial_health(text, text, text, date, text, text) TO neondb_owner;

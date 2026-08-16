@@ -1,0 +1,33 @@
+------------------------------------------------------------------------------------------
+-- View: user_hkr_tree_photos_for_tag_info_editing
+--
+-- Purpose: Tree photos with our EpiCollect link and tag_info for easy Kenster editing
+--
+-- Create Order :
+--		MUST BE AFTER
+--			tree_photo
+--
+-- When editing a tag_info value, if prompted with:
+-- 		There is no physical unique key defined.
+-- Click the "Custom Unique Key" button, and select the "filename" column as the key.
+--
+-- You may need to change the view to advanced and then:
+--		1. Select the View
+--		2. Click the 'Properties' tab (instead of data)
+--		3. Verify we have a 'Virtual Key' defined for the view and that it uses the
+--		   id and filename fields as the keys
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS user_hkr_tree_photos_for_tag_info_editing;
+CREATE OR REPLACE VIEW user_hkr_tree_photos_for_tag_info_editing AS
+	SELECT
+		id,
+		tag_photo,
+		'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name=' || filename AS photo,
+		filename,
+		date_created,
+		date_updated
+	FROM
+		tree_photo
+	ORDER BY
+		tag_photo DESC
+	;

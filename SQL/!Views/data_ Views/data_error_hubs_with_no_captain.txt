@@ -1,0 +1,21 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_hubs_with_no_captain
+--
+-- Purpose: Show hubs with no captain
+--
+-- Create Order :
+--		MUST BE AFTER
+--			hub
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_hubs_with_no_captain;
+CREATE OR REPLACE VIEW data_error_hubs_with_no_captain AS
+	SELECT
+		name        AS "hub",
+		captain_id  AS "captain"
+	FROM
+		hub
+	WHERE
+		captain_id IS NULL
+	ORDER BY
+		name
+	;

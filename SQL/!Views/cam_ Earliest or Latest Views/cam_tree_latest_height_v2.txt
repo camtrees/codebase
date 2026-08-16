@@ -1,0 +1,43 @@
+------------------------------------------------------------------------------------------
+-- View: cam_tree_latest_height_v2
+--
+-- Purpose: Show latest tree_height
+--
+-- Create Order:
+--		MUST BE AFTER
+--			tree_health_assessment
+--			tree
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_tree_latest_height_v2;
+CREATE OR REPLACE VIEW cam_tree_latest_height_v2 AS
+SELECT
+    s.name              AS site,
+    t.number            AS tree_number,
+    ra.height_in_inches AS latest_height_in_inches,
+    ra.date             AS latest_height_date
+FROM
+    tree t
+JOIN
+    site s ON t.site_id = s.id
+LEFT JOIN LATERAL (
+    SELECT
+        height_in_inches,
+        date
+    FROM
+        tree_health_assessment
+    WHERE
+        tree_id = t.id
+        AND height_in_inches IS NOT NULL
+    ORDER BY
+        date DESC,
+        id DESC
+    LIMIT 1
+) ra ON true
+ORDER BY
+    s.name,
+    t.number;
+
+CREATE INDEX tree_health_assessment_latest_height_idx
+	ON tree_health_assessment (tree_id, date DESC, id DESC)
+	INCLUDE (height_in_inches);
+

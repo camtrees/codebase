@@ -1,0 +1,65 @@
+------------------------------------------------------------------------------------------
+-- View: cam_sites
+--
+-- Purpose: The list of all sites
+--
+-- Create Order :
+--		MUST BE AFTER
+--			organization
+--			site
+--			***town
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_sites;
+CREATE OR REPLACE VIEW cam_sites AS
+	SELECT
+		first_tree.geog                      AS gis_map_view,
+		s.name                               AS site,
+		o.code                               AS org_code,
+		o.name                               AS organization,
+		t.name                               AS town,
+		s.location                           AS site_location,
+		s.location_note                      AS location_note,
+		s.url                                AS site_url,
+		v1.first_name || ' ' || v1.last_name AS contact,
+		v1.email                             AS contact_email,
+		v2.first_name || ' ' || v2.last_name AS primary_caretaker,
+		v2.email                             AS primary_caretaker_email,
+		v3.first_name || ' ' || v3.last_name AS secondary_caretaker,
+		v3.email                             AS secondary_caretaker_email,
+		s.date_created,
+		s.date_updated
+	FROM
+		site s
+	LEFT JOIN
+		organization o
+		ON s.organization_id = o.id
+	LEFT JOIN
+		town t
+		ON s.town_id = t.id
+	LEFT JOIN
+		volunteer v1
+		ON s.volunteer_id = v1.id
+	LEFT JOIN
+		volunteer v2
+		ON s.primary_caretaker_id = v2.id
+	LEFT JOIN
+		volunteer v3
+		ON s.secondary_caretaker_id = v3.id
+	LEFT JOIN LATERAL (
+    	SELECT
+    		geog
+		FROM
+			tree tr
+		WHERE
+			tr.site_id = s.id
+			AND geog IS NOT NULL
+			AND LOWER(s.name) <> 'wild tree known to tacf'
+			AND LOWER(s.name) <> 'wild tree unknown to tacf'
+		ORDER BY
+			tr.number
+		LIMIT 1
+		) first_tree ON true
+	ORDER BY
+		o.code, s.name
+	;

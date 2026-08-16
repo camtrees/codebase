@@ -1,0 +1,49 @@
+------------------------------------------------------------------------------------------
+-- Function: camtrees_get_distance_to_closest_wildcam_tree
+--
+-- Purpose: Get the distance (in meters) to the closest WildCAM tree (site id = 6)
+--
+-- Returns: distance in meters
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_get_distance_to_closest_wildcam_tree(float8, float8);
+
+CREATE OR REPLACE FUNCTION public.camtrees_get_distance_to_closest_wildcam_tree(
+	p_longitude  double precision,
+	p_latitude   double precision
+	)
+	RETURNS TABLE(
+		distance_in_feet  numeric,
+		closest_tree_id   integer,
+		longitude         double precision,
+		latitude          double precision
+		)
+	LANGUAGE plpgsql
+	AS       $function$
+
+	BEGIN
+		RETURN QUERY
+		SELECT 
+			ROUND((ST_Distance(
+				ST_SetSRID(ST_MakePoint(p_longitude, p_latitude), 4326)::geography,
+				t.geog
+			) * 3.280839895)::numeric, 0) AS distance_in_feet,
+			t.id AS closest_tree_id,
+			t.longitude,
+			t.latitude
+		FROM tree t
+		WHERE t.site_id = 6
+			AND t.longitude IS NOT NULL 
+			AND t.latitude IS NOT NULL
+		ORDER BY ST_Distance(
+			ST_SetSRID(ST_MakePoint(p_longitude, p_latitude), 4326)::geography,
+			t.geog
+		)
+		LIMIT 1;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_get_distance_to_closest_wildcam_tree(float8, float8) OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_get_distance_to_closest_wildcam_tree(float8, float8) TO neondb_owner;

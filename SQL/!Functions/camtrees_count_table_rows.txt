@@ -1,0 +1,45 @@
+------------------------------------------------------------------------------------------
+-- Function: camtrees_count_table_rows
+--
+-- Purpose: Assists with counting rows in tables
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_count_table_rows(text);
+
+CREATE OR REPLACE FUNCTION public.camtrees_count_table_rows(
+	_schema text DEFAULT 'public'::text
+	)
+	RETURNS TABLE(
+		table_name text,
+		row_count bigint
+		)
+	LANGUAGE plpgsql
+	AS       $function$
+
+	BEGIN
+		FOR table_name IN 
+			SELECT
+				c.relname::text 
+			FROM
+				pg_catalog.pg_class c
+			JOIN
+				pg_catalog.pg_namespace n
+				ON n.oid = c.relnamespace
+			WHERE
+				c.relkind = 'r'
+				AND n.nspname = _schema
+			ORDER BY
+				1
+		LOOP
+			RETURN QUERY EXECUTE format(
+				'SELECT %1$L::text, count(*)::bigint FROM %2$I.%1$I', 
+				table_name, _schema
+			);
+		END LOOP;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_count_table_rows(text) OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_count_table_rows(text) TO neondb_owner;

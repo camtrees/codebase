@@ -1,0 +1,63 @@
+------------------------------------------------------------------------------------------
+-- Table: organization
+--
+-- Purpose: The list of CAM Organizations
+--
+-- Create Order:
+--		MUST BE BEFORE
+--			site
+--		MUST BE AFTER
+--			volunteer
+------------------------------------------------------------------------------------------
+-- public.organization definition
+
+-- Drop table
+
+-- DROP TABLE public.organization;
+
+CREATE TABLE public.organization (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	code text NOT NULL, -- The Cam Org short code
+	"name" text NOT NULL, -- The CAM Org name
+	volunteer_id int4 NOT NULL, -- The CAM Org contact person
+	date_created date NOT NULL, -- The date the record was created
+	date_updated date NOT NULL, -- The date the record was most recently updated
+	CONSTRAINT organization_code_not_null NOT NULL code,
+	CONSTRAINT organization_date_created_not_null NOT NULL date_created,
+	CONSTRAINT organization_date_updated_not_null NOT NULL date_updated,
+	CONSTRAINT organization_id_not_null NOT NULL id,
+	CONSTRAINT organization_name_not_null NOT NULL name,
+	CONSTRAINT organization_pkey PRIMARY KEY (id),
+	CONSTRAINT organization_volunteer_id_not_null NOT NULL volunteer_id
+);
+CREATE UNIQUE INDEX organization_code_unique ON public.organization USING btree (code);
+CREATE UNIQUE INDEX organization_name_unique ON public.organization USING btree (name);
+COMMENT ON TABLE public.organization IS 'Cam Organizations';
+
+-- Column comments
+
+COMMENT ON COLUMN public.organization.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.organization.code IS 'The Cam Org short code';
+COMMENT ON COLUMN public.organization."name" IS 'The CAM Org name';
+COMMENT ON COLUMN public.organization.volunteer_id IS 'The CAM Org contact person';
+COMMENT ON COLUMN public.organization.date_created IS 'The date the record was created';
+COMMENT ON COLUMN public.organization.date_updated IS 'The date the record was most recently updated';
+
+-- Table Triggers
+
+create trigger camtrees_manage_dates before
+insert
+    or
+update
+    on
+    public.organization for each row execute function camtrees_manage_dates();
+
+-- Permissions
+
+ALTER TABLE public.organization OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.organization TO neondb_owner;
+
+
+-- public.organization foreign keys
+
+ALTER TABLE public.organization ADD CONSTRAINT organization_volunteer_id_fkey FOREIGN KEY (volunteer_id) REFERENCES public.volunteer(id);

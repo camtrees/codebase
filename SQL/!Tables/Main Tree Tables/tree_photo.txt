@@ -1,0 +1,74 @@
+------------------------------------------------------------------------------------------
+-- Table: tree_photo
+--
+-- Purpose: All the photos taken of trees
+--
+-- Create Order:
+--		MUST BE BEFORE
+--		MUST BE AFTER
+--			***epicollect_record_type
+--			site
+--			tree
+--			volunteer
+------------------------------------------------------------------------------------------
+-- public.tree_photo definition
+
+-- Drop table
+
+-- DROP TABLE public.tree_photo;
+
+CREATE TABLE public.tree_photo (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	epicollect_record_type_id int4 NOT NULL, -- The EpiCollect record_type (pathway through the app) used to collect the data
+	"date" date NOT NULL, -- The date the tree photo was taken
+	volunteer_id int4 NOT NULL, -- The volunteer who took the tree photo
+	tag_photo bool NULL, -- Is the photo a picture of the tree tag?
+	filename text NOT NULL, -- The EpiCollect filename to access the photo
+	date_created date NOT NULL, -- The date the record was created
+	date_updated date NOT NULL, -- The date the record was most recently updated
+	tree_id int4 NOT NULL, -- The tree of which the photo was taken
+	CONSTRAINT tree_photo_date_created_not_null NOT NULL date_created,
+	CONSTRAINT tree_photo_date_not_null NOT NULL date,
+	CONSTRAINT tree_photo_date_updated_not_null NOT NULL date_updated,
+	CONSTRAINT tree_photo_epicollect_record_type_id_not_null NOT NULL epicollect_record_type_id,
+	CONSTRAINT tree_photo_filename_not_null NOT NULL filename,
+	CONSTRAINT tree_photo_id_not_null NOT NULL id,
+	CONSTRAINT tree_photo_pkey PRIMARY KEY (id),
+	CONSTRAINT tree_photo_tree_id_not_null NOT NULL tree_id,
+	CONSTRAINT tree_photo_volunteer_id_not_null NOT NULL volunteer_id
+);
+CREATE UNIQUE INDEX tree_photo_filename_unique ON public.tree_photo USING btree (filename);
+COMMENT ON TABLE public.tree_photo IS 'Photos of the trees. The actual photos are stored in EpiCollect. We compute the URL necessary to view the tree. NOTE: You MUST BE LOGGED INTO EpiCOllect to view the photos.';
+
+-- Column comments
+
+COMMENT ON COLUMN public.tree_photo.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.tree_photo.epicollect_record_type_id IS 'The EpiCollect record_type (pathway through the app) used to collect the data';
+COMMENT ON COLUMN public.tree_photo."date" IS 'The date the tree photo was taken';
+COMMENT ON COLUMN public.tree_photo.volunteer_id IS 'The volunteer who took the tree photo';
+COMMENT ON COLUMN public.tree_photo.tag_photo IS 'Is the photo a picture of the tree tag?';
+COMMENT ON COLUMN public.tree_photo.filename IS 'The EpiCollect filename to access the photo';
+COMMENT ON COLUMN public.tree_photo.date_created IS 'The date the record was created';
+COMMENT ON COLUMN public.tree_photo.date_updated IS 'The date the record was most recently updated';
+COMMENT ON COLUMN public.tree_photo.tree_id IS 'The tree of which the photo was taken';
+
+-- Table Triggers
+
+create trigger camtrees_manage_dates before
+insert
+    or
+update
+    on
+    public.tree_photo for each row execute function camtrees_manage_dates();
+
+-- Permissions
+
+ALTER TABLE public.tree_photo OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.tree_photo TO neondb_owner;
+
+
+-- public.tree_photo foreign keys
+
+ALTER TABLE public.tree_photo ADD CONSTRAINT tree_photo_epicollect_record_type_id_fkey FOREIGN KEY (epicollect_record_type_id) REFERENCES public.epicollect_record_type(id);
+ALTER TABLE public.tree_photo ADD CONSTRAINT tree_photo_tree_id_fkey FOREIGN KEY (tree_id) REFERENCES public.tree(id);
+ALTER TABLE public.tree_photo ADD CONSTRAINT tree_photo_volunteer_id_fkey FOREIGN KEY (volunteer_id) REFERENCES public.volunteer(id);

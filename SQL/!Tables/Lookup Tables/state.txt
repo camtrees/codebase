@@ -1,0 +1,36 @@
+------------------------------------------------------------------------------------------
+-- Table: state
+--
+-- Purpose: List of 50 States plus Washington DC.
+--
+-- Create Order:
+--		MUST BE BEFORE
+--			town
+------------------------------------------------------------------------------------------
+-- public.state definition
+
+-- Drop table
+
+-- DROP TABLE public.state;
+
+CREATE TABLE public.state (
+	code varchar(2) NOT NULL, -- The two letter postal code
+	"name" text NOT NULL, -- The state name
+	CONSTRAINT state_code_check CHECK ((char_length((code)::text) = 2)),
+	CONSTRAINT state_code_not_null NOT NULL code,
+	CONSTRAINT state_name_not_null NOT NULL name,
+	CONSTRAINT state_pkey PRIMARY KEY (code)
+);
+CREATE UNIQUE INDEX state_code_unique ON public.state USING btree (code);
+CREATE UNIQUE INDEX state_name_unique ON public.state USING btree (name);
+COMMENT ON TABLE public.state IS 'Lookup Table - State codes plus Washing D.C.';
+
+-- Column comments
+
+COMMENT ON COLUMN public.state.code IS 'The two letter postal code';
+COMMENT ON COLUMN public.state."name" IS 'The state name';
+
+-- Permissions
+
+ALTER TABLE public.state OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.state TO neondb_owner;

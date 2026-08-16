@@ -1,0 +1,27 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_volunteers_with_no_phone
+--
+-- Purpose: Volunteers with no known phone number
+--
+-- Create Order :
+--		MUST BE AFTER
+--			volunteer
+--			volunteer_phone
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_volunteers_with_no_phone;
+CREATE OR REPLACE VIEW data_error_volunteers_with_no_phone AS
+	SELECT
+		v.first_name,
+		v.last_name,
+		v.email
+	FROM
+		volunteer v
+	LEFT JOIN
+		volunteer_phone vp
+		ON v.id = vp.volunteer_id
+	WHERE
+		vp.id IS NULL
+	ORDER BY
+		v.first_name,
+		v.last_name
+	;

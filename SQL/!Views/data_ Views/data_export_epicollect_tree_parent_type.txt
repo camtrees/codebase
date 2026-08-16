@@ -1,0 +1,19 @@
+------------------------------------------------------------------------------------------
+-- View: data_export_epicollect_tree_parent_type
+--
+-- Purpose: Export tree_parent_type as CSV file to load into EpiCollect CAM Tree Maintenance form
+--
+-- Create Order:
+--		MUST BE AFTER
+--			tree_parent_type
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_export_epicollect_tree_parent_type;
+CREATE OR REPLACE VIEW data_export_epicollect_tree_parent_type AS
+	SELECT 
+		'"' || parent || '"' as "Mother Father Tree List"
+	FROM
+		tree_parent_type
+	ORDER BY
+		(parent = 'Open Pollination') DESC,
+		parent ASC
+	;

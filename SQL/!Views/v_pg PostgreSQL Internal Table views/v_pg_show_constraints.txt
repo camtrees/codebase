@@ -1,0 +1,45 @@
+------------------------------------------------------------------------------------------
+-- View: v_pg_show_constraints
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS v_pg_show_constraints;
+CREATE OR REPLACE VIEW v_pg_show_constraints AS
+	SELECT
+		CASE 
+			WHEN pgc.contype = 'p' THEN 'PKEY'
+			WHEN pgc.contype = 'f' THEN 'FKEY'
+			WHEN pgc.contype = 'n' THEN 'NOT NULL'
+			WHEN pgc.contype = 'c' THEN 'CHECK'
+								   ELSE 'Other'
+		END AS constraint_type,
+		ccu.table_name,
+		ccu.column_name,
+		pg_get_constraintdef(pgc.oid) AS constraint_definition,
+		cc.table_name AS referring_table_name,
+		pgc.conname AS constraint_name
+	FROM
+		pg_constraint pgc
+		JOIN pg_namespace nsp
+			ON pgc.connamespace = nsp.oid
+		JOIN pg_class cls
+			ON pgc.conrelid = cls.oid
+		LEFT JOIN information_schema.constraint_column_usage ccu
+			ON pgc.conname = ccu.constraint_name::name
+			AND nsp.nspname = ccu.constraint_schema::name
+		LEFT JOIN information_schema.table_constraints cc
+			ON pgc.conname = cc.constraint_name 
+	WHERE
+		pgc.connamespace = 'public'::regnamespace::oid
+		AND ccu.table_name <> 'NULL'
+	ORDER BY
+		CASE pgc.contype
+			WHEN 'p' THEN 1 -- PKEY
+			WHEN 'n' THEN 2 -- FKEY
+			WHEN 'c' THEN 3 -- CHECK
+			WHEN 'f' THEN 4 -- NOT NULL
+					 ELSE 5 -- for values not in the custom list, sort them normally or give them a low priority
+		END,
+		ccu.table_name,
+		ccu.column_name,
+		constraint_definition,
+		pgc.conname 
+		;

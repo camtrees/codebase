@@ -1,0 +1,42 @@
+------------------------------------------------------------------------------------------
+-- View: data_count_trees_by_primary_caretaker
+--
+-- Purpose: Show how many trees each primary caretaker is responsible for
+--
+-- Create Order:
+--		MUST BE AFTER
+--			cam_trees
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_count_trees_by_primary_caretaker;
+CREATE OR REPLACE VIEW data_count_trees_by_primary_caretaker AS
+SELECT 
+    COALESCE(
+        NULLIF(TRIM(BOTH FROM CONCAT(v.first_name, ' ', v.last_name)), ''),
+        NULLIF(TRIM(BOTH FROM CONCAT(v_site_primary.first_name, ' ', v_site_primary.last_name)), ''),
+        'No Caretaker Assigned'
+    ) AS "Primary Caretaker",
+    COUNT(*) AS "# Trees"
+FROM
+	tree t
+LEFT JOIN
+	volunteer v
+	ON t.primary_caretaker_id = v.id
+LEFT JOIN
+	site s
+	ON t.site_id = s.id
+LEFT JOIN
+	volunteer v_site_primary
+	ON s.primary_caretaker_id = v_site_primary.id
+GROUP BY
+	COALESCE(
+		NULLIF(TRIM(BOTH FROM CONCAT(v.first_name, ' ', v.last_name)), ''),
+		NULLIF(TRIM(BOTH FROM CONCAT(v_site_primary.first_name, ' ', v_site_primary.last_name)), ''),
+		'No Caretaker Assigned'
+		)
+ORDER BY
+	COALESCE(
+		NULLIF(TRIM(BOTH FROM CONCAT(v.first_name, ' ', v.last_name)), ''),
+		NULLIF(TRIM(BOTH FROM CONCAT(v_site_primary.first_name, ' ', v_site_primary.last_name)), ''),
+		'No Caretaker Assigned'
+	)
+;

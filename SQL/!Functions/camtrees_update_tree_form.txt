@@ -1,0 +1,70 @@
+------------------------------------------------------------------------------------------
+-- Function: camtrees_update_tree_form
+--
+-- Purpose: Update tree's form
+--
+-- Returns: true  - the tree's form was updated
+--          false - the tree's form was NOT updated
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_update_tree_form(text, text, text);
+
+CREATE OR REPLACE FUNCTION public.camtrees_update_tree_form(
+	p_site_name text,
+	p_tree_number text,
+	p_tree_form text
+	)
+	RETURNS  boolean
+	LANGUAGE plpgsql
+	AS       $function$
+
+	DECLARE
+		v_site_id      INTEGER;
+		v_tree_form_id INTEGER;
+		v_tree_id      INTEGER;
+		v_rows_updated INTEGER;
+
+	BEGIN
+		-- Get the site id
+		SELECT id INTO v_site_id
+		FROM site
+		WHERE name = trim(p_site_name);
+		IF v_site_id IS NULL THEN
+			RAISE EXCEPTION 'site not found: %', p_site_name;
+		END IF;
+
+		-- Replace 'NULL' string values with NULL for various input parameters
+		p_tree_form  := NULLIF(p_tree_form , 'NULL');
+		
+		-- Get the tree_form id
+		IF p_tree_form IS NOT NULL THEN
+			SELECT id INTO v_tree_form_id FROM tree_form_type WHERE form = lower(p_tree_form);
+		END IF;
+		IF v_tree_form_id IS NULL THEN
+			RAISE EXCEPTION 'tree form not found: %', p_tree_form;
+		END IF;
+
+		-- Get the tree id
+		SELECT id INTO v_tree_id
+		FROM tree
+		WHERE site_id = v_site_id AND number = p_tree_number;
+		IF v_tree_id IS NULL THEN
+			RAISE EXCEPTION 'tree not found. Site: "%" Tree Number: "%"', p_site_name, p_tree_number;
+		END IF;
+		
+		-- Update the tree with provided values
+		UPDATE tree
+		SET 
+			form_id = v_tree_form_id
+		WHERE id = v_tree_id;
+		
+		GET DIAGNOSTICS v_rows_updated = ROW_COUNT;
+		
+		RETURN v_rows_updated > 0;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_update_tree_form(text, text, text) OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_update_tree_form(text, text, text) TO neondb_owner;

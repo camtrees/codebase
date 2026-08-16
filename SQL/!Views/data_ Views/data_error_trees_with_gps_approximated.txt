@@ -1,0 +1,32 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_trees_with_gps_approximated
+--
+-- Purpose: Trees with estimated longitude and latitude data
+--
+-- Create Order:
+--		MUST BE AFTER
+--          site
+--			tree
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_trees_with_gps_approximated;
+CREATE OR REPLACE VIEW data_error_trees_with_gps_approximated AS
+	SELECT
+		s.name        AS site,
+		t.number      AS tree_number,
+		t.longitude,
+		t.latitude,
+		t.geog        AS gis_map_view,
+		t.gps_locked
+	FROM
+		tree t
+	JOIN
+		site s
+		ON t.site_id = s.id
+	WHERE
+		t.gps_locked = FALSE
+		AND t.longitude IS NOT NULL
+		AND t.latitude IS NOT NULL
+	ORDER BY
+		s.name,
+		t.number
+	;

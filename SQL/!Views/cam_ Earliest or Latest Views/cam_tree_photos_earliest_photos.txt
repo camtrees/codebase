@@ -1,0 +1,56 @@
+------------------------------------------------------------------------------------------
+-- View: cam_tree_photos_earliest_photos
+--
+-- Purpose: Show all photos from the first date on which a tree had any photos taken
+--
+-- Note: We will NOT ALLOW editing of data in this view
+--
+-- Create Order:
+--		MUST BE AFTER
+--			cam_tree_photos
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_tree_photos_earliest_photos;
+CREATE OR REPLACE VIEW cam_tree_photos_earliest_photos AS
+	WITH first_photo_date AS (
+		-- Find the minimum date
+	    SELECT
+	    	tp.tree_id,
+			MIN(tp.date) AS first_date
+		FROM
+			tree_photo tp
+		WHERE
+			tp.tag_photo = false
+		GROUP BY
+			tp.tree_id
+		)
+	SELECT
+		((v.first_name || ' '::text) || v.last_name) AS volunteer,
+		v.email                                      AS volunteer_email,
+		s.name                                       AS site,
+		t.number                                     AS tree_number,
+		tp.date,
+		tp.tag_photo,
+		('https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name='::text || tp.filename) AS photo,
+		tp.date_created,
+		tp.date_updated
+	FROM
+		tree_photo tp
+	JOIN
+		first_photo_date fpd
+		ON tp.tree_id = fpd.tree_id
+		AND tp.date = fpd.first_date
+	JOIN
+		tree t
+		ON tp.tree_id = t.id
+	JOIN
+		site s
+		ON t.site_id = s.id
+	JOIN
+		volunteer v
+		ON tp.volunteer_id = v.id
+	WHERE
+		tp.tag_photo = false
+	ORDER BY
+		s.name,
+		t.number
+	;

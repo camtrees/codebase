@@ -1,0 +1,24 @@
+------------------------------------------------------------------------------------------
+-- View: v_pg_show_functions
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS v_pg_show_functions;
+CREATE OR REPLACE VIEW v_pg_show_functions AS
+	SELECT
+		n.nspname                                   AS "Schema",
+		u.rolname                                   AS "Owner",
+		p.proname                                   AS "Name",
+		pg_catalog.pg_get_function_result(p.oid)    AS "Result data type",
+		pg_catalog.pg_get_function_arguments(p.oid) AS "Argument data types"
+	FROM
+		pg_catalog.pg_proc p
+	JOIN
+		pg_catalog.pg_roles u
+		ON p.proowner = u.oid
+	LEFT JOIN
+		pg_catalog.pg_namespace n
+		ON p.pronamespace = n.oid
+	WHERE
+		pg_catalog.pg_function_is_visible(p.oid)
+		AND n.nspname = 'public' 
+		AND u.rolname = current_user --<< this limits the functions to those that the current user owns.
+	;  

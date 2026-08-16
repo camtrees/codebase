@@ -1,0 +1,31 @@
+------------------------------------------------------------------------------------------
+-- View: cam_hubs
+--
+-- Purpose: The list of all hubs
+--
+-- Create Order :
+--		MUST BE AFTER
+--			hub
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_hubs;
+CREATE OR REPLACE VIEW cam_hubs AS
+	SELECT
+		h.name                               AS hub,
+		v.first_name  || ' ' || v.last_name  AS captain,
+		v.email                              AS captain_email,
+		vv.first_name || ' ' || vv.last_name AS lieutenant,
+		vv.email                             AS lieutenant_email,
+		h.date_created,
+		h.date_updated
+	FROM
+		hub h
+	LEFT JOIN
+		volunteer v
+		ON h.captain_id = v.id
+	LEFT JOIN
+		volunteer vv
+		ON h.lieutenant_id = vv.id
+	ORDER BY
+		h.name
+	;

@@ -1,0 +1,24 @@
+------------------------------------------------------------------------------------------
+-- View: data_count_trees_by_site
+--
+-- Purpose: Show how many trees are at each site
+--
+-- Create Order:
+--		MUST BE AFTER
+--			cam_trees
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_count_trees_by_site;
+CREATE OR REPLACE VIEW data_count_trees_by_site AS
+	SELECT
+		s.name      AS "Site",
+		COUNT(t.id) AS "Trees"
+	FROM
+		site s
+	LEFT JOIN
+		tree t
+		ON s.id = t.site_id
+	GROUP BY
+		s.name
+	ORDER BY
+		s.name
+	;

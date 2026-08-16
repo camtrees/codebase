@@ -1,0 +1,23 @@
+------------------------------------------------------------------------------------------
+-- View: data_error_volunteers_with_no_email
+--
+-- Purpose: Volunteers with temporary (non-valid) email addresses
+--
+-- Create Order:
+--		MUST BE AFTER
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_error_volunteers_with_no_email;
+CREATE OR REPLACE VIEW data_error_volunteers_with_no_email AS
+	SELECT
+		first_name,
+		last_name,
+		email
+	FROM
+		volunteer
+	WHERE
+		email LIKE '%UNKNOWN%'
+	ORDER BY
+		first_name,
+		last_name
+	;

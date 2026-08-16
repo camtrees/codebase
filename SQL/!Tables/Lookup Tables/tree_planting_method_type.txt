@@ -1,0 +1,34 @@
+------------------------------------------------------------------------------------------
+-- Table: tree_planting_method_type
+--
+-- Purpose: The list of tree planting methods
+--
+-- Create Order:
+--		MUST BE BEFORE
+--			tree
+------------------------------------------------------------------------------------------
+-- public.tree_planting_method_type definition
+
+-- Drop table
+
+-- DROP TABLE public.tree_planting_method_type;
+
+CREATE TABLE public.tree_planting_method_type (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	planting_method text NOT NULL, -- Tube size
+	CONSTRAINT tree_planting_method_type_id_not_null NOT NULL id,
+	CONSTRAINT tree_planting_method_type_pkey PRIMARY KEY (id),
+	CONSTRAINT tree_planting_method_type_planting_method_not_null NOT NULL planting_method
+);
+CREATE UNIQUE INDEX tree_planting_method_type_planting_method_unique ON public.tree_planting_method_type USING btree (planting_method);
+COMMENT ON TABLE public.tree_planting_method_type IS 'Lookup Table - Tube (if any) used to plant the tree';
+
+-- Column comments
+
+COMMENT ON COLUMN public.tree_planting_method_type.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.tree_planting_method_type.planting_method IS 'Tube size';
+
+-- Permissions
+
+ALTER TABLE public.tree_planting_method_type OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.tree_planting_method_type TO neondb_owner;

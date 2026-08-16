@@ -1,0 +1,18 @@
+------------------------------------------------------------------------------------------
+-- View: v_pg_show_unique_indexes
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS v_pg_show_unique_indexes;
+CREATE OR REPLACE VIEW v_pg_show_unique_indexes AS
+	SELECT
+		tablename,
+		indexname,
+		indexdef
+	FROM
+		pg_indexes
+	WHERE
+		schemaname = 'public'::name
+		AND indexname !~~ '%_pkey'::text
+	ORDER BY
+		tablename,
+		indexname
+	;
