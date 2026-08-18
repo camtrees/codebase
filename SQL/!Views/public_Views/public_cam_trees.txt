@@ -1,0 +1,124 @@
+------------------------------------------------------------------------------------------
+-- View: public_cam_trees
+--
+-- Purpose: The cam_trees view sanitized for public access
+--
+-- Create Order :
+--		MUST BE AFTER
+--			cam_tree_latest_health
+--			cam_tree_latest_height
+--			cam_tree_latest_water
+--			hub
+--			organization
+--			site
+--			site_hub
+--			tree
+--			***tree_access_level_type
+--			***tree_access_method_type
+--			***tree_access_path_type
+--			***tree_form_type
+--			***tree_planting_method_type
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS public_cam_trees;
+CREATE OR REPLACE VIEW public_cam_trees AS
+	SELECT
+		s.name                                  AS site,
+		t.number                                AS tree_id,
+		o.code                                  AS cam_org,
+		h.name                                  AS hub,
+		t.date                                  AS "date_planted_or_observed(wild)",
+		v1.first_name || ' ' || v1.last_name    AS planted_by,
+		COALESCE(
+			NULLIF(TRIM(CONCAT(v2.first_name, ' ', v2.last_name)), ''),
+			NULLIF(TRIM(CONCAT(v_site_primary.first_name, ' ', v_site_primary.last_name)), '')
+			) AS primary_caretaker,
+		COALESCE(
+			NULLIF(TRIM(CONCAT(v3.first_name, ' ', v3.last_name)), ''),
+			NULLIF(TRIM(CONCAT(v_site_secondary.first_name, ' ', v_site_secondary.last_name)), '')
+			) AS secondary_caretaker,
+		ctlh.latest_health,
+		ctlh.latest_health_date,
+		ctlhe.latest_height_in_inches,
+		ctlhe.latest_height_date,
+		ctlw.latest_water_date,
+		t.elevation_in_feet,
+		tapt.access_path,
+		talt.access_level,
+		tamt.access_method,
+		t.access_note,
+		tft.form,
+		tpmt.planting_method,
+		t.wire_fence,
+		p1.parent                               AS mother_tree,
+		t.mother_tree_other,
+		p2.parent                               AS father_tree,
+		t.father_tree_other,
+		t.parent_tree_note,
+		t.note
+	FROM
+		tree t
+	LEFT JOIN
+		tree_parent_type p1
+		ON t.mother_tree_id = p1.id
+	LEFT JOIN
+		tree_parent_type p2
+		ON t.father_tree_id = p2.id
+	LEFT JOIN
+		site s
+		ON t.site_id = s.id
+	LEFT JOIN
+		site_hub sh
+		ON s.id = sh.site_id
+	LEFT JOIN
+		hub h
+		ON sh.hub_id = h.id
+	LEFT JOIN
+		organization o
+		ON s.organization_id = o.id
+	LEFT JOIN
+		volunteer v1
+		ON t.volunteer_id = v1.id
+	LEFT JOIN
+		volunteer v2
+		ON t.primary_caretaker_id = v2.id
+	LEFT JOIN
+		volunteer v3
+		ON t.secondary_caretaker_id = v3.id
+	LEFT JOIN 
+		volunteer v_site_primary
+		ON s.primary_caretaker_id = v_site_primary.id
+	LEFT JOIN 
+		volunteer v_site_secondary
+		ON s.secondary_caretaker_id = v_site_secondary.id
+	LEFT JOIN
+		tree_access_path_type tapt
+		ON t.access_path_id = tapt.id
+	LEFT JOIN
+		tree_access_level_type talt
+		ON t.access_level_id = talt.id
+	LEFT JOIN
+		tree_access_method_type tamt
+		ON t.access_method_id = tamt.id
+	LEFT JOIN
+		tree_form_type tft
+		ON t.form_id = tft.id
+	LEFT JOIN
+		tree_planting_method_type tpmt
+		ON t.planting_method_id = tpmt.id
+	LEFT JOIN
+		cam_tree_latest_health ctlh
+		ON s.name  = ctlh.site 
+		AND t.number  = ctlh.tree_number 
+	LEFT JOIN
+		cam_tree_latest_height ctlhe
+		ON s.name  = ctlhe.site 
+		AND t.number  = ctlhe.tree_number 
+	LEFT JOIN
+		cam_tree_latest_water ctlw
+		ON s.name  = ctlw.site  
+		AND t.number  = ctlw.tree_number  
+	ORDER BY
+		s.name,
+		t.number
+	;
