@@ -1,0 +1,51 @@
+------------------------------------------------------------------------------------------
+-- View: public_sites
+--
+-- Purpose: The list of all sites
+--
+-- Create Order :
+--		MUST BE AFTER
+--			organization
+--			site
+--			***town
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS public_sites;
+CREATE OR REPLACE VIEW public_sites AS
+	SELECT
+		s.name                               AS site,
+		o.code                               AS org_code,
+		o.name                               AS organization,
+		t.name                               AS town,
+		s.location                           AS site_location,
+		s.location_note                      AS location_note,
+		v1.first_name || ' ' || v1.last_name AS contact,
+		v2.first_name || ' ' || v2.last_name AS primary_caretaker,
+		v3.first_name || ' ' || v3.last_name AS secondary_caretaker
+	FROM
+		site s
+	LEFT JOIN
+		organization o
+		ON s.organization_id = o.id
+	LEFT JOIN
+		town t
+		ON s.town_id = t.id
+	LEFT JOIN
+		volunteer v1
+		ON s.volunteer_id = v1.id
+	LEFT JOIN
+		volunteer v2
+		ON s.primary_caretaker_id = v2.id
+	LEFT JOIN
+		volunteer v3
+		ON s.secondary_caretaker_id = v3.id
+	ORDER BY
+		o.code, s.name
+	;
+
+COMMENT ON VIEW public.public_sites IS 'A sanitized (no email addresses) view of sites';
+
+-- Permissions
+
+ALTER TABLE public.public_sites OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.public_sites TO neondb_owner;
