@@ -40,6 +40,7 @@ CREATE OR REPLACE VIEW public_trees AS
 		ctlh.latest_health,
 		ctlh.latest_health_date,
 		ctlhe.latest_height_in_inches,
+		FLOOR(ctlhe.latest_height_in_inches / 12)::INTEGER || ' ft ' || ROUND(ctlhe.latest_height_in_inches % 12)::INTEGER || ' in' AS latest_height,
 		ctlhe.latest_height_date,
 		ctlw.latest_water_date,
 		t.elevation_in_feet,
