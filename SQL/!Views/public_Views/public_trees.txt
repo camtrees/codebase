@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------------
--- View: public_cam_trees
+-- View: public_trees
 --
 -- Purpose: The cam_trees view sanitized for public access
 --
@@ -20,8 +20,8 @@
 --			***tree_planting_method_type
 --			volunteer
 ------------------------------------------------------------------------------------------
---DROP VIEW IF EXISTS public_cam_trees;
-CREATE OR REPLACE VIEW public_cam_trees AS
+--DROP VIEW IF EXISTS public_trees;
+CREATE OR REPLACE VIEW public_trees AS
 	SELECT
 		s.name                                  AS site,
 		t.number                                AS tree_id,
@@ -122,3 +122,10 @@ CREATE OR REPLACE VIEW public_cam_trees AS
 		s.name,
 		t.number
 	;
+
+COMMENT ON VIEW public.public_trees IS 'A sanitized (no email addresses) view of trees';
+
+-- Permissions
+
+ALTER TABLE public.public_trees OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.public_trees TO neondb_owner;
