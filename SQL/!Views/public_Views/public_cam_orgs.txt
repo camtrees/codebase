@@ -1,0 +1,31 @@
+------------------------------------------------------------------------------------------
+-- View: public_cam_orgs
+--
+-- Purpose: The cam_organizations view sanitized for public access
+--
+-- Create Order :
+--		MUST BE AFTER
+--			organization
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS public_cam_orgs;
+CREATE OR REPLACE VIEW public.public_cam_orgs AS
+	SELECT
+		o.code                                     AS org_code,
+		o.name                                     AS organization,
+		(v.first_name || ' '::text) || v.last_name AS contact
+	FROM
+		organization o
+	LEFT JOIN
+		volunteer v
+		ON o.volunteer_id = v.id
+	ORDER BY
+		o.name
+	;
+
+COMMENT ON VIEW public.public_cam_orgs IS 'A sanitized (no email addresses) view of the organization table';
+
+-- Permissions
+
+ALTER TABLE public.public_cam_orgs OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.public_cam_orgs TO neondb_owner;
