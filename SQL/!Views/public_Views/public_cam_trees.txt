@@ -124,7 +124,7 @@ CREATE OR REPLACE VIEW public_cam_trees AS
 		t.number
 	;
 
-COMMENT ON VIEW public.public_cam_trees IS 'A sanitized (no email addresses) view of trees';
+COMMENT ON VIEW public.public_cam_trees IS 'A sanitized (no email addresses) view of the trees table';
 
 -- Permissions
 
