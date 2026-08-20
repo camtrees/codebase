@@ -4,3 +4,7 @@ Python/.env
 
 # Ignore Mac folder view
 **/.DS_Store
+
+#Ignore EpiCollect access tokens
+Python/epicollect_cam_tree_maintenance_access_token
+Python/epicollect_cam_tree_rain_event_access_token
