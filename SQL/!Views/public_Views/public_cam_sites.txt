@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------------
--- View: public_sites
+-- View: public_cam_sites
 --
 -- Purpose: The list of all sites
 --
@@ -10,8 +10,8 @@
 --			***town
 --			volunteer
 ------------------------------------------------------------------------------------------
---DROP VIEW IF EXISTS public_sites;
-CREATE OR REPLACE VIEW public_sites AS
+--DROP VIEW IF EXISTS public_cam_sites;
+CREATE OR REPLACE VIEW public_cam_sites AS
 	SELECT
 		s.name                               AS site,
 		o.code                               AS org_code,
@@ -43,9 +43,9 @@ CREATE OR REPLACE VIEW public_sites AS
 		o.code, s.name
 	;
 
-COMMENT ON VIEW public.public_sites IS 'A sanitized (no email addresses) view of sites';
+COMMENT ON VIEW public.public_cam_sites IS 'A sanitized (no email addresses) view of sites';
 
 -- Permissions
 
-ALTER TABLE public.public_sites OWNER TO neondb_owner;
-GRANT ALL ON TABLE public.public_sites TO neondb_owner;
+ALTER TABLE public.public_cam_sites OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.public_cam_sites TO neondb_owner;
