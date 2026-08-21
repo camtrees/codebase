@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------------------
--- View: data_site_visit
+-- View: public_site_visit
 --
--- Purpose: Show data useful to have printed for when a volunteer performs a site visit
+-- Purpose: Tree data useful to have printed when a performing a site visit
 --
 -- Create Order :
 --		MUST BE AFTER
@@ -14,12 +14,12 @@
 --			***tree_form_type
 --			***tree_planting_method_type
 ------------------------------------------------------------------------------------------
---DROP VIEW IF EXISTS data_site_visit;
-CREATE OR REPLACE VIEW data_site_visit AS
+--DROP VIEW IF EXISTS public_site_visit;
+CREATE OR REPLACE VIEW public_site_visit AS
 	SELECT
 		s.name                                  AS "Site",
-		t.number                                AS "Tree #",
-		t.date                                  AS "Planted",
+		t.number                                AS "Tree ID",
+		t.date                                  AS "Date Planted",
 		ctlh.latest_health                      AS "Health",
 		tapt.access_path                        AS "Access Path",
 		talt.access_level                       AS "Access Level",
