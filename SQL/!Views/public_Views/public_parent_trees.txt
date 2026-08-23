@@ -12,3 +12,10 @@ CREATE OR REPLACE VIEW public_parent_trees AS
 	ORDER BY
 		parent
 	;
+
+COMMENT ON VIEW public.public_parent_trees IS 'A sanitized (no email addresses) view of parent trees';
+
+-- Permissions
+
+ALTER TABLE public.public_parent_trees OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.public_parent_trees TO neondb_owner;
