@@ -43,6 +43,8 @@ CREATE OR REPLACE VIEW public_cam_trees AS
 		FLOOR(ctlhe.latest_height_in_inches / 12)::INTEGER || ' ft ' || ROUND(ctlhe.latest_height_in_inches % 12)::INTEGER || ' in' AS latest_height,
 		ctlhe.latest_height_date,
 		ctlw.latest_water_date,
+		t.longitude,
+		t.latitude,
 		t.elevation_in_feet,
 		tapt.access_path,
 		talt.access_level,
