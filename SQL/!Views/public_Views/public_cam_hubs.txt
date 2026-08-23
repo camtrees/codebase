@@ -1,0 +1,34 @@
+------------------------------------------------------------------------------------------
+-- View: public_cam_hubs
+--
+-- Purpose: The cam_hubs view sanitized for public access
+--
+-- Create Order :
+--		MUST BE AFTER
+--			hub
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS public_cam_hubs;
+CREATE OR REPLACE VIEW public.public_cam_hubs AS
+	SELECT
+		h.name                                       AS hub,
+		(v.first_name  || ' '::text) || v.last_name  AS captain,
+		(vv.first_name || ' '::text) || vv.last_name AS lieutenant
+	FROM
+		hub h
+	LEFT JOIN
+		volunteer v
+		ON h.captain_id = v.id
+	LEFT JOIN
+		volunteer vv
+		ON h.lieutenant_id = vv.id
+	ORDER BY
+		h.name
+	;
+
+COMMENT ON VIEW public.public_cam_hubs IS 'A sanitized (no email addresses) view of the hub table';
+
+-- Permissions
+
+ALTER TABLE public.public_cam_hubs OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.public_cam_hubs TO neondb_owner;
