@@ -1,0 +1,14 @@
+------------------------------------------------------------------------------------------
+-- View: public_parent_trees
+--
+-- Purpose: All the possible parent trees
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS public_parent_trees;
+CREATE OR REPLACE VIEW public_parent_trees AS
+	SELECT
+		parent AS parent_tree
+	FROM
+		tree_parent_type
+	ORDER BY
+		parent
+	;
