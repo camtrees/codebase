@@ -10,7 +10,7 @@ CREATE OR REPLACE VIEW public_parent_trees AS
 	FROM
 		tree_parent_type
 	ORDER BY
-		parent
+		(parent = 'Open Pollination') DESC, parent
 	;
 
 COMMENT ON VIEW public.public_parent_trees IS 'A sanitized (no email addresses) view of parent trees';
