@@ -16,6 +16,7 @@ CREATE OR REPLACE VIEW public_cam_sites AS
 		s.name                               AS site,
 		o.code                               AS org_code,
 		o.name                               AS organization,
+		s.url                                AS site_url,
 		t.name                               AS town,
 		s.location                           AS site_location,
 		s.location_note                      AS location_note,
@@ -23,8 +24,7 @@ CREATE OR REPLACE VIEW public_cam_sites AS
 		v2.first_name || ' ' || v2.last_name AS primary_caretaker,
 		v3.first_name || ' ' || v3.last_name AS secondary_caretaker,
 		first_tree.longitude                 AS longitude,
-		first_tree.latitude                  AS latitude,
-		s.url                                AS site_url		
+		first_tree.latitude                  AS latitude
 	FROM
 		site s
 	LEFT JOIN
