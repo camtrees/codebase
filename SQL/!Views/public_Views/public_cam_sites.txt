@@ -23,7 +23,8 @@ CREATE OR REPLACE VIEW public_cam_sites AS
 		v2.first_name || ' ' || v2.last_name AS primary_caretaker,
 		v3.first_name || ' ' || v3.last_name AS secondary_caretaker,
 		first_tree.longitude                 AS longitude,
-		first_tree.latitude                  AS latitude
+		first_tree.latitude                  AS latitude,
+		s.url                                AS site_url		
 	FROM
 		site s
 	LEFT JOIN
