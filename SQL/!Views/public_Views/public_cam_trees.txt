@@ -43,6 +43,8 @@ CREATE OR REPLACE VIEW public_cam_trees AS
 		FLOOR(ctlhe.latest_height_in_inches / 12)::INTEGER || ' ft ' || ROUND(ctlhe.latest_height_in_inches % 12)::INTEGER || ' in' AS latest_height,
 		ctlhe.latest_height_date,
 		ctlw.latest_water_date,
+		ctln.latest_nuts                        AS nuts_present,
+		ctln.latest_nuts_date,
 		t.longitude,
 		t.latitude,
 		t.elevation_in_feet,
@@ -121,6 +123,10 @@ CREATE OR REPLACE VIEW public_cam_trees AS
 		cam_tree_latest_water ctlw
 		ON s.name  = ctlw.site  
 		AND t.number  = ctlw.tree_number  
+	LEFT JOIN
+		cam_tree_latest_nuts ctln
+		ON s.name  = ctln.site  
+		AND t.number  = ctln.tree_number  
 	ORDER BY
 		s.name,
 		t.number

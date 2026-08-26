@@ -53,6 +53,8 @@ CREATE OR REPLACE VIEW cam_trees AS
 		ctlhe.latest_height_date,
 		ctlw.latest_water_date,
 		(CURRENT_DATE - ctlw.latest_water_date) AS days_since_watered,
+		ctln.latest_nuts,
+		ctln.latest_nuts_date,
 		t.longitude,
 		t.latitude,
 		t.gps_locked,
@@ -142,9 +144,20 @@ CREATE OR REPLACE VIEW cam_trees AS
 		AND t.number  = ctlhe.tree_number 
 	LEFT JOIN
 		cam_tree_latest_water ctlw
-		ON s.name  = ctlw.site  
-		AND t.number  = ctlw.tree_number  
+		ON s.name  = ctlw.site
+		AND t.number  = ctlw.tree_number
+	LEFT JOIN
+		cam_tree_latest_nuts ctln
+		ON s.name  = ctln.site
+		AND t.number  = ctln.tree_number
 	ORDER BY
 		s.name,
 		t.number
 	;
+
+COMMENT ON VIEW public.cam_trees IS 'A sanitized (no email addresses) view of the trees table';
+
+-- Permissions
+
+ALTER TABLE public.cam_trees OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.cam_trees TO neondb_owner;

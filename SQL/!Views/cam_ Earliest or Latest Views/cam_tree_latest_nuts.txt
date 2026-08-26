@@ -1,0 +1,58 @@
+------------------------------------------------------------------------------------------
+-- View: cam_tree_latest_nuts
+--
+-- Purpose: Show latest nuts_present
+--
+-- Create Order:
+--		MUST BE AFTER
+--			tree_health_assessment
+--			tree
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_tree_latest_nuts;
+CREATE OR REPLACE VIEW cam_tree_latest_nuts AS
+	WITH ranked_assessments AS (
+		SELECT
+			tree_id,
+			date,
+			nuts_id,
+			ROW_NUMBER() OVER (
+				PARTITION BY tree_id
+				ORDER BY date DESC, id DESC
+				) AS rn
+		FROM
+			tree_health_assessment
+		WHERE
+			nuts_id IS NOT NULL
+		)
+		SELECT
+			s.name     AS site,
+			t.number   AS tree_number,
+			ra.date    AS latest_nuts_date,
+			thnt.nuts  AS latest_nuts
+		FROM
+			tree t
+		JOIN
+			site s
+		ON
+			t.site_id = s.id
+		JOIN
+			ranked_assessments ra
+		ON
+			t.id = ra.tree_id
+		JOIN
+			tree_health_nuts_type thnt
+		ON
+			ra.nuts_id = thnt.id
+		WHERE
+			ra.rn = 1
+		ORDER BY
+			s.name,
+			t.number
+		;
+
+COMMENT ON VIEW public.cam_tree_latest_nuts IS 'Show latest tree_nuts';
+
+-- Permissions
+
+ALTER TABLE public.cam_tree_latest_nuts OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.cam_tree_latest_nuts TO neondb_owner;
