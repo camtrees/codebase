@@ -28,3 +28,10 @@ CREATE OR REPLACE VIEW public_sites_hubs AS
 		s.name,
 		h.name
 	;
+
+COMMENT ON VIEW public.public_sites_hubs IS 'A sanitized (no email addresses) view of what hubs sites are contained in';
+
+-- Permissions
+
+ALTER TABLE public.public_sites_hubs OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.public_sites_hubs TO neondb_owner;
