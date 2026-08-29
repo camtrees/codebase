@@ -25,8 +25,9 @@ CREATE OR REPLACE VIEW public_cam_trees AS
 	SELECT
 		s.name                                  AS site,
 		t.number                                AS tree_id,
-		o.code                                  AS cam_org,
+		town.name                               AS town,
 		h.name                                  AS hub,
+		o.code                                  AS cam_org,
 		t.date                                  AS "date_planted_or_observed(wild)",
 		v1.first_name || ' ' || v1.last_name    AS planted_by,
 		COALESCE(
@@ -78,6 +79,9 @@ CREATE OR REPLACE VIEW public_cam_trees AS
 	LEFT JOIN
 		hub h
 		ON sh.hub_id = h.id
+	LEFT JOIN
+		town town
+		ON s.town_id = town.id
 	LEFT JOIN
 		organization o
 		ON s.organization_id = o.id
