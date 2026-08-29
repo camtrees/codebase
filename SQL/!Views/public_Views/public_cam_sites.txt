@@ -14,10 +14,11 @@
 CREATE OR REPLACE VIEW public_cam_sites AS
 	SELECT
 		s.name                               AS site,
+		t.name                               AS town,
+		h.name                                  AS hub,
 		o.code                               AS org_code,
 		o.name                               AS organization,
 		s.url                                AS site_url,
-		t.name                               AS town,
 		s.location                           AS site_location,
 		s.location_note                      AS location_note,
 		v1.first_name || ' ' || v1.last_name AS contact,
@@ -27,6 +28,12 @@ CREATE OR REPLACE VIEW public_cam_sites AS
 		first_tree.latitude                  AS latitude
 	FROM
 		site s
+	LEFT JOIN
+		site_hub sh
+		ON s.id = sh.site_id
+	LEFT JOIN
+		hub h
+		ON sh.hub_id = h.id
 	LEFT JOIN
 		organization o
 		ON s.organization_id = o.id
