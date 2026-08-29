@@ -13,7 +13,9 @@ CREATE OR REPLACE VIEW public.public_cam_hubs AS
 	SELECT
 		h.name                                       AS hub,
 		(v.first_name  || ' '::text) || v.last_name  AS captain,
-		(vv.first_name || ' '::text) || vv.last_name AS lieutenant
+		(vv.first_name || ' '::text) || vv.last_name AS lieutenant,
+		h.longitude,
+		h.latitude
 	FROM
 		hub h
 	LEFT JOIN
