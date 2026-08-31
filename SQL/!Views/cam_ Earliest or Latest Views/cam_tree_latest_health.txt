@@ -49,3 +49,5 @@ CREATE OR REPLACE VIEW cam_tree_latest_health AS
 			s.name,
 			t.number
 		;
+
+COMMENT ON VIEW cam_tree_latest_health IS 'Show latest tree_health';
