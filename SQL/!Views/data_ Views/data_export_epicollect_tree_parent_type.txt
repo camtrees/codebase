@@ -10,7 +10,7 @@
 --DROP VIEW IF EXISTS data_export_epicollect_tree_parent_type;
 CREATE OR REPLACE VIEW data_export_epicollect_tree_parent_type AS
 	SELECT 
-		'"' || parent || '"' as "Mother Father Tree List"
+		parent AS "Mother Father Tree List"
 	FROM
 		tree_parent_type
 	ORDER BY
