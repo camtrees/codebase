@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------------------
--- View: data_error_trees_with_planting_method_unknown
+-- View: data_error_trees_with_no_planting_method
 --
 -- Purpose: Trees with unknown planting method
 --
@@ -9,8 +9,8 @@
 --          site
 --          tree_planting_method_type
 ------------------------------------------------------------------------------------------
---DROP VIEW IF EXISTS data_error_trees_with_planting_method_unknown;
-CREATE OR REPLACE VIEW data_error_trees_with_planting_method_unknown AS
+--DROP VIEW IF EXISTS data_error_trees_with_no_planting_method;
+CREATE OR REPLACE VIEW data_error_trees_with_no_planting_method AS
 	SELECT
 		s.name               AS site,
 		t.number             AS tree_number
@@ -26,3 +26,10 @@ CREATE OR REPLACE VIEW data_error_trees_with_planting_method_unknown AS
 		site,
 		tree_number
 	;
+
+COMMENT ON VIEW public.data_error_trees_with_no_planting_method IS 'Trees with no planting method';
+
+-- Permissions
+
+ALTER TABLE public.data_error_trees_with_no_planting_method OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_error_trees_with_no_planting_method TO neondb_owner;
