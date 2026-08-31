@@ -13,18 +13,15 @@
 CREATE OR REPLACE VIEW data_error_trees_with_planting_method_unknown AS
 	SELECT
 		s.name               AS site,
-		t.number             AS tree_number,
-		pmt.planting_method  AS planting_method
+		t.number             AS tree_number
 	FROM
 		tree t
 	JOIN
 		site s
 		ON t.site_id = s.id
-	JOIN
-		tree_planting_method_type pmt
-		ON t.planting_method_id = pmt.id
 	WHERE
-		planting_method = 'unknown'
+		planting_method_id IS NULL
+		AND s.name not like 'Wild%'
 	ORDER BY
 		site,
 		tree_number
