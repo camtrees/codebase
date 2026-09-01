@@ -17,3 +17,5 @@ CREATE OR REPLACE VIEW data_export_epicollect_tree_parent_type AS
 		(parent = 'Open Pollination') DESC,
 		parent ASC
 	;
+
+COMMENT ON VIEW data_export_epicollect_tree_parent_type IS 'Export tree_parent_type as CSV file to load into EpiCollect CAM Tree Maintenance form';
