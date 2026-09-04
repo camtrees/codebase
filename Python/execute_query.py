@@ -15,7 +15,7 @@
 ##            2026-07-22 Changes for using config.py file
 ###############################################################################
 
-import psycopg2
+import psycopg
 
 # load globals from config.py file
 from config import *
@@ -25,58 +25,24 @@ def execute_query(query, params=None):
     Executes a single SQL query and returns the results.
     """
 
-    conn    = None
-    cur     = None
     results = None
 
-    try:
-        # ------------------------------------------------------------------------------------------
-        # Establish the connection
-        # ------------------------------------------------------------------------------------------
-        conn = psycopg2.connect(
-            host     = DB_HOST_WRITE,
-            database = DB_NAME,
-            user     = DB_USER,
-            password = DB_PASSWORD,
-            port     = DB_PORT
-        )
+    # ------------------------------------------------------------------------------------------
+    # Establish the connection
+    # ------------------------------------------------------------------------------------------
+    with psycopg.connect(DB_HOST_WRITE) as conn:
+        with conn.cursor() as cur:
+            # ------------------------------------------------------------------------------------------
+            # Execute the query, using parameters safely to prevent SQL injection
+            # ------------------------------------------------------------------------------------------
+            cur.execute(query, params)
 
-        # ------------------------------------------------------------------------------------------
-        # Create a cursor object
-        # ------------------------------------------------------------------------------------------
-        cur = conn.cursor()
-
-        # ------------------------------------------------------------------------------------------
-        # Execute the query, using parameters safely to prevent SQL injection
-        # ------------------------------------------------------------------------------------------
-        cur.execute(query, params)
-
-        # ------------------------------------------------------------------------------------------
-        # If it's a SELECT query, fetch the results. Else get the number of rows updated.
-        # ------------------------------------------------------------------------------------------
-        if cur.description:
-            results = cur.fetchall()
-        else:
-            results = cur.rowcount
-
-        # ------------------------------------------------------------------------------------------
-        # Commit the transaction - must also commit SELECT (since using a function to update tables)
-        # ------------------------------------------------------------------------------------------
-        conn.commit()
-        cur.close()
-
-    except psycopg2.Error as e:
-        print(f"Database error: {e}")
-        if conn:
-            conn.rollback()  # Roll back in case of error
-
-    finally:
-        # ------------------------------------------------------------------------------------------
-        # Close the cursor and connection
-        # ------------------------------------------------------------------------------------------
-        if cur:
-            cur.close()
-        if conn:
-            conn.close()
+            # ------------------------------------------------------------------------------------------
+            # If it's a SELECT query, fetch the results. Else get the number of rows updated.
+            # ------------------------------------------------------------------------------------------
+            if cur.description:
+                results = cur.fetchall()
+            else:
+                results = cur.rowcount
 
     return results
