@@ -26,7 +26,7 @@
 
 # Python libraries
 from datetime import date, timedelta
-import pandas
+import pandas as pd
 from tabulate import tabulate
 
 # load globals from config.py file

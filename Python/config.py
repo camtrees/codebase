@@ -8,6 +8,7 @@
 ## Revised  : 2026-07-22 Initial Version
 ##            2026-07-22 Changes for using config.py file
 ##            2026-09-04 Move some globals to .env file
+##            2026-09-05 Allow GitHub Actions to select the CAMTREES database
 ##########################################################################################
 
 import os
@@ -25,13 +26,18 @@ KR_TESTING = False
 
 #------------------------------------------------------------------------------------------
 # Connect to the CAMTREES database? If not, connect to the KENSTER backup database.
+#
+# Local runs keep the historical KENSTER default. The nightly GitHub workflow sets
+# USE_CAMTREES_DATABASE=true explicitly so maintenance always targets CAMTREES.
 #------------------------------------------------------------------------------------------
-USE_CAMTREES_DATABASE = True
+USE_CAMTREES_DATABASE = os.getenv("USE_CAMTREES_DATABASE", "false").strip().lower() in {
+    "1", "true", "yes", "on"
+}
 
 # ------------------------------------------------------------------------------------------
 # Extract secret database globals based upon which database user selected to use
 # ------------------------------------------------------------------------------------------
-if USE_CAMTREES_DATABASE == True:
+if USE_CAMTREES_DATABASE:
     # Get CAMTREES master database connection parameters from .env
     DB_HOST_WRITE = os.getenv("CAMTREES_WRITE_URL")
     DB_HOST_READ  = os.getenv("CAMTREES_READ_URL")
@@ -62,5 +68,4 @@ MAINT_PROJECT_SLUG  = 'cam-tree-maintenance'
 RAIN_CLIENT_ID     = '7571'
 RAIN_PROJECT_NAME  = 'CAM_Tree_Rain_Event'
 RAIN_PROJECT_SLUG  = 'cam-tree-rain-event'
-
 
