@@ -26,7 +26,7 @@ KR_TESTING = False
 #------------------------------------------------------------------------------------------
 # Connect to the CAMTREES database? If not, connect to the KENSTER backup database.
 #------------------------------------------------------------------------------------------
-USE_CAMTREES_DATABASE = False
+USE_CAMTREES_DATABASE = True
 
 # ------------------------------------------------------------------------------------------
 # Extract secret database globals based upon which database user selected to use
