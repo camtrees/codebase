@@ -15,6 +15,7 @@
 ##          : 2026-06-13 <hkr> Removed location_note column from SQL tree table
 ##          : 2026-07-11 <hkr> Add return statements at end of all functions
 ##                             even if there is an earlier return
+##          : 2026-09-05 <hkr> Fix Added Row output in sql_camtrees_add_tree_initial_health
 ###############################################################################
 
 # Python libraries
@@ -224,8 +225,8 @@ def sql_camtrees_add_tree_initial_health(row, record_type, site, tree_number):
     # ------------------------------------------------------------------------------------------
     # Execute the SQL command
     # ------------------------------------------------------------------------------------------
-    added_rows = execute_query(sql_command)
-    print(f"\t +++++ Added {added_rows[0][0]} row(s) in the tree_health_assessment table.")
+    added_row = execute_query(sql_command)
+    print(f"\t +++++ Added row {added_row[0][0]} in the tree_health_assessment table.")
 
     return  ## END FUNCTION: sql_camtrees_add_care_action
 
