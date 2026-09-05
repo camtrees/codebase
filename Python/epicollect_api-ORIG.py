@@ -12,13 +12,9 @@
 ## Revised  : 2026-03-09 Initial Version
 ##            2026-06-06 <hkr> Allow for EpiCollect MAP_INDEX
 ##            2026-07-22 <hkr> Storing access tokens in file (was using .env)
-##            2026-09-05 <hkr> Make token caching safe for GitHub Actions
 ###############################################################################
 
 # Python libraries
-import os
-from pathlib import Path
-
 import pandas as pd
 import pyepicollect as pyep
 
@@ -26,63 +22,49 @@ import pyepicollect as pyep
 from print_functions import *
 
 
-def _token_path(token_file):
-    """Return the local token-cache path without ever exposing its contents."""
-    token_directory = os.getenv("EPICOLLECT_TOKEN_DIR")
-    if token_directory:
-        return Path(token_directory) / Path(token_file).name
-    return Path(token_file)
-
-
 def epicollect_get_access_token(epicollect_attribs) -> str:
     """
     Validate our access_token. If it's not valid, get a new one.
     """
 
-    # Read our current access_token from a local file. A missing or empty cache is
-    # normal on a fresh GitHub runner and simply causes a new token to be requested.
-    file_path = _token_path(epicollect_attribs['TOKEN_FILE'])
-    access_token = ""
+    # Read our current access_token from a local file.
+    file_path = epicollect_attribs['TOKEN_FILE']
     try:
-        access_token = file_path.read_text(encoding='utf-8').strip()
+        # Open the file in read mode ('r' is the default)
+        with open(file_path, 'r', encoding='utf-8') as file:
+            # Read the entire content into a single string variable
+            access_token = file.read()
     except FileNotFoundError:
-        print("No cached EpiCollect access token was found.")
-    except OSError as error:
-        print(f"The cached EpiCollect access token could not be read: {error}")
+        print(f"Error: The file at {file_path} was not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
-    if access_token:
-        # Try using the cached token. An API error means it is stale or invalid.
-        try:
-            project = pyep.api.get_project(epicollect_attribs['PROJECT_SLUG'], access_token)
-            if isinstance(project, dict) and 'errors' not in project:
-                print("\nThe cached EpiCollect access token is still valid.")
-                return access_token
-        except Exception as error:
-            print(f"The cached EpiCollect access token could not be validated: {error}")
+    # Try using the access_token to see if it's valid
+    project = pyep.api.get_project(epicollect_attribs['PROJECT_SLUG'], access_token)
+    # If the project dict has an 'errors' key, our access_token is not valid
+    key_to_check = 'errors'
+    if key_to_check in project:
+        # We need a new access_token
+        print(f"\nWe need a new access_token...")
+        access_token = epicollect_get_new_access_token(epicollect_attribs)
+    else:
+        print(f"\nOur current access_token is still valid...")
 
-    print("\nRequesting a new EpiCollect access token...")
-    return epicollect_get_new_access_token(epicollect_attribs)
+    return access_token
 
 
 def epicollect_get_new_access_token(epicollect_attribs):
     """
     Get (and save) a new Epicollect access_token.
     """
-    if not epicollect_attribs.get('CLIENT_SECRET'):
-        raise RuntimeError("The required EpiCollect client secret is not configured.")
-
     print('Getting a new access token...')
     new_access_token = pyep.auth.request_token(epicollect_attribs['CLIENT_ID'], epicollect_attribs['CLIENT_SECRET'])
-    access_token = new_access_token.get('access_token')
-    if not access_token:
-        raise RuntimeError("EpiCollect did not return an access token.")
+    access_token = new_access_token['access_token']
 
-    # Store the token in a private local cache. GitHub Actions points this at the
-    # runner's temporary directory so the token can never enter the public site.
-    file_path = _token_path(epicollect_attribs['TOKEN_FILE'])
-    file_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-    file_path.write_text(access_token, encoding='utf-8')
-    file_path.chmod(0o600)
+    # Store the new access_token in our external file
+    file_path = epicollect_attribs['TOKEN_FILE']
+    with open(file_path, 'w') as file:
+        file.write(access_token)
 
     return access_token
 
