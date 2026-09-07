@@ -1,14 +1,6 @@
 # Not sure what a .gitignore is?
 # See: https://git-scm.com/docs/gitignore
 
-#Ignore Python and PyCharm items
-Python/.env
-/Python/__pycache__
-/Python/.idea
-
 # Ignore Mac folder view
 **/.DS_Store
 
-#Ignore EpiCollect access tokens
-Python/epicollect_cam_tree_maintenance_access_token
-Python/epicollect_cam_tree_rain_event_access_token
