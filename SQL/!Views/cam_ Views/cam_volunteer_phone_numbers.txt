@@ -10,20 +10,21 @@
 --			volunteer
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS cam_volunteer_phone_numbers;
-CREATE OR REPLACE VIEW cam_volunteer_phone_numbers AS
-	SELECT
-		v.first_name || ' ' || v.last_name AS volunteer,
-		p.label                            AS phone_type,
-		regexp_replace(vp.number, '(\d{3})(\d{3})(\d{4})', '(\1) \2-\3') AS phone_number
-	FROM
-		volunteer_phone vp
-	LEFT JOIN
-		volunteer v
-		ON vp.volunteer_id = v.id
-	LEFT JOIN
-		phone_type p
-		ON vp.phone_type_id = p.id
-	ORDER BY
-		volunteer,
-		p.label
-	;
+
+-- public.cam_volunteer_phone_numbers source
+
+CREATE OR REPLACE VIEW public.cam_volunteer_phone_numbers
+AS SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
+    p.label AS phone_type,
+    regexp_replace(vp.number, '(\d{3})(\d{3})(\d{4})'::text, '(\1) \2-\3'::text) AS phone_number
+   FROM volunteer_phone vp
+     LEFT JOIN volunteer v ON vp.volunteer_id = v.id
+     LEFT JOIN phone_type p ON vp.phone_type_id = p.id
+  ORDER BY ((v.first_name || ' '::text) || v.last_name), p.label;
+
+COMMENT ON VIEW public.cam_volunteer_phone_numbers IS 'Phone numbers at which volunteers can be reached';
+
+-- Permissions
+
+ALTER TABLE public.cam_volunteer_phone_numbers OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.cam_volunteer_phone_numbers TO neondb_owner;

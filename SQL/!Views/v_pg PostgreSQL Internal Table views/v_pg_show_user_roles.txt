@@ -2,20 +2,25 @@
 -- View: v_pg_show_user_roles
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS v_pg_show_user_roles;
-CREATE OR REPLACE VIEW v_pg_show_user_roles AS
-	SELECT
-		rolname        AS username,
-		rolsuper       AS is_superuser,
-		rolcreaterole  AS can_create_role,
-		rolcreatedb    AS can_create_db,
-		rolcanlogin    AS can_login,
-		rolvaliduntil  AS password_expires,
-		rolinherit     AS inherits_privileges,
-		rolreplication AS is_replication_role
-	FROM
-		pg_roles
-	WHERE
-		rolcanlogin
-	ORDER BY
-		rolname
-	;
+
+-- public.v_pg_show_user_roles source
+
+CREATE OR REPLACE VIEW public.v_pg_show_user_roles
+AS SELECT rolname AS username,
+    rolsuper AS is_superuser,
+    rolcreaterole AS can_create_role,
+    rolcreatedb AS can_create_db,
+    rolcanlogin AS can_login,
+    rolvaliduntil AS password_expires,
+    rolinherit AS inherits_privileges,
+    rolreplication AS is_replication_role
+   FROM pg_roles
+  WHERE rolcanlogin
+  ORDER BY rolname;
+
+COMMENT ON VIEW public.v_pg_show_user_roles IS 'Database Admin View - Show User roles';
+
+-- Permissions
+
+ALTER TABLE public.v_pg_show_user_roles OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.v_pg_show_user_roles TO neondb_owner;

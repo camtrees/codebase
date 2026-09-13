@@ -18,16 +18,22 @@
 --		   id and filename fields as the keys
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS user_hkr_tree_photos_for_tag_info_editing;
-CREATE OR REPLACE VIEW user_hkr_tree_photos_for_tag_info_editing AS
-	SELECT
-		id,
-		tag_photo,
-		'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name=' || filename AS photo,
-		filename,
-		date_created,
-		date_updated
-	FROM
-		tree_photo
-	ORDER BY
-		tag_photo DESC
-	;
+
+-- public.user_hkr_tree_photos_for_tag_info_editing source
+
+CREATE OR REPLACE VIEW public.user_hkr_tree_photos_for_tag_info_editing
+AS SELECT id,
+    tag_photo,
+    'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name='::text || filename AS photo,
+    filename,
+    date_created,
+    date_updated
+   FROM tree_photo
+  ORDER BY tag_photo DESC;
+
+COMMENT ON VIEW public.user_hkr_tree_photos_for_tag_info_editing IS 'Tree photos with our EpiCollect link and tag_info for easy Kenster editing';
+
+-- Permissions
+
+ALTER TABLE public.user_hkr_tree_photos_for_tag_info_editing OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.user_hkr_tree_photos_for_tag_info_editing TO neondb_owner;

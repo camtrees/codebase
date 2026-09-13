@@ -10,18 +10,20 @@
 --			***volunteer_interest_type
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS cam_volunteer_interests;
-CREATE OR REPLACE VIEW cam_volunteer_interests AS
-	SELECT
-		v.first_name || ' ' || v.last_name AS volunteer,
-		i.interest
-	FROM
-		volunteer_interest vi
-	LEFT JOIN
-		volunteer v
-		ON vi.volunteer_id = v.id
-	LEFT JOIN
-		volunteer_interest_type i
-		ON vi.interest_id = i.id
-	ORDER BY
-		volunteer
-	;
+
+-- public.cam_volunteer_interests source
+
+CREATE OR REPLACE VIEW public.cam_volunteer_interests
+AS SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
+    i.interest
+   FROM volunteer_interest vi
+     LEFT JOIN volunteer v ON vi.volunteer_id = v.id
+     LEFT JOIN volunteer_interest_type i ON vi.interest_id = i.id
+  ORDER BY ((v.first_name || ' '::text) || v.last_name);
+
+COMMENT ON VIEW public.cam_volunteer_interests IS 'Volunteer''s interests. Like watering trees or being available for special events.';
+
+-- Permissions
+
+ALTER TABLE public.cam_volunteer_interests OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.cam_volunteer_interests TO neondb_owner;

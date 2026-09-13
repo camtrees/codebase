@@ -40,4 +40,3 @@ ORDER BY
 CREATE INDEX tree_health_assessment_latest_height_idx
 	ON tree_health_assessment (tree_id, date DESC, id DESC)
 	INCLUDE (height_in_inches);
-

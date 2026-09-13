@@ -14,39 +14,31 @@
 --			tree
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS cam_tree_latest_height;
-CREATE OR REPLACE VIEW cam_tree_latest_height AS
-	WITH ranked_assessments AS (
-		SELECT
-			tree_id,
-			date,
-			height_in_inches,
-			ROW_NUMBER() OVER (
-				PARTITION BY tree_id
-				ORDER BY date DESC, id DESC
-				) AS rn
-		FROM
-			tree_health_assessment
-		WHERE
-			height_in_inches IS NOT NULL
-		)
-		SELECT
-			s.name              AS site,
-			t.number            AS tree_number,
-			ra.height_in_inches AS latest_height_in_inches,
-			ra.date             AS latest_height_date
-		FROM
-			tree t
-		JOIN
-			site s
-			ON
-				t.site_id = s.id
-		JOIN
-			ranked_assessments ra
-			ON
-				t.id = ra.tree_id
-		WHERE
-			ra.rn = 1
-		ORDER BY
-			s.name,
-			t.number
-		;
+
+-- public.cam_tree_latest_height source
+
+CREATE OR REPLACE VIEW public.cam_tree_latest_height
+AS WITH ranked_assessments AS (
+         SELECT tree_health_assessment.tree_id,
+            tree_health_assessment.date,
+            tree_health_assessment.height_in_inches,
+            row_number() OVER (PARTITION BY tree_health_assessment.tree_id ORDER BY tree_health_assessment.date DESC, tree_health_assessment.id DESC) AS rn
+           FROM tree_health_assessment
+          WHERE tree_health_assessment.height_in_inches IS NOT NULL
+        )
+ SELECT s.name AS site,
+    t.number AS tree_number,
+    ra.height_in_inches AS latest_height_in_inches,
+    ra.date AS latest_height_date
+   FROM tree t
+     JOIN site s ON t.site_id = s.id
+     JOIN ranked_assessments ra ON t.id = ra.tree_id
+  WHERE ra.rn = 1
+  ORDER BY s.name, t.number;
+
+COMMENT ON VIEW public.cam_tree_latest_height IS 'Show latest tree_height';
+
+-- Permissions
+
+ALTER TABLE public.cam_tree_latest_height OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.cam_tree_latest_height TO neondb_owner;

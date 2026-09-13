@@ -2,13 +2,18 @@
 -- View: v_pg_show_sequences
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS v_pg_show_sequences;
-CREATE OR REPLACE VIEW v_pg_show_sequences AS
-	SELECT
-		relname
-	FROM
-		pg_class
-	WHERE
-		relkind = 'S'::"char"
-	ORDER BY
-		relname
-	;
+
+-- public.v_pg_show_sequences source
+
+CREATE OR REPLACE VIEW public.v_pg_show_sequences
+AS SELECT relname
+   FROM pg_class
+  WHERE relkind = 'S'::"char"
+  ORDER BY relname;
+
+COMMENT ON VIEW public.v_pg_show_sequences IS 'Database Admin View - Show Sequences';
+
+-- Permissions
+
+ALTER TABLE public.v_pg_show_sequences OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.v_pg_show_sequences TO neondb_owner;

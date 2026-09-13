@@ -4,14 +4,13 @@
 -- Purpose: All the possible parent trees
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS public_parent_trees;
-CREATE OR REPLACE VIEW public_parent_trees AS
-	SELECT
-		parent AS parent_tree
-	FROM
-		tree_parent_type
-	ORDER BY
-		(parent = 'Open Pollination') DESC, parent
-	;
+
+-- public.public_parent_trees source
+
+CREATE OR REPLACE VIEW public.public_parent_trees
+AS SELECT parent AS parent_tree
+   FROM tree_parent_type
+  ORDER BY (parent = 'Open Pollination'::text) DESC, parent;
 
 COMMENT ON VIEW public.public_parent_trees IS 'A sanitized (no email addresses) view of parent trees';
 

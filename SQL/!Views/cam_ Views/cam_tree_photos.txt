@@ -15,38 +15,33 @@
 --			volunteer
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS cam_tree_photos;
-CREATE OR REPLACE VIEW cam_tree_photos AS
-	SELECT
-		v.first_name || ' ' || v.last_name AS volunteer,
-		e.record_type,
-		s.name                             AS site,
-		t.number                           AS tree_number,
-		tp.date,
-		tp.tag_photo,
-		'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name=' || tp.filename AS photo,
-		'=HYPERLINK("' || 'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name=' || tp.filename || '")' as excel_url,
-		-- following columns are necessary so we can edit the tag_photo column
-		tp.date_created,
-		tp.date_updated,
-		tp.tree_id,
-		t.access_note,
-		t.note
-	FROM
-		tree_photo tp
-	LEFT JOIN
-		epicollect_record_type e
-		ON tp.epicollect_record_type_id=e.id
-	LEFT JOIN
-		tree t
-		ON tp.tree_id = t.id
-	LEFT JOIN
-		site s
-		ON t.site_id = s.id
-	LEFT JOIN
-		volunteer v
-		ON tp.volunteer_id = v.id
-	ORDER BY
-		s.name,
-		t.number,
-		tp.date
-	;
+
+-- public.cam_tree_photos source
+
+CREATE OR REPLACE VIEW public.cam_tree_photos
+AS SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
+    e.record_type,
+    s.name AS site,
+    t.number AS tree_number,
+    tp.date,
+    tp.tag_photo,
+    'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name='::text || tp.filename AS photo,
+    (('=HYPERLINK("'::text || 'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name='::text) || tp.filename) || '")'::text AS excel_url,
+    tp.date_created,
+    tp.date_updated,
+    tp.tree_id,
+    t.access_note,
+    t.note
+   FROM tree_photo tp
+     LEFT JOIN epicollect_record_type e ON tp.epicollect_record_type_id = e.id
+     LEFT JOIN tree t ON tp.tree_id = t.id
+     LEFT JOIN site s ON t.site_id = s.id
+     LEFT JOIN volunteer v ON tp.volunteer_id = v.id
+  ORDER BY s.name, t.number, tp.date;
+
+COMMENT ON VIEW public.cam_tree_photos IS 'Photos of the trees. The actual photos are stored in EpiCollect. We compute the URL necessary to view the tree. NOTE: You MUST BE LOGGED INTO EpiCOllect to view the photos.';
+
+-- Permissions
+
+ALTER TABLE public.cam_tree_photos OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.cam_tree_photos TO neondb_owner;

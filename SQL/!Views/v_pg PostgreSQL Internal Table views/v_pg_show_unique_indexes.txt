@@ -2,17 +2,20 @@
 -- View: v_pg_show_unique_indexes
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS v_pg_show_unique_indexes;
-CREATE OR REPLACE VIEW v_pg_show_unique_indexes AS
-	SELECT
-		tablename,
-		indexname,
-		indexdef
-	FROM
-		pg_indexes
-	WHERE
-		schemaname = 'public'::name
-		AND indexname !~~ '%_pkey'::text
-	ORDER BY
-		tablename,
-		indexname
-	;
+
+-- public.v_pg_show_unique_indexes source
+
+CREATE OR REPLACE VIEW public.v_pg_show_unique_indexes
+AS SELECT tablename,
+    indexname,
+    indexdef
+   FROM pg_indexes
+  WHERE schemaname = 'public'::name AND indexname !~~ '%_pkey'::text
+  ORDER BY tablename, indexname;
+
+COMMENT ON VIEW public.v_pg_show_unique_indexes IS 'Database Admin View - Show Unique Indexes';
+
+-- Permissions
+
+ALTER TABLE public.v_pg_show_unique_indexes OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.v_pg_show_unique_indexes TO neondb_owner;

@@ -4,18 +4,21 @@
 -- Note: Could use DBeaver to show them instead
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS v_pg_show_indexes;
-CREATE OR REPLACE VIEW v_pg_show_indexes AS
-	SELECT
-		split_part(indexname, '_', -1) AS index_type,
-		tablename,
-		indexname,
-		indexdef
-	FROM
-		pg_indexes
-	WHERE
-		schemaname = 'public'::name
-	ORDER BY
-		index_type,
-		tablename,
-		indexname
-	;
+
+-- public.v_pg_show_indexes source
+
+CREATE OR REPLACE VIEW public.v_pg_show_indexes
+AS SELECT split_part(indexname::text, '_'::text, '-1'::integer) AS index_type,
+    tablename,
+    indexname,
+    indexdef
+   FROM pg_indexes
+  WHERE schemaname = 'public'::name
+  ORDER BY (split_part(indexname::text, '_'::text, '-1'::integer)), tablename, indexname;
+
+COMMENT ON VIEW public.v_pg_show_indexes IS 'Database Admin View - Show Indexes';
+
+-- Permissions
+
+ALTER TABLE public.v_pg_show_indexes OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.v_pg_show_indexes TO neondb_owner;

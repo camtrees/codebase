@@ -10,11 +10,34 @@
 --			cam_tree_photos
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS cam_tree_photos_with_tags;
-CREATE OR REPLACE VIEW cam_tree_photos_with_tags AS
-	SELECT
-		*
-	FROM
-		cam_tree_photos
-	WHERE
-		tag_photo = true
-	;
+
+-- public.cam_tree_photos_with_tags source
+
+CREATE OR REPLACE VIEW public.cam_tree_photos_with_tags
+AS SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
+    e.record_type,
+    s.name AS site,
+    t.number AS tree_number,
+    tp.date,
+    tp.tag_photo,
+    'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name='::text || tp.filename AS photo,
+    (('=HYPERLINK("'::text || 'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name='::text) || tp.filename) || '")'::text AS excel_url,
+    tp.date_created,
+    tp.date_updated,
+    tp.tree_id,
+    t.access_note,
+    t.note
+   FROM tree_photo tp
+     LEFT JOIN epicollect_record_type e ON tp.epicollect_record_type_id = e.id
+     LEFT JOIN tree t ON tp.tree_id = t.id
+     LEFT JOIN site s ON t.site_id = s.id
+     LEFT JOIN volunteer v ON tp.volunteer_id = v.id
+  WHERE tp.tag_photo = true
+  ORDER BY s.name, t.number, tp.date;
+
+COMMENT ON VIEW public.cam_tree_photos_with_tags IS 'Tree photos showing a closeup of the tree''s tag';
+
+-- Permissions
+
+ALTER TABLE public.cam_tree_photos_with_tags OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.cam_tree_photos_with_tags TO neondb_owner;

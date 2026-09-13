@@ -6,9 +6,18 @@
 
 -- Create view that will use the count function
 DROP VIEW IF EXISTS v_pg_show_count_view_rows;
-CREATE OR REPLACE VIEW v_pg_show_count_view_rows AS
-	SELECT
-		*
-	FROM
-		camtrees_count_view_rows()
-	;
+
+-- public.v_pg_show_count_view_rows source
+
+CREATE OR REPLACE VIEW public.v_pg_show_count_view_rows
+AS SELECT view_schema,
+    view_name,
+    row_count
+   FROM camtrees_count_view_rows() camtrees_count_view_rows(view_schema, view_name, row_count);
+
+COMMENT ON VIEW public.v_pg_show_count_view_rows IS 'Database Admin View - Show number of rows in all Views';
+
+-- Permissions
+
+ALTER TABLE public.v_pg_show_count_view_rows OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.v_pg_show_count_view_rows TO neondb_owner;

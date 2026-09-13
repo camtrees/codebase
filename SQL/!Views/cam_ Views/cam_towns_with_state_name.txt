@@ -9,17 +9,20 @@
 --			town
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS cam_towns_with_state_name;
-CREATE OR REPLACE VIEW cam_towns_with_state_name AS
-	SELECT
-		t.state_code AS state,
-		t.name       AS town,
-		s.name       AS state_name
-	FROM
-		town t
-	LEFT JOIN
-		state s
-		ON t.state_code = s.code
-	ORDER BY
-		s.name,
-		t.name
-	;
+
+-- public.cam_towns_with_state_name source
+
+CREATE OR REPLACE VIEW public.cam_towns_with_state_name
+AS SELECT t.state_code AS state,
+    t.name AS town,
+    s.name AS state_name
+   FROM town t
+     LEFT JOIN state s ON t.state_code::text = s.code::text
+  ORDER BY s.name, t.name;
+
+COMMENT ON VIEW public.cam_towns_with_state_name IS 'All towns in Maine with a few towns from other states';
+
+-- Permissions
+
+ALTER TABLE public.cam_towns_with_state_name OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.cam_towns_with_state_name TO neondb_owner;

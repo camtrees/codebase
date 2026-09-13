@@ -9,18 +9,22 @@
 --			volunteer
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS cam_organizations;
-CREATE OR REPLACE VIEW cam_organizations AS
-	SELECT
-		o.code                             AS org_code,
-		o.name                             AS organization,
-		v.first_name || ' ' || v.last_name AS contact,
-		o.date_created,
-		o.date_updated
-	FROM
-		organization o
-	LEFT JOIN
-		volunteer v
-		ON o.volunteer_id = v.id
-	ORDER BY
-		o.name
-	;
+
+-- public.cam_organizations source
+
+CREATE OR REPLACE VIEW public.cam_organizations
+AS SELECT o.code AS org_code,
+    o.name AS organization,
+    (v.first_name || ' '::text) || v.last_name AS contact,
+    o.date_created,
+    o.date_updated
+   FROM organization o
+     LEFT JOIN volunteer v ON o.volunteer_id = v.id
+  ORDER BY o.name;
+
+COMMENT ON VIEW public.cam_organizations IS 'Cam Organizations';
+
+-- Permissions
+
+ALTER TABLE public.cam_organizations OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.cam_organizations TO neondb_owner;

@@ -4,9 +4,17 @@
 -- Requires: camtrees_count_table_rows FUNCTION
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS v_pg_show_count_table_rows;
-CREATE OR REPLACE VIEW v_pg_show_count_table_rows AS
-	SELECT
-		*
-	FROM
-		camtrees_count_table_rows()
-	;
+
+-- public.v_pg_show_count_table_rows source
+
+CREATE OR REPLACE VIEW public.v_pg_show_count_table_rows
+AS SELECT table_name,
+    row_count
+   FROM camtrees_count_table_rows() camtrees_count_table_rows(table_name, row_count);
+
+COMMENT ON VIEW public.v_pg_show_count_table_rows IS 'Database Admin View - Show number of rows in all Tables';
+
+-- Permissions
+
+ALTER TABLE public.v_pg_show_count_table_rows OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.v_pg_show_count_table_rows TO neondb_owner;

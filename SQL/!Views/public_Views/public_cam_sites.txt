@@ -11,62 +11,38 @@
 --			volunteer
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS public_cam_sites;
-CREATE OR REPLACE VIEW public_cam_sites AS
-	SELECT
-		s.name                               AS site,
-		t.name                               AS town,
-		h.name                                  AS hub,
-		o.code                               AS org_code,
-		o.name                               AS organization,
-		s.url                                AS site_url,
-		s.location                           AS site_location,
-		s.location_note                      AS location_note,
-		v1.first_name || ' ' || v1.last_name AS contact,
-		v2.first_name || ' ' || v2.last_name AS primary_caretaker,
-		v3.first_name || ' ' || v3.last_name AS secondary_caretaker,
-		first_tree.longitude                 AS longitude,
-		first_tree.latitude                  AS latitude
-	FROM
-		site s
-	LEFT JOIN
-		site_hub sh
-		ON s.id = sh.site_id
-	LEFT JOIN
-		hub h
-		ON sh.hub_id = h.id
-	LEFT JOIN
-		organization o
-		ON s.organization_id = o.id
-	LEFT JOIN
-		town t
-		ON s.town_id = t.id
-	LEFT JOIN
-		volunteer v1
-		ON s.volunteer_id = v1.id
-	LEFT JOIN
-		volunteer v2
-		ON s.primary_caretaker_id = v2.id
-	LEFT JOIN
-		volunteer v3
-		ON s.secondary_caretaker_id = v3.id
-	LEFT JOIN LATERAL (
-    	SELECT
-    		longitude,
-    		latitude
-		FROM
-			tree tr
-		WHERE
-			tr.site_id = s.id
-			AND geog IS NOT NULL
-			AND LOWER(s.name) <> 'wild tree known to tacf'
-			AND LOWER(s.name) <> 'wild tree unknown to tacf'
-		ORDER BY
-			tr.number
-		LIMIT 1
-		) first_tree ON true
-	ORDER BY
-		o.code, s.name
-	;
+
+-- public.public_cam_sites source
+
+CREATE OR REPLACE VIEW public.public_cam_sites
+AS SELECT s.name AS site,
+    t.name AS town,
+    h.name AS hub,
+    o.code AS org_code,
+    o.name AS organization,
+    s.url AS site_url,
+    s.location AS site_location,
+    s.location_note,
+    (v1.first_name || ' '::text) || v1.last_name AS contact,
+    (v2.first_name || ' '::text) || v2.last_name AS primary_caretaker,
+    (v3.first_name || ' '::text) || v3.last_name AS secondary_caretaker,
+    first_tree.longitude,
+    first_tree.latitude
+   FROM site s
+     LEFT JOIN site_hub sh ON s.id = sh.site_id
+     LEFT JOIN hub h ON sh.hub_id = h.id
+     LEFT JOIN organization o ON s.organization_id = o.id
+     LEFT JOIN town t ON s.town_id = t.id
+     LEFT JOIN volunteer v1 ON s.volunteer_id = v1.id
+     LEFT JOIN volunteer v2 ON s.primary_caretaker_id = v2.id
+     LEFT JOIN volunteer v3 ON s.secondary_caretaker_id = v3.id
+     LEFT JOIN LATERAL ( SELECT tr.longitude,
+            tr.latitude
+           FROM tree tr
+          WHERE tr.site_id = s.id AND tr.geog IS NOT NULL AND lower(s.name) <> 'wild tree known to tacf'::text AND lower(s.name) <> 'wild tree unknown to tacf'::text
+          ORDER BY tr.number
+         LIMIT 1) first_tree ON true
+  ORDER BY o.code, s.name;
 
 COMMENT ON VIEW public.public_cam_sites IS 'A sanitized (no email addresses) view of the sites table';
 

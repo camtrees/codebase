@@ -2,14 +2,20 @@
 -- View: v_pg_show_columns_generated
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS v_pg_show_columns_generated;
-CREATE OR REPLACE VIEW v_pg_show_columns_generated AS
-	SELECT
-		table_schema,
-		table_name,
-		column_name,
-		generation_expression
-	FROM
-		information_schema.columns
-	WHERE
-		is_generated::text = 'ALWAYS'::text
-	;
+
+-- public.v_pg_show_columns_generated source
+
+CREATE OR REPLACE VIEW public.v_pg_show_columns_generated
+AS SELECT table_schema,
+    table_name,
+    column_name,
+    generation_expression
+   FROM information_schema.columns
+  WHERE is_generated::text = 'ALWAYS'::text;
+
+COMMENT ON VIEW public.v_pg_show_columns_generated IS 'Database Admin View - Show Generated Columns';
+
+-- Permissions
+
+ALTER TABLE public.v_pg_show_columns_generated OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.v_pg_show_columns_generated TO neondb_owner;

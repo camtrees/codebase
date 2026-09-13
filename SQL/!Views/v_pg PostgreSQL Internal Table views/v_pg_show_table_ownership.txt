@@ -2,17 +2,20 @@
 -- View: v_pg_show_table_ownership
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS v_pg_show_table_ownership;
-CREATE OR REPLACE VIEW v_pg_show_table_ownership AS
-	SELECT
-		schemaname,
-		tablename,
-		tableowner
-	FROM
-		pg_tables
-	WHERE
-		(schemaname <> ALL (ARRAY['pg_catalog'::name, 'information_schema'::name]))
-		AND schemaname !~~ 'pg_toast%'::text
-	ORDER BY
-		schemaname,
-		tablename
-	;
+
+-- public.v_pg_show_table_ownership source
+
+CREATE OR REPLACE VIEW public.v_pg_show_table_ownership
+AS SELECT schemaname,
+    tablename,
+    tableowner
+   FROM pg_tables
+  WHERE (schemaname <> ALL (ARRAY['pg_catalog'::name, 'information_schema'::name])) AND schemaname !~~ 'pg_toast%'::text
+  ORDER BY schemaname, tablename;
+
+COMMENT ON VIEW public.v_pg_show_table_ownership IS 'Database Admin View - Show Table ownership';
+
+-- Permissions
+
+ALTER TABLE public.v_pg_show_table_ownership OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.v_pg_show_table_ownership TO neondb_owner;

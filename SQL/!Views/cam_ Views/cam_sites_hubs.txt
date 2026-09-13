@@ -12,19 +12,20 @@
 --			site_hub
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS cam_sites_hubs;
-CREATE OR REPLACE VIEW cam_sites_hubs AS
-	SELECT
-		s.name AS site,
-		h.name AS hub
-	FROM
-		site_hub sh
-	LEFT JOIN
-		site s
-		ON sh.site_id = s.id
-	LEFT JOIN
-		hub  h
-		ON sh.hub_id  = h.id
-	ORDER BY
-		h.name,
-		s.name
-	;
+
+-- public.cam_sites_hubs source
+
+CREATE OR REPLACE VIEW public.cam_sites_hubs
+AS SELECT s.name AS site,
+    h.name AS hub
+   FROM site_hub sh
+     LEFT JOIN site s ON sh.site_id = s.id
+     LEFT JOIN hub h ON sh.hub_id = h.id
+  ORDER BY h.name, s.name;
+
+COMMENT ON VIEW public.cam_sites_hubs IS 'Sites contained in each hub';
+
+-- Permissions
+
+ALTER TABLE public.cam_sites_hubs OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.cam_sites_hubs TO neondb_owner;
