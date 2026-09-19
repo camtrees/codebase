@@ -16,8 +16,8 @@ CREATE OR REPLACE VIEW public.public_cam_hubs
 AS SELECT h.name AS hub,
     (v.first_name || ' '::text) || v.last_name AS captain,
     (vv.first_name || ' '::text) || vv.last_name AS lieutenant,
-    h.longitude,
-    h.latitude
+    h.latitude,
+    h.longitude
    FROM hub h
      LEFT JOIN volunteer v ON h.captain_id = v.id
      LEFT JOIN volunteer vv ON h.lieutenant_id = vv.id
