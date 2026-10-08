@@ -1,0 +1,51 @@
+------------------------------------------------------------------------------------------
+-- View: public_cam_volunteers
+--
+-- Purpose: The list of all volunteers
+--
+-- Create Order :
+--		MUST BE AFTER
+--			state
+--			town
+--			volunteer
+--			volunteer_phone
+--			***volunteer_status_type
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS public_cam_volunteers;
+
+-- public.public_cam_volunteers source
+
+CREATE OR REPLACE VIEW public.public_cam_volunteers
+AS SELECT v.first_name,
+    v.last_name,
+    (v.first_name || ' '::text) || v.last_name AS volunteer,
+    v.email,
+    v.title,
+    vst.status,
+    regexp_replace(vp1.number, '(\d{3})(\d{3})(\d{4})'::text, '(\1) \2-\3'::text) AS cell_phone,
+    regexp_replace(vp2.number, '(\d{3})(\d{3})(\d{4})'::text, '(\1) \2-\3'::text) AS work_phone,
+    regexp_replace(vp3.number, '(\d{3})(\d{3})(\d{4})'::text, '(\1) \2-\3'::text) AS home_phone,
+    t.name AS town,
+    s.code AS state,
+    s.name AS state_name
+   FROM volunteer v
+     LEFT JOIN volunteer_status_type vst ON v.status_id = vst.id
+     LEFT JOIN town t ON v.town_id = t.id
+     LEFT JOIN state s ON t.state_code::text = s.code::text
+     LEFT JOIN volunteer_phone vp1 ON vp1.volunteer_id = v.id AND vp1.phone_type_id = (( SELECT phone_type.id
+           FROM phone_type
+          WHERE phone_type.label = 'cell'::text))
+     LEFT JOIN volunteer_phone vp2 ON vp2.volunteer_id = v.id AND vp2.phone_type_id = (( SELECT phone_type.id
+           FROM phone_type
+          WHERE phone_type.label = 'work'::text))
+     LEFT JOIN volunteer_phone vp3 ON vp3.volunteer_id = v.id AND vp3.phone_type_id = (( SELECT phone_type.id
+           FROM phone_type
+          WHERE phone_type.label = 'home'::text))
+  ORDER BY v.first_name, v.last_name;
+
+COMMENT ON VIEW public.public_cam_volunteers IS 'Public view of the volunteers table.';
+
+-- Permissions
+
+ALTER TABLE public.public_cam_volunteers OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.public_cam_volunteers TO neondb_owner;
