@@ -1,0 +1,37 @@
+------------------------------------------------------------------------------------------
+-- View: public_cam_tree_photos
+--
+-- Requires: FUNCTION camtrees_update_tree_photo_tag
+-- Requires: TRIGGER  camtrees_update_tree_photo_tag_trig
+--             Both of which allow us to edit the tag_photo BOOLEAN value
+--
+-- Purpose: The tree photos with additional info like site name, and organization name
+--
+-- Create Order :
+--		MUST BE AFTER
+--			***epicollect_record_type
+--			site
+--			tree_photo
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS public_cam_tree_photos;
+
+-- public.public_cam_tree_photos source
+
+CREATE OR REPLACE VIEW public.public_cam_tree_photos
+AS SELECT s.name AS "Site",
+    t.number AS "Tree ID",
+    tp.date AS "Date",
+    tp.tag_photo AS "Tag Photo",
+    'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name='::text || tp.filename AS "Photo URL"
+   FROM tree_photo tp
+     LEFT JOIN tree t ON tp.tree_id = t.id
+     LEFT JOIN site s ON t.site_id = s.id
+  ORDER BY s.name, t.number, tp.date;
+
+COMMENT ON VIEW public.public_cam_tree_photos IS 'Public view of the tree_photos table.';
+
+-- Permissions
+
+ALTER TABLE public.public_cam_tree_photos OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.public_cam_tree_photos TO neondb_owner;
