@@ -40,6 +40,7 @@ AS SELECT s.name AS site,
     ((floor(ctlhe.latest_height_in_inches / 12::numeric)::integer || ' ft '::text) || round(ctlhe.latest_height_in_inches % 12::numeric)::integer) || ' in'::text AS latest_height,
     ctlhe.latest_height_date,
     ctlw.latest_water_date,
+    ctlf.latest_fertilize_date,    
     ctln.latest_nuts AS nuts_present,
     ctln.latest_nuts_date,
     t.latitude,
@@ -79,6 +80,7 @@ AS SELECT s.name AS site,
      LEFT JOIN cam_tree_latest_health ctlh ON s.name = ctlh.site AND t.number = ctlh.tree_number
      LEFT JOIN cam_tree_latest_height ctlhe ON s.name = ctlhe.site AND t.number = ctlhe.tree_number
      LEFT JOIN cam_tree_latest_water ctlw ON s.name = ctlw.site AND t.number = ctlw.tree_number
+     LEFT JOIN cam_tree_latest_fertilize ctlf ON s.name = ctlf.site AND t.number = ctlf.tree_number
      LEFT JOIN cam_tree_latest_nuts ctln ON s.name = ctln.site AND t.number = ctln.tree_number
   ORDER BY s.name, t.number;
 

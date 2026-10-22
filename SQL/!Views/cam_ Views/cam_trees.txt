@@ -45,6 +45,8 @@ AS SELECT t.geog AS gis_map_view,
     ctlhe.latest_height_date,
     ctlw.latest_water_date,
     CURRENT_DATE - ctlw.latest_water_date AS days_since_watered,
+    ctlf.latest_fertilize_date,
+    CURRENT_DATE - ctlf.latest_fertilize_date AS days_since_fertilized,
     ctln.latest_nuts,
     ctln.latest_nuts_date,
     t.longitude,
@@ -91,10 +93,11 @@ AS SELECT t.geog AS gis_map_view,
      LEFT JOIN cam_tree_latest_health ctlh ON s.name = ctlh.site AND t.number = ctlh.tree_number
      LEFT JOIN cam_tree_latest_height ctlhe ON s.name = ctlhe.site AND t.number = ctlhe.tree_number
      LEFT JOIN cam_tree_latest_water ctlw ON s.name = ctlw.site AND t.number = ctlw.tree_number
+     LEFT JOIN cam_tree_latest_fertilize ctlf ON s.name = ctlf.site AND t.number = ctlf.tree_number
      LEFT JOIN cam_tree_latest_nuts ctln ON s.name = ctln.site AND t.number = ctln.tree_number
   ORDER BY s.name, t.number;
 
-COMMENT ON VIEW public.cam_trees IS 'A sanitized (no email addresses) view of the trees table';
+COMMENT ON VIEW public.cam_trees IS 'CAM planted trees under observation';
 
 -- Permissions
 

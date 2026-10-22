@@ -1,0 +1,40 @@
+------------------------------------------------------------------------------------------
+-- View: cam_tree_latest_fertilize
+--
+-- Purpose: Show most recent date trees have been fertilized
+--
+-- Create Order:
+--		MUST BE AFTER
+--			tree
+--			site
+--			tree_care_action
+--			tree_care_action_type
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_tree_latest_fertilize;
+
+-- public.cam_tree_latest_fertilize source
+
+CREATE OR REPLACE VIEW public.cam_tree_latest_fertilize
+AS WITH latest_fertilize_date AS (
+         SELECT s.name AS site,
+            t.number AS tree_number,
+            max(tca.date) AS latest_date
+           FROM tree_care_action tca
+             JOIN tree t ON tca.tree_id = t.id
+             JOIN site s ON t.site_id = s.id
+             JOIN tree_care_action_type tcat ON tca.care_action_id = tcat.id
+          WHERE tcat.care_action = 'fertilize'::text
+          GROUP BY s.name, t.number
+        )
+ SELECT site,
+    tree_number,
+    latest_date AS latest_fertilize_date
+   FROM latest_fertilize_date
+  ORDER BY site, tree_number;
+
+COMMENT ON VIEW public.cam_tree_latest_fertilize IS 'Show most recent date trees have been fertilized';
+
+-- Permissions
+
+ALTER TABLE public.cam_tree_latest_fertilize OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.cam_tree_latest_fertilize TO neondb_owner;
