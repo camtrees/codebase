@@ -27,3 +27,10 @@ CREATE OR REPLACE VIEW data_crosstab_tree_planting_method_by_wire_fence AS
 								  ELSE 5 -- for values not in the custom list, sort them normally or give them a low priority
 				END
 	;
+
+COMMENT ON VIEW public.data_crosstab_tree_planting_method_by_wire_fence IS 'Crosstab of Tree Planting Method BY Wire Fence';
+
+-- Permissions
+
+ALTER TABLE public.data_crosstab_tree_planting_method_by_wire_fence OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_crosstab_tree_planting_method_by_wire_fence TO neondb_owner;
