@@ -27,14 +27,14 @@ AS WITH ranked_assessments AS (
           WHERE tree_health_assessment.height_in_inches IS NOT NULL
         )
  SELECT s.name AS site,
-    t.number AS tree_number,
+    t.tag_id,
     ra.height_in_inches AS latest_height_in_inches,
     ra.date AS latest_height_date
    FROM tree t
      JOIN site s ON t.site_id = s.id
      JOIN ranked_assessments ra ON t.id = ra.tree_id
   WHERE ra.rn = 1
-  ORDER BY s.name, t.number;
+  ORDER BY s.name, t.tag_id;
 
 COMMENT ON VIEW public.cam_tree_latest_height IS 'Show latest tree_height';
 

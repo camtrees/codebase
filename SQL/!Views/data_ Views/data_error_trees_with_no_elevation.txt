@@ -9,21 +9,23 @@
 --			tree
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_error_trees_with_no_elevation;
-CREATE OR REPLACE VIEW data_error_trees_with_no_elevation AS
-	SELECT
-		s.name              AS site,
-		t.number            AS tree_number,
-		t.longitude         AS longitude,
-		t.latitude          AS latitude,
-		t.elevation_in_feet AS tree_elevation
-	FROM
-		tree t
-	JOIN
-		site s
-		ON t.site_id = s.id
-	WHERE
-		t.elevation_in_feet IS NULL
-	ORDER BY
-		s.name,
-		t.number
-	;
+
+-- public.data_error_trees_with_no_elevation source
+
+CREATE OR REPLACE VIEW public.data_error_trees_with_no_elevation
+AS SELECT s.name AS site,
+    t.tag_id,
+    t.longitude,
+    t.latitude,
+    t.elevation_in_feet AS tree_elevation
+   FROM tree t
+     JOIN site s ON t.site_id = s.id
+  WHERE t.elevation_in_feet IS NULL
+  ORDER BY s.name, t.tag_id;
+
+COMMENT ON VIEW public.data_error_trees_with_no_elevation IS 'Trees with no elevation';
+
+-- Permissions
+
+ALTER TABLE public.data_error_trees_with_no_elevation OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_error_trees_with_no_elevation TO neondb_owner;

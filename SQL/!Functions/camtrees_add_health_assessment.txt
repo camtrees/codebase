@@ -46,9 +46,9 @@ CREATE OR REPLACE FUNCTION public.camtrees_add_health_assessment(
 		END IF;
 
 		-- Get tree_id
-		SELECT id INTO v_tree_id FROM tree WHERE site_id=v_Site_id and number=p_tree_number;
+		SELECT id INTO v_tree_id FROM tree WHERE site_id=v_Site_id and tag_id=p_tree_number;
 		IF v_tree_id IS NULL THEN
-			RAISE EXCEPTION 'Tree not found. Site:"%" Tree_Number:"%"', p_site_name, p_tree_number;
+			RAISE EXCEPTION 'Tree not found. Site:"%" Tag ID:"%"', p_site_name, p_tree_number;
 		END IF;
 		
 		-- Get the volunteer_id

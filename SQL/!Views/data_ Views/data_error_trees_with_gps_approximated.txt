@@ -9,24 +9,24 @@
 --			tree
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_error_trees_with_gps_approximated;
-CREATE OR REPLACE VIEW data_error_trees_with_gps_approximated AS
-	SELECT
-		s.name        AS site,
-		t.number      AS tree_number,
-		t.longitude,
-		t.latitude,
-		t.geog        AS gis_map_view,
-		t.gps_locked
-	FROM
-		tree t
-	JOIN
-		site s
-		ON t.site_id = s.id
-	WHERE
-		t.gps_locked = FALSE
-		AND t.longitude IS NOT NULL
-		AND t.latitude IS NOT NULL
-	ORDER BY
-		s.name,
-		t.number
-	;
+
+-- public.data_error_trees_with_gps_approximated source
+
+CREATE OR REPLACE VIEW public.data_error_trees_with_gps_approximated
+AS SELECT s.name AS site,
+    t.tag_id,
+    t.longitude,
+    t.latitude,
+    t.geog AS gis_map_view,
+    t.gps_locked
+   FROM tree t
+     JOIN site s ON t.site_id = s.id
+  WHERE t.gps_locked = false AND t.longitude IS NOT NULL AND t.latitude IS NOT NULL
+  ORDER BY s.name, t.tag_id;
+
+COMMENT ON VIEW public.data_error_trees_with_gps_approximated IS 'Trees with estimated longitude and latitude data';
+
+-- Permissions
+
+ALTER TABLE public.data_error_trees_with_gps_approximated OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_error_trees_with_gps_approximated TO neondb_owner;

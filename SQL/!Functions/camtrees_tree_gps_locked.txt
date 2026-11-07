@@ -32,7 +32,7 @@ CREATE OR REPLACE FUNCTION public.camtrees_tree_gps_locked(
 		-- Get the gps_locked value
 		SELECT gps_locked INTO v_gps_locked
 		FROM tree
-		WHERE site_id = v_site_id AND number = p_tree_number;
+		WHERE site_id = v_site_id AND tag_id = p_tree_number;
 		
 		RETURN v_gps_locked;
 	END;

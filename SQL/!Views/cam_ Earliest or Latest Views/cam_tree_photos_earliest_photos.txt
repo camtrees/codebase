@@ -24,7 +24,7 @@ AS WITH first_photo_date AS (
  SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
     v.email AS volunteer_email,
     s.name AS site,
-    t.number AS tree_number,
+    t.tag_id,
     tp.date,
     tp.tag_photo,
     'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name='::text || tp.filename AS photo,
@@ -36,7 +36,7 @@ AS WITH first_photo_date AS (
      JOIN site s ON t.site_id = s.id
      JOIN volunteer v ON tp.volunteer_id = v.id
   WHERE tp.tag_photo = false
-  ORDER BY s.name, t.number;
+  ORDER BY s.name, t.tag_id;
 
 COMMENT ON VIEW public.cam_tree_photos_earliest_photos IS 'Show all photos from the first date on which a tree had any photos taken';
 

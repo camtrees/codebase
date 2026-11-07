@@ -20,7 +20,7 @@
 
 CREATE OR REPLACE VIEW public.public_site_visit
 AS SELECT s.name AS "Site",
-    t.number AS "Tree ID",
+    t.tag_id AS "Tag ID",
     t.date AS "Date Planted",
     ctlh.latest_health AS "Health",
     tapt.access_path AS "Access Path",
@@ -40,8 +40,8 @@ AS SELECT s.name AS "Site",
      LEFT JOIN tree_access_level_type talt ON t.access_level_id = talt.id
      LEFT JOIN tree_form_type tft ON t.form_id = tft.id
      LEFT JOIN tree_planting_method_type tpmt ON t.planting_method_id = tpmt.id
-     LEFT JOIN cam_tree_latest_health ctlh ON s.name = ctlh.site AND t.number = ctlh.tree_number
-  ORDER BY s.name, t.number;
+     LEFT JOIN cam_tree_latest_health ctlh ON s.name = ctlh.site AND t.tag_id = ctlh.tag_id
+  ORDER BY s.name, t.tag_id;
 
 COMMENT ON VIEW public.public_site_visit IS 'Tree data useful to have printed when performing a site visit';
 

@@ -6,6 +6,7 @@
 --			cam_trees
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_crosstab_tree_planting_method_by_wire_fence;
+
 CREATE OR REPLACE VIEW data_crosstab_tree_planting_method_by_wire_fence AS
 	SELECT
 		COALESCE(planting_method, 'Column Total') AS "Planting Method",

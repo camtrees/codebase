@@ -19,7 +19,7 @@ CREATE OR REPLACE VIEW public.cam_tree_care_action
 AS SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
     e.record_type,
     s.name AS site,
-    t.number AS tree_number,
+    t.tag_id,
     tca.date,
     v.email AS volunteer_email,
     tcat.care_action,
@@ -33,7 +33,7 @@ AS SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
      LEFT JOIN site s ON t.site_id = s.id
      LEFT JOIN volunteer v ON tca.volunteer_id = v.id
      LEFT JOIN tree_care_action_type tcat ON tca.care_action_id = tcat.id
-  ORDER BY s.name, t.number, tca.date, tcat.care_action;
+  ORDER BY s.name, t.tag_id, tca.date, tcat.care_action;
 
 COMMENT ON VIEW public.cam_tree_care_action IS 'Care actions performed on trees';
 

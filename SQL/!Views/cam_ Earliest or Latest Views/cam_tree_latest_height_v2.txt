@@ -12,7 +12,7 @@
 CREATE OR REPLACE VIEW cam_tree_latest_height_v2 AS
 SELECT
     s.name              AS site,
-    t.number            AS tree_number,
+    t.tag_id,
     ra.height_in_inches AS latest_height_in_inches,
     ra.date             AS latest_height_date
 FROM
@@ -35,7 +35,7 @@ LEFT JOIN LATERAL (
 ) ra ON true
 ORDER BY
     s.name,
-    t.number;
+    t.tag_id;
 
 CREATE INDEX tree_health_assessment_latest_height_idx
 	ON tree_health_assessment (tree_id, date DESC, id DESC)

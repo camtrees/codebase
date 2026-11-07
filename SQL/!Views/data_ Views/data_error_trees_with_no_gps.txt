@@ -9,21 +9,22 @@
 --			tree
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_error_trees_with_no_gps;
-CREATE OR REPLACE VIEW data_error_trees_with_no_gps AS
-	SELECT
-		s.name       AS site,
-		t.number     AS tree_number,
-		t.longitude,
-		t.latitude
-	FROM
-		tree t
-	JOIN
-		site s
-		ON t.site_id = s.id
-	WHERE
-		t.longitude IS NULL
-		OR t.latitude IS NULL 
-	ORDER BY
-		s.name,
-		t.number
-	;
+
+-- public.data_error_trees_with_no_gps source
+
+CREATE OR REPLACE VIEW public.data_error_trees_with_no_gps
+AS SELECT s.name AS site,
+    t.tag_id,
+    t.longitude,
+    t.latitude
+   FROM tree t
+     JOIN site s ON t.site_id = s.id
+  WHERE t.longitude IS NULL OR t.latitude IS NULL
+  ORDER BY s.name, t.tag_id;
+
+COMMENT ON VIEW public.data_error_trees_with_no_gps IS 'Trees with no longitude and latitude data';
+
+-- Permissions
+
+ALTER TABLE public.data_error_trees_with_no_gps OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_error_trees_with_no_gps TO neondb_owner;

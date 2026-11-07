@@ -25,7 +25,7 @@ CREATE TABLE public.tree (
 	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
 	epicollect_record_type_id int4 NOT NULL, -- The EpiCollect record_type (pathway through the app) used to collect the data
 	site_id int4 NOT NULL, -- The site at which the tree was planted
-	"number" text NOT NULL, -- The tree number as text. CAM planted trees are integers with leading zeroes. WildCAM trees use the longitude and latitude as a tree number. WildTACF trees use a tree id in the format 'ME-XXnnn' where XX are two uppercase letters and nnn are three digits.
+	tag_id text NOT NULL, -- The tree's tag id. Old style is a three digit number with leading zeroes. New style as of 2027 is three letters, followed by a hyphen, followed by a four digit number with leading zeroes
 	"date" date NOT NULL, -- The date the tree was planted OR for Wild trees the date the tree was observed
 	volunteer_id int4 NOT NULL, -- The volunteer who planted the tree OR for Wild trees the volunteer who observed the tree
 	primary_caretaker_id int4 NULL, -- The primary caretaker of the tree. Responsible for watering, etc.
@@ -58,13 +58,13 @@ CREATE TABLE public.tree (
 	CONSTRAINT tree_epicollect_record_type_id_not_null NOT NULL epicollect_record_type_id,
 	CONSTRAINT tree_gps_locked_not_null NOT NULL gps_locked,
 	CONSTRAINT tree_id_not_null NOT NULL id,
-	CONSTRAINT tree_number_not_null NOT NULL number,
 	CONSTRAINT tree_pkey PRIMARY KEY (id),
 	CONSTRAINT tree_site_id_not_null NOT NULL site_id,
+	CONSTRAINT tree_tag_id_not_null NOT NULL tag_id,
 	CONSTRAINT tree_volunteer_id_not_null NOT NULL volunteer_id
 );
 CREATE INDEX tree_geog_index ON public.tree USING gist (geog);
-CREATE UNIQUE INDEX tree_site_id_and_number_unique ON public.tree USING btree (site_id, number);
+CREATE UNIQUE INDEX tree_site_id_and_tag_id_unique ON public.tree USING btree (site_id, tag_id);
 COMMENT ON TABLE public.tree IS 'CAM planted trees or Wild trees under observation';
 
 -- Column comments
@@ -72,7 +72,7 @@ COMMENT ON TABLE public.tree IS 'CAM planted trees or Wild trees under observati
 COMMENT ON COLUMN public.tree.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
 COMMENT ON COLUMN public.tree.epicollect_record_type_id IS 'The EpiCollect record_type (pathway through the app) used to collect the data';
 COMMENT ON COLUMN public.tree.site_id IS 'The site at which the tree was planted';
-COMMENT ON COLUMN public.tree."number" IS 'The tree number as text. CAM planted trees are integers with leading zeroes. WildCAM trees use the longitude and latitude as a tree number. WildTACF trees use a tree id in the format ''ME-XXnnn'' where XX are two uppercase letters and nnn are three digits.';
+COMMENT ON COLUMN public.tree.tag_id IS 'The tree''s tag id. Old style is a three digit number with leading zeroes. New style as of 2027 is three letters, followed by a hyphen, followed by a four digit number with leading zeroes';
 COMMENT ON COLUMN public.tree."date" IS 'The date the tree was planted OR for Wild trees the date the tree was observed';
 COMMENT ON COLUMN public.tree.volunteer_id IS 'The volunteer who planted the tree OR for Wild trees the volunteer who observed the tree';
 COMMENT ON COLUMN public.tree.primary_caretaker_id IS 'The primary caretaker of the tree. Responsible for watering, etc.';

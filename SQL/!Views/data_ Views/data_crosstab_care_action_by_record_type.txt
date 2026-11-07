@@ -6,20 +6,23 @@
 --			cam_tree_care_action
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_crosstab_care_action_by_record_type;
-CREATE OR REPLACE VIEW data_crosstab_care_action_by_record_type AS
-	SELECT
-		COALESCE(care_action, 'Column Total') AS "Care Action",
-		COUNT(*) FILTER (WHERE record_type = 'all'      ) AS "Record Type ALL"  ,
-		COUNT(*) FILTER (WHERE record_type = 'one'      ) AS "Record Type ONE"  ,
-		COUNT(*) FILTER (WHERE record_type = 'plant'    ) AS "Record Type PLANT"  ,
-		COUNT(*) FILTER (WHERE record_type = 'rain'     ) AS "Record Type RAIN"  ,
-		COUNT(*) FILTER (WHERE record_type = 'wildcam'  ) AS "Record Type WildCAM"  ,
-		COUNT(*) FILTER (WHERE record_type = 'wildtacf' ) AS "Record Type WildTACF"  ,
-		COUNT(*)                                          AS "Row Total"
-	FROM
-		cam_tree_care_action
-	GROUP BY
-		ROLLUP(care_action)
-		ORDER BY
-			care_action
-	;
+
+-- public.data_crosstab_care_action_by_record_type source
+
+CREATE OR REPLACE VIEW public.data_crosstab_care_action_by_record_type
+AS SELECT COALESCE(care_action, 'Column Total'::text) AS "Care Action",
+    count(*) FILTER (WHERE record_type = 'all'::text) AS "Record Type ALL",
+    count(*) FILTER (WHERE record_type = 'one'::text) AS "Record Type ONE",
+    count(*) FILTER (WHERE record_type = 'plant'::text) AS "Record Type PLANT",
+    count(*) FILTER (WHERE record_type = 'rain'::text) AS "Record Type RAIN",
+    count(*) FILTER (WHERE record_type = 'wildcam'::text) AS "Record Type WildCAM",
+    count(*) FILTER (WHERE record_type = 'wildtacf'::text) AS "Record Type WildTACF",
+    count(*) AS "Row Total"
+   FROM cam_tree_care_action
+  GROUP BY ROLLUP(care_action)
+  ORDER BY care_action;
+
+-- Permissions
+
+ALTER TABLE public.data_crosstab_care_action_by_record_type OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_crosstab_care_action_by_record_type TO neondb_owner;

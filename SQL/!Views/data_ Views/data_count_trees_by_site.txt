@@ -8,17 +8,20 @@
 --			cam_trees
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_count_trees_by_site;
-CREATE OR REPLACE VIEW data_count_trees_by_site AS
-	SELECT
-		s.name      AS "Site",
-		COUNT(t.id) AS "Trees"
-	FROM
-		site s
-	LEFT JOIN
-		tree t
-		ON s.id = t.site_id
-	GROUP BY
-		s.name
-	ORDER BY
-		s.name
-	;
+
+-- public.data_count_trees_by_site source
+
+CREATE OR REPLACE VIEW public.data_count_trees_by_site
+AS SELECT s.name AS "Site",
+    count(t.id) AS "Trees"
+   FROM site s
+     LEFT JOIN tree t ON s.id = t.site_id
+  GROUP BY s.name
+  ORDER BY s.name;
+
+COMMENT ON VIEW public.data_count_trees_by_site IS 'Frequency count of how many trees are at each site';
+
+-- Permissions
+
+ALTER TABLE public.data_count_trees_by_site OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_count_trees_by_site TO neondb_owner;

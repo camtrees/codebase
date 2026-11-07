@@ -110,7 +110,7 @@ CREATE OR REPLACE FUNCTION public.camtrees_add_care_action(
 			WHERE
 				t.site_id = v_site_id
 				AND p_date >= t.date
-				AND t.number BETWEEN p_tree_number_min AND p_tree_number_max
+				AND t.tag_id BETWEEN p_tree_number_min AND p_tree_number_max
 			;
 	
 			-- For each site (LOOP) Get the number of rows added

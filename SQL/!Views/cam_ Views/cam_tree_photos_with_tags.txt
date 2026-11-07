@@ -17,7 +17,7 @@ CREATE OR REPLACE VIEW public.cam_tree_photos_with_tags
 AS SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
     e.record_type,
     s.name AS site,
-    t.number AS tree_number,
+    t.tag_id,
     tp.date,
     tp.tag_photo,
     'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name='::text || tp.filename AS photo,
@@ -33,7 +33,7 @@ AS SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
      LEFT JOIN site s ON t.site_id = s.id
      LEFT JOIN volunteer v ON tp.volunteer_id = v.id
   WHERE tp.tag_photo = true
-  ORDER BY s.name, t.number, tp.date;
+  ORDER BY s.name, t.tag_id, tp.date;
 
 COMMENT ON VIEW public.cam_tree_photos_with_tags IS 'Tree photos showing a closeup of the tree''s tag';
 

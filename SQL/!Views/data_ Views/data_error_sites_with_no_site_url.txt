@@ -8,16 +8,19 @@
 --			site
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_error_sites_with_no_site_url;
-CREATE OR REPLACE VIEW data_error_sites_with_no_site_url AS
-	SELECT
-		name       AS site,
-		url        AS site_url
-	FROM
-		site
-	WHERE
-		url IS NULL
-		AND LOWER(name) <> 'wild tree unknown to tacf'
-		AND LOWER(name) <> 'wild tree known to tacf'
-	ORDER BY
-		site
-	;
+
+-- public.data_error_sites_with_no_site_url source
+
+CREATE OR REPLACE VIEW public.data_error_sites_with_no_site_url
+AS SELECT name AS site,
+    url AS site_url
+   FROM site
+  WHERE url IS NULL AND lower(name) <> 'wild tree unknown to tacf'::text AND lower(name) <> 'wild tree known to tacf'::text
+  ORDER BY name;
+
+COMMENT ON VIEW public.data_error_sites_with_no_site_url IS 'Sites with no URL';
+
+-- Permissions
+
+ALTER TABLE public.data_error_sites_with_no_site_url OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_error_sites_with_no_site_url TO neondb_owner;

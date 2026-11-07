@@ -46,9 +46,9 @@ CREATE OR REPLACE FUNCTION public.camtrees_update_access_method(
 		-- Get the tree id
 		SELECT id INTO v_tree_id
 		FROM tree
-		WHERE site_id = v_site_id AND number = p_tree_number;
+		WHERE site_id = v_site_id AND tag_id = p_tree_number;
 		IF v_tree_id IS NULL THEN
-			RAISE EXCEPTION 'tree not found. Site: "%" Tree Number: "%"', p_site_name, p_tree_number;
+			RAISE EXCEPTION 'tree not found. Site: "%" Tag ID: "%"', p_site_name, p_tree_number;
 		END IF;
 		
 		-- Update the tree with provided values

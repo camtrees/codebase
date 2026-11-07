@@ -34,7 +34,7 @@ CREATE OR REPLACE FUNCTION public.camtrees_tree_exists(
 		INTO v_tree_count
 		FROM tree
 		WHERE site_id = v_site_id
-		AND number = p_tree_number;
+		AND tag_id = p_tree_number;
 		
 		RETURN v_tree_count > 0;
 	END;

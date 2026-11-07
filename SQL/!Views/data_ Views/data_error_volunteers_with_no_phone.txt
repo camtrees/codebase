@@ -9,19 +9,21 @@
 --			volunteer_phone
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_error_volunteers_with_no_phone;
-CREATE OR REPLACE VIEW data_error_volunteers_with_no_phone AS
-	SELECT
-		v.first_name,
-		v.last_name,
-		v.email
-	FROM
-		volunteer v
-	LEFT JOIN
-		volunteer_phone vp
-		ON v.id = vp.volunteer_id
-	WHERE
-		vp.id IS NULL
-	ORDER BY
-		v.first_name,
-		v.last_name
-	;
+
+-- public.data_error_volunteers_with_no_phone source
+
+CREATE OR REPLACE VIEW public.data_error_volunteers_with_no_phone
+AS SELECT v.first_name,
+    v.last_name,
+    v.email
+   FROM volunteer v
+     LEFT JOIN volunteer_phone vp ON v.id = vp.volunteer_id
+  WHERE vp.id IS NULL
+  ORDER BY v.first_name, v.last_name;
+
+COMMENT ON VIEW public.data_error_volunteers_with_no_phone IS 'Volunteers with no known phone number';
+
+-- Permissions
+
+ALTER TABLE public.data_error_volunteers_with_no_phone OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_error_volunteers_with_no_phone TO neondb_owner;

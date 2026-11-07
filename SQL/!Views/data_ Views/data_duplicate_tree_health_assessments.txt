@@ -8,19 +8,21 @@
 --			tree_care_action
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_duplicate_tree_health_assessments
-CREATE OR REPLACE VIEW data_duplicate_tree_health_assessments AS
-	SELECT
-		tree_id,
-		date,
-		COUNT(*) AS duplicate_count
-	FROM
-		tree_health_assessment
-	GROUP BY
-		tree_id,
-		date
-	HAVING
-		COUNT(*) > 1
-	ORDER BY
-		tree_id,
-		date
-		;
+
+-- public.data_duplicate_tree_health_assessments source
+
+CREATE OR REPLACE VIEW public.data_duplicate_tree_health_assessments
+AS SELECT tree_id,
+    date,
+    count(*) AS duplicate_count
+   FROM tree_health_assessment
+  GROUP BY tree_id, date
+ HAVING count(*) > 1
+  ORDER BY tree_id, date;
+
+COMMENT ON VIEW public.data_duplicate_tree_health_assessments IS 'Duplicate tree_health_assessments records (if any)';
+
+-- Permissions
+
+ALTER TABLE public.data_duplicate_tree_health_assessments OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_duplicate_tree_health_assessments TO neondb_owner;

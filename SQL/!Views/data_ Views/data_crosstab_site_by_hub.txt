@@ -6,27 +6,32 @@
 --			cam_trees
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_crosstab_site_by_hub;
-CREATE OR REPLACE VIEW data_crosstab_site_by_hub AS
-	SELECT
-		COALESCE(site, 'Column Total') AS "Site",
-		COUNT(*) FILTER (WHERE hub = 'Bethel'        ) AS "Bethel Hub"        ,
-		COUNT(*) FILTER (WHERE hub = 'Bridgton'      ) AS "Bridgton Hub"      ,
-		COUNT(*) FILTER (WHERE hub = 'Ellsworth'     ) AS "Ellsworth Hub"     ,
-		COUNT(*) FILTER (WHERE hub = 'Freeport'      ) AS "Freeport Hub"      ,
-		COUNT(*) FILTER (WHERE hub = 'Hartland'      ) AS "Hartland Hub"      ,
-		COUNT(*) FILTER (WHERE hub = 'Lincoln'       ) AS "Lincoln Hub"       ,
-		COUNT(*) FILTER (WHERE hub = 'Manchester NH' ) AS "Manchester NH Hub" ,
-		COUNT(*) FILTER (WHERE hub = 'Orono'         ) AS "Orono Hub"         ,
-		COUNT(*) FILTER (WHERE hub = 'Princeton'     ) AS "Princeton Hub"     ,
-		COUNT(*) FILTER (WHERE hub = 'Sanford'       ) AS "Sanford Hub"       ,
-		COUNT(*) FILTER (WHERE hub = 'Searsport'     ) AS "Searsport Hub"     ,
-		COUNT(*) FILTER (WHERE hub = 'Warren'        ) AS "Warren Hub"        ,
-		COUNT(*) FILTER (WHERE hub =  NULL)            AS "Unknown Hub"       ,
-		COUNT(*)                                       AS "Row Total"
-	FROM
-		cam_sites_hubs
-	GROUP BY
-		ROLLUP(site)
-		ORDER BY
-			site
-	;
+
+-- public.data_crosstab_site_by_hub source
+
+CREATE OR REPLACE VIEW public.data_crosstab_site_by_hub
+AS SELECT COALESCE(site, 'Column Total'::text) AS "Site",
+    count(*) FILTER (WHERE hub = 'Bethel'::text) AS "Bethel Hub",
+    count(*) FILTER (WHERE hub = 'Bridgton'::text) AS "Bridgton Hub",
+    count(*) FILTER (WHERE hub = 'Ellsworth'::text) AS "Ellsworth Hub",
+    count(*) FILTER (WHERE hub = 'Freeport'::text) AS "Freeport Hub",
+    count(*) FILTER (WHERE hub = 'Hartland'::text) AS "Hartland Hub",
+    count(*) FILTER (WHERE hub = 'Lincoln'::text) AS "Lincoln Hub",
+    count(*) FILTER (WHERE hub = 'Manchester NH'::text) AS "Manchester NH Hub",
+    count(*) FILTER (WHERE hub = 'Orono'::text) AS "Orono Hub",
+    count(*) FILTER (WHERE hub = 'Princeton'::text) AS "Princeton Hub",
+    count(*) FILTER (WHERE hub = 'Sanford'::text) AS "Sanford Hub",
+    count(*) FILTER (WHERE hub = 'Searsport'::text) AS "Searsport Hub",
+    count(*) FILTER (WHERE hub = 'Warren'::text) AS "Warren Hub",
+    count(*) FILTER (WHERE hub = NULL::text) AS "Unknown Hub",
+    count(*) AS "Row Total"
+   FROM cam_sites_hubs
+  GROUP BY ROLLUP(site)
+  ORDER BY site;
+
+COMMENT ON VIEW public.data_crosstab_site_by_hub IS 'Crosstab of Site BY hub';
+
+-- Permissions
+
+ALTER TABLE public.data_crosstab_site_by_hub OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_crosstab_site_by_hub TO neondb_owner;

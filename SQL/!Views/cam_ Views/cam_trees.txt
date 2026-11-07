@@ -28,8 +28,8 @@
 CREATE OR REPLACE VIEW public.cam_trees
 AS SELECT t.geog AS gis_map_view,
     s.name AS site,
-    t.number AS tree_number,
-    (o.code || ' '::text) || t.number AS cam_org_tree_number,
+    t.tag_id,
+    (o.code || ' '::text) || t.tag_id AS cam_org_tag_id,
     h.name AS hub,
     e.record_type,
     t.date AS "date_planted_or_observed(wild)",
@@ -90,12 +90,12 @@ AS SELECT t.geog AS gis_map_view,
      LEFT JOIN tree_access_method_type tamt ON t.access_method_id = tamt.id
      LEFT JOIN tree_form_type tft ON t.form_id = tft.id
      LEFT JOIN tree_planting_method_type tpmt ON t.planting_method_id = tpmt.id
-     LEFT JOIN cam_tree_latest_health ctlh ON s.name = ctlh.site AND t.number = ctlh.tree_number
-     LEFT JOIN cam_tree_latest_height ctlhe ON s.name = ctlhe.site AND t.number = ctlhe.tree_number
-     LEFT JOIN cam_tree_latest_water ctlw ON s.name = ctlw.site AND t.number = ctlw.tree_number
-     LEFT JOIN cam_tree_latest_fertilize ctlf ON s.name = ctlf.site AND t.number = ctlf.tree_number
-     LEFT JOIN cam_tree_latest_nuts ctln ON s.name = ctln.site AND t.number = ctln.tree_number
-  ORDER BY s.name, t.number;
+     LEFT JOIN cam_tree_latest_health ctlh ON s.name = ctlh.site AND t.tag_id = ctlh.tag_id
+     LEFT JOIN cam_tree_latest_height ctlhe ON s.name = ctlhe.site AND t.tag_id = ctlhe.tag_id
+     LEFT JOIN cam_tree_latest_water ctlw ON s.name = ctlw.site AND t.tag_id = ctlw.tag_id
+     LEFT JOIN cam_tree_latest_fertilize ctlf ON s.name = ctlf.site AND t.tag_id = ctlf.tag_id
+     LEFT JOIN cam_tree_latest_nuts ctln ON s.name = ctln.site AND t.tag_id = ctln.tag_id
+  ORDER BY s.name, t.tag_id;
 
 COMMENT ON VIEW public.cam_trees IS 'CAM planted trees under observation';
 

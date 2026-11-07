@@ -10,32 +10,24 @@
 --			tree_parent_type
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_error_trees_with_no_mother_or_father;
-CREATE OR REPLACE VIEW data_error_trees_with_no_mother_or_father AS
-	SELECT
-		s.name    AS site_name,
-		t.number  AS tree_number,
-		p1.parent AS mother_tree,
-		p2.parent AS father_tree
-	FROM
-		tree t
-	JOIN
-		site s
-		ON t.site_id = s.id
-	LEFT JOIN
-		tree_parent_type p1
-		ON t.mother_tree_id = p1.id
-	LEFT JOIN
-		tree_parent_type p2
-		ON t.father_tree_id = p2.id
-	WHERE
-		(
-		t.mother_tree_id IS NULL
-		OR t.father_tree_id IS NULL
-		)
-		AND LOWER(name) <> 'wild tree unknown to tacf'
-		AND LOWER(name) <> 'wild tree known to tacf'
-		
-	ORDER BY
-		s.name,
-		t.number
-		;
+
+-- public.data_error_trees_with_no_mother_or_father source
+
+CREATE OR REPLACE VIEW public.data_error_trees_with_no_mother_or_father
+AS SELECT s.name AS site_name,
+    t.tag_id,
+    p1.parent AS mother_tree,
+    p2.parent AS father_tree
+   FROM tree t
+     JOIN site s ON t.site_id = s.id
+     LEFT JOIN tree_parent_type p1 ON t.mother_tree_id = p1.id
+     LEFT JOIN tree_parent_type p2 ON t.father_tree_id = p2.id
+  WHERE (t.mother_tree_id IS NULL OR t.father_tree_id IS NULL) AND lower(s.name) <> 'wild tree unknown to tacf'::text AND lower(s.name) <> 'wild tree known to tacf'::text
+  ORDER BY s.name, t.tag_id;
+
+COMMENT ON VIEW public.data_error_trees_with_no_mother_or_father IS 'Trees with no mother or no father tree';
+
+-- Permissions
+
+ALTER TABLE public.data_error_trees_with_no_mother_or_father OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_error_trees_with_no_mother_or_father TO neondb_owner;

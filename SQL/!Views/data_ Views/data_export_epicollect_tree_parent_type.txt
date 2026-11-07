@@ -8,14 +8,17 @@
 --			tree_parent_type
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_export_epicollect_tree_parent_type;
-CREATE OR REPLACE VIEW data_export_epicollect_tree_parent_type AS
-	SELECT 
-		parent AS "Mother Father Tree List"
-	FROM
-		tree_parent_type
-	ORDER BY
-		(parent = 'Open Pollination') DESC,
-		parent ASC
-	;
 
-COMMENT ON VIEW data_export_epicollect_tree_parent_type IS 'Export tree_parent_type as CSV file to load into EpiCollect CAM Tree Maintenance form';
+-- public.data_export_epicollect_tree_parent_type source
+
+CREATE OR REPLACE VIEW public.data_export_epicollect_tree_parent_type
+AS SELECT parent AS "Mother Father Tree List"
+   FROM tree_parent_type
+  ORDER BY (parent = 'Open Pollination'::text) DESC, parent;
+
+COMMENT ON VIEW public.data_export_epicollect_tree_parent_type IS 'Export tree_parent_type as CSV file to load into EpiCollect CAM Tree Maintenance form';
+
+-- Permissions
+
+ALTER TABLE public.data_export_epicollect_tree_parent_type OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_export_epicollect_tree_parent_type TO neondb_owner;

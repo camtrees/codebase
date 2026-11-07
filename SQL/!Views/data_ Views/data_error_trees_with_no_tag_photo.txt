@@ -10,22 +10,21 @@
 --			tree_photo
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_error_trees_with_no_tag_photo;
-CREATE OR REPLACE VIEW data_error_trees_with_no_tag_photo AS
-	SELECT
-		s.name AS site,
-		t.number AS tree_number
-	FROM
-		tree t
-	JOIN
-		site s
-		ON t.site_id = s.id
-	LEFT JOIN
-		tree_photo tp
-		ON (t.id = tp.tree_id AND tp.tag_photo = true)
-	WHERE
-		tp.id IS NULL 
-		AND LOWER(s.name) <> 'wild tree unknown to tacf'
-		AND LOWER(s.name) <> 'wild tree known to tacf'
-	ORDER BY
-		s.name,
-		t.number
+
+-- public.data_error_trees_with_no_tag_photo source
+
+CREATE OR REPLACE VIEW public.data_error_trees_with_no_tag_photo
+AS SELECT s.name AS site,
+    t.tag_id
+   FROM tree t
+     JOIN site s ON t.site_id = s.id
+     LEFT JOIN tree_photo tp ON t.id = tp.tree_id AND tp.tag_photo = true
+  WHERE tp.id IS NULL AND lower(s.name) <> 'wild tree unknown to tacf'::text AND lower(s.name) <> 'wild tree known to tacf'::text
+  ORDER BY s.name, t.tag_id;
+
+COMMENT ON VIEW public.data_error_trees_with_no_tag_photo IS 'Trees with no tag photo';
+
+-- Permissions
+
+ALTER TABLE public.data_error_trees_with_no_tag_photo OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_error_trees_with_no_tag_photo TO neondb_owner;

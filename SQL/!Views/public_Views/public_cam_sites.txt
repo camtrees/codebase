@@ -40,7 +40,7 @@ AS SELECT s.name AS site,
             tr.latitude
            FROM tree tr
           WHERE tr.site_id = s.id AND tr.geog IS NOT NULL AND lower(s.name) <> 'wild tree known to tacf'::text AND lower(s.name) <> 'wild tree unknown to tacf'::text
-          ORDER BY tr.number
+          ORDER BY tr.tag_id
          LIMIT 1) first_tree ON true
   ORDER BY o.code, s.name;
 

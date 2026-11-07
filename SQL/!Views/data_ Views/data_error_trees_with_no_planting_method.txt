@@ -10,22 +10,16 @@
 --          tree_planting_method_type
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_error_trees_with_no_planting_method;
-CREATE OR REPLACE VIEW data_error_trees_with_no_planting_method AS
-	SELECT
-		s.name               AS site,
-		t.number             AS tree_number
-	FROM
-		tree t
-	JOIN
-		site s
-		ON t.site_id = s.id
-	WHERE
-		planting_method_id IS NULL
-		AND s.name not like 'Wild%'
-	ORDER BY
-		site,
-		tree_number
-	;
+
+-- public.data_error_trees_with_no_planting_method source
+
+CREATE OR REPLACE VIEW public.data_error_trees_with_no_planting_method
+AS SELECT s.name AS site,
+    t.tag_id
+   FROM tree t
+     JOIN site s ON t.site_id = s.id
+  WHERE t.planting_method_id IS NULL AND s.name !~~ 'Wild%'::text
+  ORDER BY s.name, t.tag_id;
 
 COMMENT ON VIEW public.data_error_trees_with_no_planting_method IS 'Trees with no planting method';
 

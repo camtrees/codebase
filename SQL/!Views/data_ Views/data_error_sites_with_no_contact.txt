@@ -8,6 +8,22 @@
 --			site
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_error_sites_with_no_contact;
+
+-- public.data_error_sites_with_no_contact source
+
+CREATE OR REPLACE VIEW public.data_error_sites_with_no_contact
+AS SELECT name AS site,
+    volunteer_id AS contact
+   FROM site
+  WHERE volunteer_id IS NULL
+  ORDER BY name;
+
+COMMENT ON VIEW public.data_error_sites_with_no_contact IS 'Sites with no contact person';
+
+-- Permissions
+
+ALTER TABLE public.data_error_sites_with_no_contact OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_error_sites_with_no_contact TO neondb_owner;
 CREATE OR REPLACE VIEW data_error_sites_with_no_contact AS
 	SELECT
 		name           AS site,

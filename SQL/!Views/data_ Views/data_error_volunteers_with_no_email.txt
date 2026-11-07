@@ -8,16 +8,20 @@
 --			volunteer
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_error_volunteers_with_no_email;
-CREATE OR REPLACE VIEW data_error_volunteers_with_no_email AS
-	SELECT
-		first_name,
-		last_name,
-		email
-	FROM
-		volunteer
-	WHERE
-		email LIKE '%UNKNOWN%'
-	ORDER BY
-		first_name,
-		last_name
-	;
+
+-- public.data_error_volunteers_with_no_email source
+
+CREATE OR REPLACE VIEW public.data_error_volunteers_with_no_email
+AS SELECT first_name,
+    last_name,
+    email
+   FROM volunteer
+  WHERE email ~~ '%UNKNOWN%'::text
+  ORDER BY first_name, last_name;
+
+COMMENT ON VIEW public.data_error_volunteers_with_no_email IS 'Volunteers with temporary (non-valid) email addresses';
+
+-- Permissions
+
+ALTER TABLE public.data_error_volunteers_with_no_email OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_error_volunteers_with_no_email TO neondb_owner;

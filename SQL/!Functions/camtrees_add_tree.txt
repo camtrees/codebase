@@ -98,7 +98,7 @@ CREATE OR REPLACE FUNCTION public.camtrees_add_tree(
 		INSERT INTO tree (
 			epicollect_record_type_id,
 			site_id,
-			number,
+			tag_id,
 			date,
 			volunteer_id,
 			longitude,

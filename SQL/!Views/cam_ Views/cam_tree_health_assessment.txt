@@ -21,7 +21,7 @@ AS SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
     v.email AS volunteer_email,
     e.record_type,
     s.name AS site,
-    t.number AS tree_number,
+    t.tag_id,
     h.date,
     tht.health,
     h.height_in_inches,
@@ -41,7 +41,7 @@ AS SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
      LEFT JOIN volunteer v ON h.volunteer_id = v.id
      LEFT JOIN tree_health_type tht ON h.health_id = tht.id
      LEFT JOIN tree_health_nuts_type n ON h.nuts_id = n.id
-  ORDER BY s.name, t.number, h.date;
+  ORDER BY s.name, t.tag_id, h.date;
 
 COMMENT ON VIEW public.cam_tree_health_assessment IS 'Tree size and health measurements';
 

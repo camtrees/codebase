@@ -8,14 +8,19 @@
 --			hub
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_error_hubs_with_no_captain;
-CREATE OR REPLACE VIEW data_error_hubs_with_no_captain AS
-	SELECT
-		name        AS "hub",
-		captain_id  AS "captain"
-	FROM
-		hub
-	WHERE
-		captain_id IS NULL
-	ORDER BY
-		name
-	;
+
+-- public.data_error_hubs_with_no_captain source
+
+CREATE OR REPLACE VIEW public.data_error_hubs_with_no_captain
+AS SELECT name AS hub,
+    captain_id AS captain
+   FROM hub
+  WHERE captain_id IS NULL
+  ORDER BY name;
+
+COMMENT ON VIEW public.data_error_hubs_with_no_captain IS 'Hubs with no captain (If any)';
+
+-- Permissions
+
+ALTER TABLE public.data_error_hubs_with_no_captain OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_error_hubs_with_no_captain TO neondb_owner;

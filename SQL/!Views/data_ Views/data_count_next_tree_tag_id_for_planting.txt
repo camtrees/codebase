@@ -1,0 +1,32 @@
+------------------------------------------------------------------------------------------
+-- View: data_count_next_tree_tag_id_for_planting
+--
+-- Purpose: Show the NEXT CamOrg tree tag_id to be used when planting new trees
+--
+-- Create Order:
+--		MUST BE AFTER
+--			organization
+--			site
+--			tree
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS data_count_next_tree_tag_id_for_planting;
+
+-- public.data_count_next_tree_tag_id_for_planting source
+
+CREATE OR REPLACE VIEW public.data_count_next_tree_tag_id_for_planting
+AS SELECT COALESCE(max(t.tag_id::integer) + 1, 1) AS "NEXT Tree Tag_ID",
+    o.code AS "CAM Org",
+    o.name AS "CAM Org Name"
+   FROM organization o
+     LEFT JOIN site s ON o.id = s.organization_id
+     LEFT JOIN tree t ON s.id = t.site_id AND t.tag_id ~ '^[0-9]+$'::text
+  WHERE lower(s.name) <> 'wild tree unknown to tacf'::text AND lower(s.name) <> 'wild tree known to tacf'::text
+  GROUP BY o.code, o.name
+  ORDER BY o.code;
+
+COMMENT ON VIEW public.data_count_next_tree_tag_id_for_planting IS 'Show the NEXT CamOrg tree tag_id to be used when planting new trees';
+
+-- Permissions
+
+ALTER TABLE public.data_count_next_tree_tag_id_for_planting OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_count_next_tree_tag_id_for_planting TO neondb_owner;

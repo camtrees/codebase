@@ -8,35 +8,22 @@
 --			cam_trees
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_count_trees_by_primary_caretaker;
-CREATE OR REPLACE VIEW data_count_trees_by_primary_caretaker AS
-SELECT 
-    COALESCE(
-        NULLIF(TRIM(BOTH FROM CONCAT(v.first_name, ' ', v.last_name)), ''),
-        NULLIF(TRIM(BOTH FROM CONCAT(v_site_primary.first_name, ' ', v_site_primary.last_name)), ''),
-        'No Caretaker Assigned'
-    ) AS "Primary Caretaker",
-    COUNT(*) AS "# Trees"
-FROM
-	tree t
-LEFT JOIN
-	volunteer v
-	ON t.primary_caretaker_id = v.id
-LEFT JOIN
-	site s
-	ON t.site_id = s.id
-LEFT JOIN
-	volunteer v_site_primary
-	ON s.primary_caretaker_id = v_site_primary.id
-GROUP BY
-	COALESCE(
-		NULLIF(TRIM(BOTH FROM CONCAT(v.first_name, ' ', v.last_name)), ''),
-		NULLIF(TRIM(BOTH FROM CONCAT(v_site_primary.first_name, ' ', v_site_primary.last_name)), ''),
-		'No Caretaker Assigned'
-		)
-ORDER BY
-	COALESCE(
-		NULLIF(TRIM(BOTH FROM CONCAT(v.first_name, ' ', v.last_name)), ''),
-		NULLIF(TRIM(BOTH FROM CONCAT(v_site_primary.first_name, ' ', v_site_primary.last_name)), ''),
-		'No Caretaker Assigned'
-	)
-;
+
+-- public.data_count_trees_by_primary_caretaker source
+
+CREATE OR REPLACE VIEW public.data_count_trees_by_primary_caretaker
+AS SELECT COALESCE(NULLIF(TRIM(BOTH FROM concat(v.first_name, ' ', v.last_name)), ''::text), NULLIF(TRIM(BOTH FROM concat(v_site_primary.first_name, ' ', v_site_primary.last_name)), ''::text), 'No Caretaker Assigned'::text) AS "Primary Caretaker",
+    count(*) AS "# Trees"
+   FROM tree t
+     LEFT JOIN volunteer v ON t.primary_caretaker_id = v.id
+     LEFT JOIN site s ON t.site_id = s.id
+     LEFT JOIN volunteer v_site_primary ON s.primary_caretaker_id = v_site_primary.id
+  GROUP BY (COALESCE(NULLIF(TRIM(BOTH FROM concat(v.first_name, ' ', v.last_name)), ''::text), NULLIF(TRIM(BOTH FROM concat(v_site_primary.first_name, ' ', v_site_primary.last_name)), ''::text), 'No Caretaker Assigned'::text))
+  ORDER BY (COALESCE(NULLIF(TRIM(BOTH FROM concat(v.first_name, ' ', v.last_name)), ''::text), NULLIF(TRIM(BOTH FROM concat(v_site_primary.first_name, ' ', v_site_primary.last_name)), ''::text), 'No Caretaker Assigned'::text));
+
+COMMENT ON VIEW public.data_count_trees_by_primary_caretaker IS 'Frequency count of how many trees each primary caretaker is responsible for';
+
+-- Permissions
+
+ALTER TABLE public.data_count_trees_by_primary_caretaker OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_count_trees_by_primary_caretaker TO neondb_owner;

@@ -20,14 +20,14 @@
 
 CREATE OR REPLACE VIEW public.public_cam_tree_photos
 AS SELECT s.name AS "Site",
-    t.number AS "Tree ID",
+    t.tag_id AS "Tag ID",
     tp.date AS "Date",
     tp.tag_photo AS "Tag Photo",
     'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name='::text || tp.filename AS "Photo URL"
    FROM tree_photo tp
      LEFT JOIN tree t ON tp.tree_id = t.id
      LEFT JOIN site s ON t.site_id = s.id
-  ORDER BY s.name, t.number, tp.date;
+  ORDER BY s.name, t.tag_id, tp.date;
 
 COMMENT ON VIEW public.public_cam_tree_photos IS 'Public view of the tree_photos table.';
 

@@ -22,7 +22,7 @@ CREATE OR REPLACE VIEW public.cam_tree_photos
 AS SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
     e.record_type,
     s.name AS site,
-    t.number AS tree_number,
+    t.tag_id,
     tp.date,
     tp.tag_photo,
     'https://five.epicollect.net/api/internal/media/cam-tree-maintenance?type=photo&format=entry_original&name='::text || tp.filename AS photo,
@@ -37,7 +37,7 @@ AS SELECT (v.first_name || ' '::text) || v.last_name AS volunteer,
      LEFT JOIN tree t ON tp.tree_id = t.id
      LEFT JOIN site s ON t.site_id = s.id
      LEFT JOIN volunteer v ON tp.volunteer_id = v.id
-  ORDER BY s.name, t.number, tp.date;
+  ORDER BY s.name, t.tag_id, tp.date;
 
 COMMENT ON VIEW public.cam_tree_photos IS 'Photos of the trees. The actual photos are stored in EpiCollect. We compute the URL necessary to view the tree. NOTE: You MUST BE LOGGED INTO EpiCOllect to view the photos.';
 

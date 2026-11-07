@@ -8,14 +8,18 @@
 --			tree_parent_type
 ------------------------------------------------------------------------------------------
 --DROP VIEW IF EXISTS data_export_epicollect_volunteer_email;
-CREATE OR REPLACE VIEW data_export_epicollect_volunteer_email AS
-	SELECT 
-		email AS "EpiCollect Collectors"
-	FROM
-		volunteer
-	WHERE
-		email != 'kimcolson.sebago@gmail.com'
-		AND email != 'ken.rosenberry@gmail.com'
-	ORDER BY
-		email ASC	
-	;
+
+-- public.data_export_epicollect_volunteer_email source
+
+CREATE OR REPLACE VIEW public.data_export_epicollect_volunteer_email
+AS SELECT email AS "EpiCollect Collectors"
+   FROM volunteer
+  WHERE email <> 'kimcolson.sebago@gmail.com'::text AND email <> 'ken.rosenberry@gmail.com'::text
+  ORDER BY email;
+
+COMMENT ON VIEW public.data_export_epicollect_volunteer_email IS 'Export volunteer_email as CSV file to load into EpiCollect CAM Tree Maintenance form';
+
+-- Permissions
+
+ALTER TABLE public.data_export_epicollect_volunteer_email OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.data_export_epicollect_volunteer_email TO neondb_owner;
