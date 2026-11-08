@@ -22,6 +22,8 @@ AS SELECT COALESCE(care_action, 'Column Total'::text) AS "Care Action",
   GROUP BY ROLLUP(care_action)
   ORDER BY care_action;
 
+COMMENT ON VIEW public.data_crosstab_care_action_by_record_type IS 'Crosstab of Tree Care Action BY EpiCollect Record Type';
+
 -- Permissions
 
 ALTER TABLE public.data_crosstab_care_action_by_record_type OWNER TO neondb_owner;
