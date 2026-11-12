@@ -1,0 +1,80 @@
+------------------------------------------------------------------------------------------
+-- Function: camtrees_add_tree_tag
+--
+-- Purpose: Add a new tree tag
+--
+-- Returns: the id number of the tag added
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_add_tree_tag(text, date, text, text, text, text, text, text);
+
+CREATE OR REPLACE FUNCTION public.camtrees_add_tree_tag(
+	p_tag_id                  text,
+	p_date                    date,
+	p_volunteer_email         text,
+	p_mother_tree             text,
+	p_mother_tree_other       text,
+	p_father_tree             text,
+	p_father_tree_other       text,
+	p_parent_tree_note        text
+	)
+	RETURNS  integer
+	LANGUAGE plpgsql
+	AS       $function$
+
+	DECLARE
+		v_volunteer_id              INTEGER;
+		v_mother_tree_id            INTEGER;
+		v_father_tree_id            INTEGER;
+		v_id                        INTEGER;
+
+	BEGIN
+		-- Get the volunteer_id
+		SELECT id INTO v_volunteer_id FROM volunteer WHERE email = lower(p_volunteer_email);
+
+		-- Replace 'NULL' string values with NULL for various input parameters
+		p_mother_tree       := NULLIF(p_mother_tree       , 'NULL');
+		p_mother_tree_other := NULLIF(p_mother_tree_other , 'NULL');
+		p_father_tree       := NULLIF(p_father_tree       , 'NULL');
+		p_father_tree_other := NULLIF(p_father_tree_other , 'NULL');
+		p_parent_tree_note  := NULLIF(p_parent_tree_note  , 'NULL');
+		
+		-- Get the mother_tree_id
+		IF p_mother_tree IS NOT NULL THEN
+			SELECT id INTO v_mother_tree_id FROM tree_parent_type WHERE parent = p_mother_tree;
+		END IF;
+
+		-- Get the father_tree_id
+		IF p_father_tree IS NOT NULL THEN
+			SELECT id INTO v_father_tree_id FROM tree_parent_type WHERE parent = p_father_tree;
+		END IF;
+
+		-- Insert the new tree
+		INSERT INTO tree (
+			tag_id,
+			date,
+			volunteer_id,
+			mother_tree_id,
+			mother_tree_other,
+			father_tree_id,
+			father_tree_other,
+			parent_tree_note
+		) VALUES (
+			p_tag_id,
+			p_date,
+			v_volunteer_id,
+			v_mother_tree_id,
+			p_mother_tree_other,
+			v_father_tree_id,
+			p_father_tree_other,
+			p_parent_tree_note
+		) RETURNING id INTO v_id;
+		
+		RETURN v_id;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_add_tree_tag(text, date, text, text, text, text, text, text) OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_add_tree_tag(text, date, text, text, text, text, text, text) TO neondb_owner;

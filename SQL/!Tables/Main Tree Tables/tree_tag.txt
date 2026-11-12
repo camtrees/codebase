@@ -1,0 +1,75 @@
+------------------------------------------------------------------------------------------
+-- Table: tree_tag
+--
+-- Purpose: Tree TAGs created by Tree Managers
+--
+-- Create Order:
+--		MUST BE BEFORE
+--		MUST BE AFTER
+--			***epicollect_record_type
+--			***tree_parent_type
+--			volunteer
+------------------------------------------------------------------------------------------
+-- public.tree_tag definition
+
+-- Drop table
+
+-- DROP TABLE public.tree_tag;
+
+CREATE TABLE public.tree_tag (
+	id int4 GENERATED ALWAYS AS IDENTITY( INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1 NO CYCLE) NOT NULL, -- The PostGreSQL unique primary key (generated when the record is created)
+	tag_id text NOT NULL, -- The tree's tag id. Old style is a three digit number with leading zeroes. New style as of 2027 is three letters, followed by a hyphen, followed by a four digit number with leading zeroes
+	"date" date NOT NULL, -- The date the TAG was created by the Tree Manager
+	volunteer_id int4 NOT NULL, -- The volunteer who created the TAG
+	mother_tree_id int4 NULL, -- Mother tree
+	mother_tree_other text NULL, -- Mother tree recorded during TAG creation when the mother tree is not in the current tree_parent_type list
+	father_tree_id int4 NULL, -- Father tree
+	father_tree_other text NULL, -- Father tree recorded during TAG creation when the father tree is not in the current tree_parent_type list
+	parent_tree_note text NULL, -- Additional Mother/Father tree info provided when the TAG was created
+	date_created date NOT NULL, -- The date the record was created
+	date_updated date NOT NULL, -- The date the record was most recently updated
+	CONSTRAINT tree_tag_date_created_not_null NOT NULL date_created,
+	CONSTRAINT tree_tag_date_not_null NOT NULL date,
+	CONSTRAINT tree_tag_date_updated_not_null NOT NULL date_updated,
+	CONSTRAINT tree_tag_id_not_null1 NOT NULL id,
+	CONSTRAINT tree_tag_pkey PRIMARY KEY (id),
+	CONSTRAINT tree_tag_tag_id_not_null NOT NULL tag_id,
+	CONSTRAINT tree_tag_volunteer_id_not_null NOT NULL volunteer_id
+);
+CREATE UNIQUE INDEX tree_tag_tag_id_unique ON public.tree_tag USING btree (tag_id);
+COMMENT ON TABLE public.tree_tag IS 'Tree TAGs created by Tree Managers';
+
+-- Column comments
+
+COMMENT ON COLUMN public.tree_tag.id IS 'The PostGreSQL unique primary key (generated when the record is created)';
+COMMENT ON COLUMN public.tree_tag.tag_id IS 'The tree''s tag id. Old style is a three digit number with leading zeroes. New style as of 2027 is three letters, followed by a hyphen, followed by a four digit number with leading zeroes';
+COMMENT ON COLUMN public.tree_tag."date" IS 'The date the TAG was created by the Tree Manager';
+COMMENT ON COLUMN public.tree_tag.volunteer_id IS 'The volunteer who created the TAG';
+COMMENT ON COLUMN public.tree_tag.mother_tree_id IS 'Mother tree';
+COMMENT ON COLUMN public.tree_tag.mother_tree_other IS 'Mother tree recorded during TAG creation when the mother tree is not in the current tree_parent_type list';
+COMMENT ON COLUMN public.tree_tag.father_tree_id IS 'Father tree';
+COMMENT ON COLUMN public.tree_tag.father_tree_other IS 'Father tree recorded during TAG creation when the father tree is not in the current tree_parent_type list';
+COMMENT ON COLUMN public.tree_tag.parent_tree_note IS 'Additional Mother/Father tree info provided when the TAG was created';
+COMMENT ON COLUMN public.tree_tag.date_created IS 'The date the record was created';
+COMMENT ON COLUMN public.tree_tag.date_updated IS 'The date the record was most recently updated';
+
+-- Table Triggers
+
+create trigger camtrees_manage_dates before
+insert
+    or
+update
+    on
+    public.tree_tag for each row execute function camtrees_manage_dates();
+
+-- Permissions
+
+ALTER TABLE public.tree_tag OWNER TO neondb_owner;
+GRANT ALL ON TABLE public.tree_tag TO neondb_owner;
+
+
+-- public.tree_tag foreign keys
+
+ALTER TABLE public.tree_tag ADD CONSTRAINT tree_tag_father_tree_id_fkey FOREIGN KEY (father_tree_id) REFERENCES public.tree_parent_type(id);
+ALTER TABLE public.tree_tag ADD CONSTRAINT tree_tag_mother_tree_id_fkey FOREIGN KEY (mother_tree_id) REFERENCES public.tree_parent_type(id);
+ALTER TABLE public.tree_tag ADD CONSTRAINT tree_tag_volunteer_id_fkey FOREIGN KEY (volunteer_id) REFERENCES public.volunteer(id);
