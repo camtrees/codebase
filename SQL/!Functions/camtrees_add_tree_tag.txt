@@ -48,8 +48,8 @@ CREATE OR REPLACE FUNCTION public.camtrees_add_tree_tag(
 			SELECT id INTO v_father_tree_id FROM tree_parent_type WHERE parent = p_father_tree;
 		END IF;
 
-		-- Insert the new tree
-		INSERT INTO tree (
+		-- Insert the new tree_tag
+		INSERT INTO tree_tag (
 			tag_id,
 			date,
 			volunteer_id,
