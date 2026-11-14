@@ -1,0 +1,30 @@
+------------------------------------------------------------------------------------------
+-- View: public_cam_tree_tags
+--
+-- Purpose: All the trees
+--
+-- Create Order :
+--		MUST BE AFTER
+--			***tree_parent_type
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS public_cam_tree_tags;
+
+-- public.public_cam_tree_tags source
+
+CREATE OR REPLACE VIEW public.public_cam_tree_tags
+AS SELECT t.tag_id,
+    (v.first_name || ' '::text) || v.last_name AS created_by,
+    t.date AS "date_tag_created",
+    p1.parent AS mother_tree,
+    t.mother_tree_other,
+    p2.parent AS father_tree,
+    t.father_tree_other,
+    t.parent_tree_note
+   FROM tree_tag t
+     LEFT JOIN tree_parent_type p1 ON t.mother_tree_id = p1.id
+     LEFT JOIN tree_parent_type p2 ON t.father_tree_id = p2.id
+     LEFT JOIN volunteer v ON t.volunteer_id = v.id
+  ORDER BY t.tag_id;
+
+COMMENT ON VIEW public.cam_tree_tags IS 'Public view of the Tree TAGs table';

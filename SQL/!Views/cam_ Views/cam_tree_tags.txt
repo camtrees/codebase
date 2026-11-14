@@ -1,0 +1,33 @@
+------------------------------------------------------------------------------------------
+-- View: cam_tree_tags
+--
+-- Purpose: All the trees
+--
+-- Create Order :
+--		MUST BE AFTER
+--			***tree_parent_type
+--			volunteer
+------------------------------------------------------------------------------------------
+--DROP VIEW IF EXISTS cam_tree_tags;
+
+-- public.cam_tree_tags source
+
+CREATE OR REPLACE VIEW public.cam_tree_tags
+AS SELECT t.tag_id,
+    (v1.first_name || ' '::text) || v1.last_name AS created_by,
+    t.date AS "date_tag_created",
+    v1.email AS created_by_email,
+    p1.parent AS mother_tree,
+    t.mother_tree_other,
+    p2.parent AS father_tree,
+    t.father_tree_other,
+    t.parent_tree_note,
+    t.date_created,
+    t.date_updated
+   FROM tree_tag t
+     LEFT JOIN tree_parent_type p1 ON t.mother_tree_id = p1.id
+     LEFT JOIN tree_parent_type p2 ON t.father_tree_id = p2.id
+     LEFT JOIN volunteer v1 ON t.volunteer_id = v1.id
+  ORDER BY t.tag_id;
+
+COMMENT ON VIEW public.cam_tree_tags IS 'New 2027 Tree TAGs';
