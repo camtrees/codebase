@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------------------
 -- Function: camtrees_tree_tag_exists
 --
--- Purpose: Determine if a tree already exists in the 'tree' table
+-- Purpose: Determine if a tree TAG already exists in the 'tree_tag' table
 --
 -- Paramters: p_site_name   - the name of the site
 --            p_tree_number - the tree number
