@@ -1,0 +1,39 @@
+------------------------------------------------------------------------------------------
+-- Function: camtrees_tree_tag_exists
+--
+-- Purpose: Determine if a tree already exists in the 'tree' table
+--
+-- Paramters: p_site_name   - the name of the site
+--            p_tree_number - the tree number
+--
+-- Returns: true  - tree does exist
+--          false - tree does not exist
+------------------------------------------------------------------------------------------
+-- DROP FUNCTION public.camtrees_tree_tag_exists(text);
+
+CREATE OR REPLACE FUNCTION public.camtrees_tree_tag_exists(
+	p_tag_id text
+	)
+	RETURNS  boolean
+	LANGUAGE plpgsql
+	AS       $function$
+
+	DECLARE
+		v_tree_tag_count INTEGER;
+	
+	BEGIN
+		-- Get count of trees with the v_site_id and p_tree_number
+		SELECT COUNT(*)
+		INTO v_tree_tag_count
+		FROM tree_tag
+		WHERE tag_id = p_tag_id;
+		
+		RETURN v_tree_tag_count > 0;
+	END;
+	$function$
+;
+
+-- Permissions
+
+ALTER FUNCTION public.camtrees_tree_tag_exists(text) OWNER TO neondb_owner;
+GRANT ALL ON FUNCTION public.camtrees_tree_tag_exists(text) TO neondb_owner;
