@@ -6,12 +6,12 @@
 -- SAMPLE calles to the function...
 --
 -- An EpiCollect 'all'  event Record_Type
---                      Note: For an 'all' record_type, the tree_number_min should be '000' and the tree_number_max should be '999'
---                      SELECT camtrees_add_care_action('all'  , 'water' , '000' , '999' , '2026-05-08' , 'ken.rosenberry@gmail.com'  , 'PVT KLC House' , 'Some note here' );
+--                      Note: For an 'all' record_type, the tree_number_min should be '000' and the tree_number_max should be 'ZZZ-9999'
+--                      SELECT camtrees_add_care_action('all'  , 'water' , '000' , 'ZZZ-9999' , '2026-05-08' , 'ken.rosenberry@gmail.com'  , 'PVT KLC House' , 'Some note here' );
 --
 -- An EpiCollect 'rain' event Record_Type for MULTIPLE SITES
---                      Note: For a 'rain' record_type, the tree_number_min should be '000', the tree_number_max should be '999', and the care_action should be 'water'
---                      SELECT camtrees_add_care_action('all'  , 'water' , '000' , '999' , '2026-05-08' , 'ken.rosenberry@gmail.com'  , 'SLSP Boat Ramp, SLSP New Gate' , 'Some note here' );
+--                      Note: For a 'rain' record_type, the tree_number_min should be '000', the tree_number_max should be 'ZZZ-9999', and the care_action should be 'water'
+--                      SELECT camtrees_add_care_action('all'  , 'water' , '000' , 'ZZZ-9999' , '2026-05-08' , 'ken.rosenberry@gmail.com'  , 'SLSP Boat Ramp, SLSP New Gate' , 'Some note here' );
 --
 -- An EpiCollect 'one'  event Record_Type
 --                      Note: For a 'one' record_type, the tree_number_min and the tree_number_max should be the same value!
