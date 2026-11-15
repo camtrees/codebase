@@ -25,15 +25,15 @@
 
 -- public.cam_trees source
 
-CREATE OR REPLACE VIEW public.cam_trees
-AS SELECT t.geog AS gis_map_view,
+CREATE VIEW public.cam_trees AS
+ SELECT t.geog AS gis_map_view,
     s.name AS site,
     t.tag_id,
-    (o.code || ' '::text) || t.tag_id AS cam_org_tag_id,
+    ((o.code || ' '::text) || t.tag_id) AS cam_org_tag_id,
     h.name AS hub,
     e.record_type,
     t.date AS "date_planted_or_observed(wild)",
-    (v1.first_name || ' '::text) || v1.last_name AS planted_by,
+    ((v1.first_name || ' '::text) || v1.last_name) AS planted_by,
     v1.email AS planted_by_email,
     COALESCE(NULLIF(TRIM(BOTH FROM concat(v2.first_name, ' ', v2.last_name)), ''::text), NULLIF(TRIM(BOTH FROM concat(v_site_primary.first_name, ' ', v_site_primary.last_name)), ''::text)) AS primary_caretaker,
     COALESCE(v2.email, v_site_primary.email) AS primary_caretaker_email,
@@ -44,16 +44,16 @@ AS SELECT t.geog AS gis_map_view,
     ctlhe.latest_height_in_inches,
     ctlhe.latest_height_date,
     ctlw.latest_water_date,
-    CURRENT_DATE - ctlw.latest_water_date AS days_since_watered,
+    (CURRENT_DATE - ctlw.latest_water_date) AS days_since_watered,
     ctlf.latest_fertilize_date,
-    CURRENT_DATE - ctlf.latest_fertilize_date AS days_since_fertilized,
+    (CURRENT_DATE - ctlf.latest_fertilize_date) AS days_since_fertilized,
     ctln.latest_nuts,
     ctln.latest_nuts_date,
     t.longitude,
     t.latitude,
     t.gps_locked,
     t.elevation_in_feet,
-    (('https://maps.google.com/?q='::text || t.latitude) || ','::text) || t.longitude AS google_map_view,
+    ((('https://maps.google.com/?q='::text || t.latitude) || ','::text) || t.longitude) AS google_map_view,
     tapt.access_path,
     talt.access_level,
     tamt.access_method,
@@ -63,38 +63,48 @@ AS SELECT t.geog AS gis_map_view,
     t.wire_fence,
     t.tag_info,
     t.classification,
-    p1.parent AS mother_tree,
-    t.mother_tree_other,
-    p2.parent AS father_tree,
-    t.father_tree_other,
-    t.parent_tree_note,
+    -- mother_tree: resolve via tree_tag fallback if tree.mother_tree_id is null
+    COALESCE(p1.parent, p1_tag.parent) AS mother_tree,
+    -- mother_tree_other: fall back to tree_tag if null on tree
+    COALESCE(t.mother_tree_other, tt.mother_tree_other) AS mother_tree_other,
+    -- father_tree: resolve via tree_tag fallback if tree.father_tree_id is null
+    COALESCE(p2.parent, p2_tag.parent) AS father_tree,
+    -- father_tree_other: fall back to tree_tag if null on tree
+    COALESCE(t.father_tree_other, tt.father_tree_other) AS father_tree_other,
+    -- parent_tree_note: fall back to tree_tag if null on tree
+    COALESCE(t.parent_tree_note, tt.parent_tree_note) AS parent_tree_note,
     t.note,
     t.date_created,
     t.date_updated,
     t.id AS tree_id
-   FROM tree t
-     LEFT JOIN tree_parent_type p1 ON t.mother_tree_id = p1.id
-     LEFT JOIN tree_parent_type p2 ON t.father_tree_id = p2.id
-     LEFT JOIN epicollect_record_type e ON t.epicollect_record_type_id = e.id
-     LEFT JOIN site s ON t.site_id = s.id
-     LEFT JOIN site_hub sh ON s.id = sh.site_id
-     LEFT JOIN hub h ON sh.hub_id = h.id
-     LEFT JOIN organization o ON s.organization_id = o.id
-     LEFT JOIN volunteer v1 ON t.volunteer_id = v1.id
-     LEFT JOIN volunteer v2 ON t.primary_caretaker_id = v2.id
-     LEFT JOIN volunteer v3 ON t.secondary_caretaker_id = v3.id
-     LEFT JOIN volunteer v_site_primary ON s.primary_caretaker_id = v_site_primary.id
-     LEFT JOIN volunteer v_site_secondary ON s.secondary_caretaker_id = v_site_secondary.id
-     LEFT JOIN tree_access_path_type tapt ON t.access_path_id = tapt.id
-     LEFT JOIN tree_access_level_type talt ON t.access_level_id = talt.id
-     LEFT JOIN tree_access_method_type tamt ON t.access_method_id = tamt.id
-     LEFT JOIN tree_form_type tft ON t.form_id = tft.id
-     LEFT JOIN tree_planting_method_type tpmt ON t.planting_method_id = tpmt.id
-     LEFT JOIN cam_tree_latest_health ctlh ON s.name = ctlh.site AND t.tag_id = ctlh.tag_id
-     LEFT JOIN cam_tree_latest_height ctlhe ON s.name = ctlhe.site AND t.tag_id = ctlhe.tag_id
-     LEFT JOIN cam_tree_latest_water ctlw ON s.name = ctlw.site AND t.tag_id = ctlw.tag_id
-     LEFT JOIN cam_tree_latest_fertilize ctlf ON s.name = ctlf.site AND t.tag_id = ctlf.tag_id
-     LEFT JOIN cam_tree_latest_nuts ctln ON s.name = ctln.site AND t.tag_id = ctln.tag_id
+   FROM public.tree t
+     LEFT JOIN public.tree_parent_type p1       ON (t.mother_tree_id = p1.id)
+     LEFT JOIN public.tree_parent_type p2       ON (t.father_tree_id = p2.id)
+     LEFT JOIN public.epicollect_record_type e  ON (t.epicollect_record_type_id = e.id)
+     LEFT JOIN public.site s                    ON (t.site_id = s.id)
+     LEFT JOIN public.site_hub sh               ON (s.id = sh.site_id)
+     LEFT JOIN public.hub h                     ON (sh.hub_id = h.id)
+     LEFT JOIN public.organization o            ON (s.organization_id = o.id)
+     LEFT JOIN public.volunteer v1              ON (t.volunteer_id = v1.id)
+     LEFT JOIN public.volunteer v2              ON (t.primary_caretaker_id = v2.id)
+     LEFT JOIN public.volunteer v3              ON (t.secondary_caretaker_id = v3.id)
+     LEFT JOIN public.volunteer v_site_primary  ON (s.primary_caretaker_id = v_site_primary.id)
+     LEFT JOIN public.volunteer v_site_secondary ON (s.secondary_caretaker_id = v_site_secondary.id)
+     LEFT JOIN public.tree_access_path_type tapt   ON (t.access_path_id = tapt.id)
+     LEFT JOIN public.tree_access_level_type talt  ON (t.access_level_id = talt.id)
+     LEFT JOIN public.tree_access_method_type tamt ON (t.access_method_id = tamt.id)
+     LEFT JOIN public.tree_form_type tft            ON (t.form_id = tft.id)
+     LEFT JOIN public.tree_planting_method_type tpmt ON (t.planting_method_id = tpmt.id)
+     -- Join tree_tag on matching tag_id to provide fallback values
+     LEFT JOIN public.tree_tag tt               ON (t.tag_id = tt.tag_id)
+     -- Resolve tree_tag mother/father parent names for fallback
+     LEFT JOIN public.tree_parent_type p1_tag   ON (tt.mother_tree_id = p1_tag.id)
+     LEFT JOIN public.tree_parent_type p2_tag   ON (tt.father_tree_id = p2_tag.id)
+     LEFT JOIN public.cam_tree_latest_health ctlh    ON (s.name = ctlh.site AND t.tag_id = ctlh.tag_id)
+     LEFT JOIN public.cam_tree_latest_height ctlhe   ON (s.name = ctlhe.site AND t.tag_id = ctlhe.tag_id)
+     LEFT JOIN public.cam_tree_latest_water ctlw     ON (s.name = ctlw.site AND t.tag_id = ctlw.tag_id)
+     LEFT JOIN public.cam_tree_latest_fertilize ctlf ON (s.name = ctlf.site AND t.tag_id = ctlf.tag_id)
+     LEFT JOIN public.cam_tree_latest_nuts ctln      ON (s.name = ctln.site AND t.tag_id = ctln.tag_id)
   ORDER BY s.name, t.tag_id;
 
 COMMENT ON VIEW public.cam_trees IS 'CAM planted trees under observation';
